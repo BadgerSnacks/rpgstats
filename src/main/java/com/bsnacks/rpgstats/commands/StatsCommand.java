@@ -4,12 +4,14 @@ import com.bsnacks.rpgstats.RpgStatsPlugin;
 import com.bsnacks.rpgstats.components.RpgStats;
 import com.bsnacks.rpgstats.config.RpgStatsConfig;
 import com.bsnacks.rpgstats.commands.StatsAddCommand;
+import com.bsnacks.rpgstats.commands.StatsReloadCommand;
 import com.bsnacks.rpgstats.commands.StatsResetCommand;
 import com.bsnacks.rpgstats.commands.StatsSetCommand;
 
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.protocol.GameMode;
 import com.hypixel.hytale.server.core.Message;
+import com.hypixel.hytale.server.core.command.system.CommandUtil;
 import com.hypixel.hytale.server.core.command.system.CommandContext;
 import com.hypixel.hytale.server.core.command.system.basecommands.CommandBase;
 import com.hypixel.hytale.server.core.entity.entities.Player;
@@ -31,10 +33,12 @@ public final class StatsCommand extends CommandBase {
         addSubCommand(new StatsAddCommand(plugin, rpgStatsType, config));
         addSubCommand(new StatsSetCommand(plugin, rpgStatsType, config));
         addSubCommand(new StatsResetCommand(plugin, rpgStatsType, config));
+        addSubCommand(new StatsReloadCommand(plugin));
     }
 
     @Override
     protected void executeSync(CommandContext ctx) {
+        CommandUtil.requirePermission(ctx.sender(), plugin.getBasePermission() + ".stats.view");
         if (!ctx.isPlayer()) {
             ctx.sendMessage(Message.raw("This command can only be used by a player."));
             return;

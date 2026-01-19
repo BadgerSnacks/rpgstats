@@ -48,6 +48,7 @@ public final class StatsSetCommand extends CommandBase {
 
     @Override
     protected void executeSync(CommandContext ctx) {
+        CommandUtil.requirePermission(ctx.sender(), plugin.getBasePermission() + ".stats.set");
         String attributeRaw = attributeArg.get(ctx);
         String targetRaw = targetArg.get(ctx);
         String valueRaw = valueArg.get(ctx);

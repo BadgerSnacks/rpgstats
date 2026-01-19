@@ -44,6 +44,7 @@ public final class StatsResetCommand extends CommandBase {
 
     @Override
     protected void executeSync(CommandContext ctx) {
+        CommandUtil.requirePermission(ctx.sender(), plugin.getBasePermission() + ".stats.reset");
         String targetRaw = targetArg.get(ctx);
         if (!"self".equalsIgnoreCase(targetRaw)) {
             CommandUtil.requirePermission(ctx.sender(), plugin.getBasePermission() + ".stats.reset.others");

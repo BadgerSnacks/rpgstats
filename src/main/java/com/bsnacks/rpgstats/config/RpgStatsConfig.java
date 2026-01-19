@@ -27,14 +27,14 @@ public final class RpgStatsConfig {
     private static final double DEFAULT_MANA_PER_POINT = 10.0;
     private static final double DEFAULT_STAMINA_PER_POINT = 1.0;
 
-    private final double xpMultiplier;
-    private final int maxLevel;
-    private final double damageMultiplierBase;
-    private final double miningSpeedBase;
-    private final double miningSpeedPerPoint;
-    private final double healthPerPoint;
-    private final double manaPerPoint;
-    private final double staminaPerPoint;
+    private double xpMultiplier;
+    private int maxLevel;
+    private double damageMultiplierBase;
+    private double miningSpeedBase;
+    private double miningSpeedPerPoint;
+    private double healthPerPoint;
+    private double manaPerPoint;
+    private double staminaPerPoint;
 
     private RpgStatsConfig(double xpMultiplier, int maxLevel, double damageMultiplierBase,
                            double miningSpeedBase, double miningSpeedPerPoint,
@@ -81,6 +81,24 @@ public final class RpgStatsConfig {
         return staminaPerPoint;
     }
 
+    public void applyFrom(RpgStatsConfig other) {
+        if (other == null) {
+            return;
+        }
+        this.xpMultiplier = other.xpMultiplier;
+        this.maxLevel = other.maxLevel;
+        this.damageMultiplierBase = other.damageMultiplierBase;
+        this.miningSpeedBase = other.miningSpeedBase;
+        this.miningSpeedPerPoint = other.miningSpeedPerPoint;
+        this.healthPerPoint = other.healthPerPoint;
+        this.manaPerPoint = other.manaPerPoint;
+        this.staminaPerPoint = other.staminaPerPoint;
+    }
+
+    public static Path resolveConfigPath(Path dataDirectory) {
+        return dataDirectory.resolve(FILE_NAME);
+    }
+
     public static RpgStatsConfig load(Path dataDirectory, HytaleLogger logger) {
         try {
             Files.createDirectories(dataDirectory);
@@ -88,7 +106,7 @@ public final class RpgStatsConfig {
             logger.at(Level.WARNING).log("[RPGStats] Failed to create data directory: " + ex.getMessage());
         }
 
-        Path configPath = dataDirectory.resolve(FILE_NAME);
+        Path configPath = resolveConfigPath(dataDirectory);
         if (!Files.exists(configPath)) {
             writeDefault(configPath, logger);
             return new RpgStatsConfig(
@@ -217,22 +235,25 @@ public final class RpgStatsConfig {
         String content = ""
                 + "# RPGStats configuration\n"
                 + "#\n"
-                + "# xp_multiplier controls how much XP a player gains from NPC kills.\n"
+                + "# xp_multiplier controls how much XP a player gains from NPC kills (default " + DEFAULT_XP_MULTIPLIER + ").\n"
                 + "# Example: 0.35 means XP = maxHealth * 0.35 (before boss multiplier and clamping, max xp gain is set to 1000).\n"
                 + "xp_multiplier = " + DEFAULT_XP_MULTIPLIER + "\n"
                 + "\n"
-                + "# Maximum player level.\n"
+                + "# Maximum player level (default " + DEFAULT_MAX_LEVEL + ").\n"
                 + "max_level = " + DEFAULT_MAX_LEVEL + "\n"
                 + "\n"
-                + "# Strength damage multiplier: damage *= (STR / damage_multiplier_base).\n"
-                + "# Each point spent into (STR) will add 0.10 to the multiplier.\n"
+                + "# Strength damage multiplier: damage *= (STR / damage_multiplier_base) (default " + DEFAULT_DAMAGE_MULTIPLIER_BASE + ").\n"
+                + "# Lower number = more damage. Each point spent into (STR) will add 0.10 to the multiplier.\n"
                 + "damage_multiplier_base = " + DEFAULT_DAMAGE_MULTIPLIER_BASE + "\n"
                 + "\n"
                 + "# Mining speed multiplier: mining_speed_base + mining_speed_per_point * (DEX - base).\n"
+                + "# Default base " + DEFAULT_MINING_SPEED_BASE + ", per point " + DEFAULT_MINING_SPEED_PER_POINT + ".\n"
                 + "mining_speed_base = " + DEFAULT_MINING_SPEED_BASE + "\n"
                 + "mining_speed_per_point = " + DEFAULT_MINING_SPEED_PER_POINT + "\n"
                 + "\n"
-                + "# Stat gains per point spent. (CON) = Health, (INT) = Mana, (END) = Stamina\n"
+                + "# Stat gains per point spent (defaults: health " + DEFAULT_HEALTH_PER_POINT
+                + ", mana " + DEFAULT_MANA_PER_POINT + ", stamina " + DEFAULT_STAMINA_PER_POINT + ").\n"
+                + "# (CON) = Health, (INT) = Mana, (END) = Stamina\n"
                 + "health_per_point = " + DEFAULT_HEALTH_PER_POINT + "\n"
                 + "mana_per_point = " + DEFAULT_MANA_PER_POINT + "\n"
                 + "stamina_per_point = " + DEFAULT_STAMINA_PER_POINT + "\n";

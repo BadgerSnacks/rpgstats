@@ -28,13 +28,19 @@ public final class PlayerListeners {
     public void onPlayerReady(PlayerReadyEvent event) {
         // The holder is the player entity storage container.
         var holder = event.getPlayer().toHolder();
-        RpgStats stats = holder.ensureAndGetComponent(rpgStatsType);
+        RpgStats stats = holder.getComponent(rpgStatsType);
+        boolean created = false;
+        if (stats == null) {
+            stats = holder.ensureAndGetComponent(rpgStatsType);
+            created = true;
+        }
         stats.migrateIfNeeded();
         EntityStatMap statMap = holder.ensureAndGetComponent(EntityStatMap.getComponentType());
         ConstitutionHealthEffect.apply(statMap, stats, config);
         IntellectManaEffect.apply(statMap, stats, config);
         EnduranceStaminaEffect.apply(statMap, stats, config);
 
-        plugin.logInfo("Loaded stats for player: " + event.getPlayer().getDisplayName() + " | Level=" + stats.getLevel() + " XP=" + stats.getXp());
+        plugin.logInfo((created ? "Created" : "Loaded") + " stats for player: "
+                + event.getPlayer().getDisplayName() + " | Level=" + stats.getLevel() + " XP=" + stats.getXp());
     }
 }

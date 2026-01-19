@@ -54,13 +54,20 @@ Admin-style commands:
 /stats set dex OtherPlayer 18
 /stats reset self
 /stats reset OtherPlayer
+/stats reload
 ```
 
-If you target other players, you need permission:
-- `your.plugin.base.stats.set.others`
-- `your.plugin.base.stats.reset.others`
+## Permissions
 
-(The base comes from `plugin.getBasePermission()` at runtime.)
+Base permission (from server log): `com.bsnacks.rpg stats`
+
+- View stats: `com.bsnacks.rpg stats.stats.view`
+- Spend stat points: `com.bsnacks.rpg stats.stats.add`
+- Set stats for self: `com.bsnacks.rpg stats.stats.set`
+- Set stats for others: `com.bsnacks.rpg stats.stats.set.others`
+- Reset stats for self: `com.bsnacks.rpg stats.stats.reset`
+- Reset stats for others: `com.bsnacks.rpg stats.stats.reset.others`
+- Reload config: `com.bsnacks.rpg stats.stats.reload`
 
 ## Config (config.toml)
 

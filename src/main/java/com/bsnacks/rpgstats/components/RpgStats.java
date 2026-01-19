@@ -10,6 +10,7 @@ import java.util.Arrays;
 
 public final class RpgStats implements Component<EntityStore> {
 
+    public static final String COMPONENT_ID = "rpgstats";
     public static final int CURRENT_VERSION = 4;
     public static final int DEFAULT_MAX_LEVEL = 25;
     public static final int BASE_XP = 100;

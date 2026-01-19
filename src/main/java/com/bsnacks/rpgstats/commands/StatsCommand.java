@@ -7,6 +7,7 @@ import com.bsnacks.rpgstats.commands.StatsAddCommand;
 import com.bsnacks.rpgstats.commands.StatsReloadCommand;
 import com.bsnacks.rpgstats.commands.StatsResetCommand;
 import com.bsnacks.rpgstats.commands.StatsSetCommand;
+import com.bsnacks.rpgstats.permissions.RpgStatsPermissions;
 
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.protocol.GameMode;
@@ -27,6 +28,7 @@ public final class StatsCommand extends CommandBase {
                         RpgStatsConfig config) {
         super("stats", "Show your RPG stats.");
         setPermissionGroup(GameMode.Adventure);
+        requirePermission(RpgStatsPermissions.STATS_VIEW);
         this.plugin = plugin;
         this.rpgStatsType = rpgStatsType;
         this.config = config;
@@ -37,8 +39,13 @@ public final class StatsCommand extends CommandBase {
     }
 
     @Override
+    protected boolean canGeneratePermission() {
+        return false;
+    }
+
+    @Override
     protected void executeSync(CommandContext ctx) {
-        CommandUtil.requirePermission(ctx.sender(), plugin.getBasePermission() + ".stats.view");
+        CommandUtil.requirePermission(ctx.sender(), RpgStatsPermissions.STATS_VIEW);
         if (!ctx.isPlayer()) {
             ctx.sendMessage(Message.raw("This command can only be used by a player."));
             return;

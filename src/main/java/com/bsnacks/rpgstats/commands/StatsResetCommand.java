@@ -3,6 +3,7 @@ package com.bsnacks.rpgstats.commands;
 import com.bsnacks.rpgstats.RpgStatsPlugin;
 import com.bsnacks.rpgstats.components.RpgStats;
 import com.bsnacks.rpgstats.config.RpgStatsConfig;
+import com.bsnacks.rpgstats.permissions.RpgStatsPermissions;
 import com.bsnacks.rpgstats.systems.ConstitutionHealthEffect;
 import com.bsnacks.rpgstats.systems.EnduranceStaminaEffect;
 import com.bsnacks.rpgstats.systems.IntellectManaEffect;
@@ -36,6 +37,7 @@ public final class StatsResetCommand extends CommandBase {
                              RpgStatsConfig config) {
         super("reset", "Reset a player's RPG stats.");
         setPermissionGroup(GameMode.Adventure);
+        requirePermission(RpgStatsPermissions.STATS_RESET);
         this.plugin = plugin;
         this.rpgStatsType = rpgStatsType;
         this.config = config;
@@ -43,11 +45,16 @@ public final class StatsResetCommand extends CommandBase {
     }
 
     @Override
+    protected boolean canGeneratePermission() {
+        return false;
+    }
+
+    @Override
     protected void executeSync(CommandContext ctx) {
-        CommandUtil.requirePermission(ctx.sender(), plugin.getBasePermission() + ".stats.reset");
+        CommandUtil.requirePermission(ctx.sender(), RpgStatsPermissions.STATS_RESET);
         String targetRaw = targetArg.get(ctx);
         if (!"self".equalsIgnoreCase(targetRaw)) {
-            CommandUtil.requirePermission(ctx.sender(), plugin.getBasePermission() + ".stats.reset.others");
+            CommandUtil.requirePermission(ctx.sender(), RpgStatsPermissions.STATS_RESET_OTHERS);
         }
         Target target = resolveTarget(ctx, targetRaw);
         if (target == null) {

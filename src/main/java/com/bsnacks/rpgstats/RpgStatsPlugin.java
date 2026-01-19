@@ -11,6 +11,7 @@ import com.bsnacks.rpgstats.systems.StrengthDamageSystem;
 import com.bsnacks.rpgstats.systems.ConstitutionHealthEffect;
 import com.bsnacks.rpgstats.systems.EnduranceStaminaEffect;
 import com.bsnacks.rpgstats.systems.IntellectManaEffect;
+import com.bsnacks.rpgstats.permissions.RpgStatsPermissions;
 
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.Ref;
@@ -43,7 +44,7 @@ public final class RpgStatsPlugin extends JavaPlugin {
     protected void setup() {
         fileLogger = new RpgStatsFileLogger(getDataDirectory(), getLogger());
         logInfo("Diagnostics log: " + fileLogger.getLogFile());
-        logInfo("Base permission: " + getBasePermission());
+        logInfo("Permission root: " + RpgStatsPermissions.ROOT);
         configPath = RpgStatsConfig.resolveConfigPath(getDataDirectory());
         logInfo("Config path: " + configPath.toAbsolutePath());
         reloadConfig("startup");

@@ -3,6 +3,7 @@ package com.bsnacks.rpgstats.commands;
 import com.bsnacks.rpgstats.RpgStatsPlugin;
 import com.bsnacks.rpgstats.components.RpgStats;
 import com.bsnacks.rpgstats.config.RpgStatsConfig;
+import com.bsnacks.rpgstats.permissions.RpgStatsPermissions;
 import com.bsnacks.rpgstats.systems.ConstitutionHealthEffect;
 import com.bsnacks.rpgstats.systems.EnduranceStaminaEffect;
 import com.bsnacks.rpgstats.systems.IntellectManaEffect;
@@ -33,6 +34,7 @@ public final class StatsAddCommand extends CommandBase {
                            RpgStatsConfig config) {
         super("add", "Spend a stat point to increase an attribute.");
         setPermissionGroup(GameMode.Adventure);
+        requirePermission(RpgStatsPermissions.STATS_ADD);
         this.plugin = plugin;
         this.rpgStatsType = rpgStatsType;
         this.config = config;
@@ -40,8 +42,13 @@ public final class StatsAddCommand extends CommandBase {
     }
 
     @Override
+    protected boolean canGeneratePermission() {
+        return false;
+    }
+
+    @Override
     protected void executeSync(CommandContext ctx) {
-        CommandUtil.requirePermission(ctx.sender(), plugin.getBasePermission() + ".stats.add");
+        CommandUtil.requirePermission(ctx.sender(), RpgStatsPermissions.STATS_ADD);
         if (!ctx.isPlayer()) {
             ctx.sendMessage(Message.raw("You must be a player to use this command."));
             return;

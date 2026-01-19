@@ -59,15 +59,17 @@ Admin-style commands:
 
 ## Permissions
 
-Base permission (from server log): `com.bsnacks.rpg stats`
+Permission root: `rpgstats`
 
-- View stats: `com.bsnacks.rpg stats.stats.view`
-- Spend stat points: `com.bsnacks.rpg stats.stats.add`
-- Set stats for self: `com.bsnacks.rpg stats.stats.set`
-- Set stats for others: `com.bsnacks.rpg stats.stats.set.others`
-- Reset stats for self: `com.bsnacks.rpg stats.stats.reset`
-- Reset stats for others: `com.bsnacks.rpg stats.stats.reset.others`
-- Reload config: `com.bsnacks.rpg stats.stats.reload`
+- View stats: `rpgstats.view`
+- Spend stat points: `rpgstats.add`
+- Set stats for self: `rpgstats.set`
+- Set stats for others: `rpgstats.set.others`
+- Reset stats for self: `rpgstats.reset`
+- Reset stats for others: `rpgstats.reset.others`
+- Reload config: `rpgstats.set`
+
+Note: LuckPerms requires explicit denies to block commands. If you don’t want players using a command, add a deny for the specific node (for example, `rpgstats.set`).
 
 ## Config (config.toml)
 

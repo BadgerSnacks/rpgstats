@@ -1,17 +1,15 @@
-# RPG Stats Plugin - Guided Walkthrough (101 Level)
+# RPG Stats Plugin - Guided Walkthrough
 
-Hello! This project is a small add-on for the Hytale server. It gives each player RPG-style stats (level, XP, and attributes) and lets you view and edit them with commands.
+This project is a java plugin mod for the game Hytale. It gives each player RPG-style stats (level, XP, and attributes) and lets you view and edit them with commands (GUI Planned for later).
 
-Below is a simple, first-week class explanation of what the code does and how to use the mod.
-
-## What the mod does now
+## What the mod does as of now
 
 - Tracks player stats (level, XP, STR, DEX, CON, INT, END, CHA).
 - Uses **total XP** for leveling (max level is configurable; default **25**).
 - Earns **1 stat point per level** (level 2 = 1 point, level 3 = 2 points, etc).
 - Lets players spend points with `/stats add <stat>`.
 - Lets admins set or reset stats with `/stats set` and `/stats reset`.
-- Awards XP on hostile NPC kills and shows chat updates.
+- Awards XP on hostile NPC kills and shows chat updates. XP is determined by health of hostile entity.
 - Applies **Strength damage multiplier**: `damage = baseDamage * (str / damage_multiplier_base)`.
   - STR 10 = 1.0x, STR 11 = 1.1x, STR 20 = 2.0x, STR 25 = 2.5x.
 - Applies **Constitution max health**: `+health_per_point` per point above 10.
@@ -21,6 +19,18 @@ Below is a simple, first-week class explanation of what the code does and how to
 - END replaces WIS (spent WIS points are migrated via stat history).
 
 If the level goes down, the **last spent point is undone first** (LIFO order).
+
+## How to Install:
+To use the mod on any server copy the jar into:
+```
+%APPDATA%/Hytale/UserData/Mods/
+```
+To use the mod on a specific server (single player world) copy the jar into:
+```
+%APPDATA&/Hytale/UserData/Saves/<NameOfServer>/mods
+```
+- For external servers just place the jar file into /mods from the root folder.
+- Server must be restarted after install/update.
 
 ## How to use it in-game
 
@@ -36,6 +46,7 @@ Spend a stat point:
 /stats add int
 ```
 Valid stats: `str`, `dex`, `con`, `int`, `end`, `cha`.
+- CHA is currently an unused stat but will be implemented in the future.
 
 Admin-style commands:
 ```text
@@ -50,23 +61,6 @@ If you target other players, you need permission:
 - `your.plugin.base.stats.reset.others`
 
 (The base comes from `plugin.getBasePermission()` at runtime.)
-
-## Leveling rules (simple formula)
-
-The XP needed for the **next** level is:
-```text
-xpToNext(L) = 100 + 50*(L-1) + 20*(L-1)^2
-```
-
-XP is stored as **total XP**, and your level is calculated from that total.
-
-## XP from NPC kills
-
-- Only **hostile** NPCs grant XP.
-- XP formula: `round(maxHealth * xp_multiplier)`
-- Boss bonus: if `maxHealth >= 200`, XP is multiplied by `1.5`.
-- XP is clamped to `1..1000`.
-- Player chat shows XP gained and progress toward next level.
 
 ## Config (config.toml)
 
@@ -83,6 +77,36 @@ health_per_point = 10.0 # (CON)
 mana_per_point = 10.0 # (INT)
 stamina_per_point = 1.0 # (END)
 ```
+
+## Planned features
+- Ability points to spend on ability's per level that can be configured from the .toml file.
+- CHA will apply some kind of discount to NPC shops.
+- Ability's that will affect gameplay in non-destructive ways.
+- Classes (maybe if it fits).
+- Uses for the ability modifiers (DND style System).
+- GUI for displaying stats, current level, current xp, stat points available, and a way to distribute/reset stat points.
+- A way to apply levels to NPC's
+- Weapon bonus, change for weapons to spawn with a +1,+2, and +3 variation.
+- Negative stat effects from poison
+- Debuffs that effect stats
+- Buffs that effect stats
+
+## Leveling rules (simple formula - Nerd stuff from here on out)
+
+The XP needed for the **next** level is:
+```text
+xpToNext(L) = 100 + 50*(L-1) + 20*(L-1)^2
+```
+
+XP is stored as **total XP**, and your level is calculated from that total.
+
+## XP from NPC kills
+
+- Only **hostile** NPCs grant XP.
+- XP formula: `round(maxHealth * xp_multiplier)`
+- Boss bonus: if `maxHealth >= 200`, XP is multiplied by `1.5`. (This may change after testing)
+- XP is clamped to `min = 1, max = 1000`.
+- Player chat shows XP gained and progress toward next level.
 
 ## Diagnostics log
 
@@ -142,7 +166,7 @@ If you add a new stat:
 - `src/main/java/com/bsnacks/rpgstats/config/RpgStatsConfig.java`: loads `config.toml`.
 - `src/main/java/com/bsnacks/rpgstats/logging/RpgStatsFileLogger.java`: writes diagnostics logs.
 
-## Build and install
+## Build from source.
 
 Build:
 ```bash
@@ -151,13 +175,5 @@ Build:
 
 JAR output:
 ```
-build/libs/rpgstats-0.1.0.jar
+build/libs/rpgstats-(Version number).jar
 ```
-
-Install:
-Copy the jar into:
-```
-%APPDATA%/Hytale/UserData/Mods/
-```
-
-Then restart the server.

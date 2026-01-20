@@ -54,8 +54,15 @@ public final class ExperienceOnKillSystem extends DeathSystems.OnDeathSystem {
             return;
         }
 
-        logDebug("NPC death detected: role=" + safeRoleName(npc) + " npcTypeId=" + safeNpcTypeId(npc)
+        String roleName = safeRoleName(npc);
+        String npcTypeId = safeNpcTypeId(npc);
+        logDebug("NPC death detected: role=" + roleName + " npcTypeId=" + npcTypeId
                 + " ref=" + ref.getIndex());
+
+        if (config != null && config.isXpBlacklisted(npcTypeId, roleName)) {
+            logDebug("XP skipped: blacklisted NPC role=" + roleName + " npcTypeId=" + npcTypeId);
+            return;
+        }
 
         Ref<EntityStore> attackerRef = resolveAttackerRef(npc, death);
         if (attackerRef == null || !attackerRef.isValid()) {
@@ -71,7 +78,7 @@ public final class ExperienceOnKillSystem extends DeathSystems.OnDeathSystem {
 
         Role role = npc.getRole();
         if (!isHostile(role, attackerRef, commandBuffer)) {
-            logDebug("NPC not hostile to player: role=" + safeRoleName(npc) + " player=" + killer.getDisplayName());
+            logDebug("NPC not hostile to player: role=" + roleName + " player=" + killer.getDisplayName());
             return;
         }
 
@@ -82,7 +89,7 @@ public final class ExperienceOnKillSystem extends DeathSystems.OnDeathSystem {
         double multiplier = config == null ? 0.35d : config.getXpMultiplier();
         int xpGained = ExperienceCalculator.calculate(npc, statMap, multiplier);
         if (xpGained <= 0) {
-            logDebug("No XP awarded: role=" + safeRoleName(npc) + " maxHealth=" + ExperienceCalculator.getMaxHealth(npc, statMap));
+            logDebug("No XP awarded: role=" + roleName + " maxHealth=" + ExperienceCalculator.getMaxHealth(npc, statMap));
             return;
         }
 

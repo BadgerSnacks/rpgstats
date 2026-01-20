@@ -20,17 +20,17 @@ public final class RpgStats implements Component<EntityStore> {
 
     public static final BuilderCodec<RpgStats> CODEC =
             BuilderCodec.builder(RpgStats.class, RpgStats::new)
-                    .addField(new KeyedCodec<>("Version", Codec.INTEGER), (d, v) -> d.version = v, d -> d.version)
-                    .addField(new KeyedCodec<>("Level", Codec.INTEGER), (d, v) -> d.level = v, d -> d.level)
-                    .addField(new KeyedCodec<>("Xp", Codec.LONG), (d, v) -> d.xp = v, d -> d.xp)
-                    .addField(new KeyedCodec<>("StatHistory", Codec.STRING_ARRAY), (d, v) -> d.statHistory = v, d -> d.statHistory)
+                    .append(new KeyedCodec<>("Version", Codec.INTEGER), (d, v) -> d.version = v, d -> d.version).add()
+                    .append(new KeyedCodec<>("Level", Codec.INTEGER), (d, v) -> d.level = v, d -> d.level).add()
+                    .append(new KeyedCodec<>("Xp", Codec.LONG), (d, v) -> d.xp = v, d -> d.xp).add()
+                    .append(new KeyedCodec<>("StatHistory", Codec.STRING_ARRAY), (d, v) -> d.statHistory = v, d -> d.statHistory).add()
 
-                    .addField(new KeyedCodec<>("Str", Codec.INTEGER), (d, v) -> d.str = v, d -> d.str)
-                    .addField(new KeyedCodec<>("Dex", Codec.INTEGER), (d, v) -> d.dex = v, d -> d.dex)
-                    .addField(new KeyedCodec<>("Con", Codec.INTEGER), (d, v) -> d.con = v, d -> d.con)
-                    .addField(new KeyedCodec<>("Intl", Codec.INTEGER), (d, v) -> d.intl = v, d -> d.intl)
-                    .addField(new KeyedCodec<>("End", Codec.INTEGER), (d, v) -> d.end = v, d -> d.end)
-                    .addField(new KeyedCodec<>("Cha", Codec.INTEGER), (d, v) -> d.cha = v, d -> d.cha)
+                    .append(new KeyedCodec<>("Str", Codec.INTEGER), (d, v) -> d.str = v, d -> d.str).add()
+                    .append(new KeyedCodec<>("Dex", Codec.INTEGER), (d, v) -> d.dex = v, d -> d.dex).add()
+                    .append(new KeyedCodec<>("Con", Codec.INTEGER), (d, v) -> d.con = v, d -> d.con).add()
+                    .append(new KeyedCodec<>("Intl", Codec.INTEGER), (d, v) -> d.intl = v, d -> d.intl).add()
+                    .append(new KeyedCodec<>("End", Codec.INTEGER), (d, v) -> d.end = v, d -> d.end).add()
+                    .append(new KeyedCodec<>("Cha", Codec.INTEGER), (d, v) -> d.cha = v, d -> d.cha).add()
                     .build();
 
     private int version =  CURRENT_VERSION;
@@ -91,12 +91,12 @@ public final class RpgStats implements Component<EntityStore> {
         this.xp = Math.max(0L, xp);
         syncLevelToXp();
     }
-    public void setStr(int str) { this.str = str; }
-    public void setDex(int dex) { this.dex = dex; }
-    public void setCon(int con) { this.con = con; }
-    public void setIntl(int intl) { this.intl = intl; }
-    public void setEnd(int end) { this.end = end; }
-    public void setCha(int cha) { this.cha = cha; }
+    public void setStr(int str) { this.str = clamp(str, 1, Integer.MAX_VALUE); }
+    public void setDex(int dex) { this.dex = clamp(dex, 1, Integer.MAX_VALUE); }
+    public void setCon(int con) { this.con = clamp(con, 1, Integer.MAX_VALUE); }
+    public void setIntl(int intl) { this.intl = clamp(intl, 1, Integer.MAX_VALUE); }
+    public void setEnd(int end) { this.end = clamp(end, 1, Integer.MAX_VALUE); }
+    public void setCha(int cha) { this.cha = clamp(cha, 1, Integer.MAX_VALUE); }
 
     //minimal getters for /stats
     public int getLevel() {

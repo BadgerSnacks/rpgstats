@@ -3,6 +3,7 @@ package com.bsnacks.rpgstats.commands;
 import com.bsnacks.rpgstats.RpgStatsPlugin;
 import com.bsnacks.rpgstats.components.RpgStats;
 import com.bsnacks.rpgstats.config.RpgStatsConfig;
+import com.bsnacks.rpgstats.permissions.PermissionChecks;
 import com.bsnacks.rpgstats.permissions.RpgStatsPermissions;
 import com.bsnacks.rpgstats.systems.ConstitutionHealthEffect;
 import com.bsnacks.rpgstats.systems.EnduranceStaminaEffect;
@@ -14,7 +15,6 @@ import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.protocol.GameMode;
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.NameMatching;
-import com.hypixel.hytale.server.core.command.system.CommandUtil;
 import com.hypixel.hytale.server.core.command.system.CommandContext;
 import com.hypixel.hytale.server.core.command.system.arguments.system.RequiredArg;
 import com.hypixel.hytale.server.core.command.system.arguments.types.ArgTypes;
@@ -66,15 +66,40 @@ public final class StatsSetCommand extends CommandBase {
 
         logPermissionDebug(ctx, targetRaw, attributeRaw);
 
-        CommandUtil.requirePermission(ctx.sender(), RpgStatsPermissions.STATS_SET);
+        if (!PermissionChecks.requirePrivileged(ctx, RpgStatsPermissions.STATS_SET)) {
+            plugin.logDebug("Denied /stats set: sender=" + ctx.sender().getDisplayName()
+                    + " uuid=" + ctx.sender().getUuid());
+            return;
+        }
 
         Long value = parseLong(ctx, valueRaw);
         if (value == null) {
             return;
         }
 
+        String attribute = attributeRaw.toLowerCase();
+        final Integer levelValue;
+        if ("level".equals(attribute)) {
+            levelValue = toIntValue(ctx, "Level", value);
+            if (levelValue == null) {
+                return;
+            }
+            int maxLevel = config.getMaxLevel();
+            if (levelValue > maxLevel) {
+                ctx.sendMessage(Message.raw("Level cap for server is set to " + maxLevel));
+                return;
+            }
+        } else {
+            levelValue = null;
+        }
+
         if (!"self".equalsIgnoreCase(targetRaw)) {
-            CommandUtil.requirePermission(ctx.sender(), RpgStatsPermissions.STATS_SET_OTHERS);
+            if (!PermissionChecks.requirePrivileged(ctx, RpgStatsPermissions.STATS_SET_OTHERS)) {
+                plugin.logDebug("Denied /stats set others: sender=" + ctx.sender().getDisplayName()
+                        + " uuid=" + ctx.sender().getUuid()
+                        + " target=" + targetRaw);
+                return;
+            }
         }
 
         Target target = resolveTarget(ctx, targetRaw);
@@ -113,10 +138,9 @@ public final class StatsSetCommand extends CommandBase {
             RpgStats stats = worldStore.ensureAndGetComponent(target.ref, rpgStatsType);
             stats.migrateIfNeeded();
 
-            String attribute = attributeRaw.toLowerCase();
             switch (attribute) {
                 case "level":
-                    Integer level = toIntValue(ctx, "Level", value);
+                    Integer level = levelValue;
                     if (level == null) {
                         return;
                     }
@@ -130,6 +154,10 @@ public final class StatsSetCommand extends CommandBase {
                     if (str == null) {
                         return;
                     }
+                    if (str > getStatCap("str")) {
+                        ctx.sendMessage(Message.raw("STR cap for server is set to " + getStatCap("str") + "."));
+                        return;
+                    }
                     stats.setStr(str);
                     break;
                 case "dex":
@@ -137,11 +165,19 @@ public final class StatsSetCommand extends CommandBase {
                     if (dex == null) {
                         return;
                     }
+                    if (dex > getStatCap("dex")) {
+                        ctx.sendMessage(Message.raw("DEX cap for server is set to " + getStatCap("dex") + "."));
+                        return;
+                    }
                     stats.setDex(dex);
                     break;
                 case "con":
                     Integer con = toIntValue(ctx, "Con", value);
                     if (con == null) {
+                        return;
+                    }
+                    if (con > getStatCap("con")) {
+                        ctx.sendMessage(Message.raw("CON cap for server is set to " + getStatCap("con") + "."));
                         return;
                     }
                     stats.setCon(con);
@@ -152,6 +188,10 @@ public final class StatsSetCommand extends CommandBase {
                     if (intl == null) {
                         return;
                     }
+                    if (intl > getStatCap("int")) {
+                        ctx.sendMessage(Message.raw("INT cap for server is set to " + getStatCap("int") + "."));
+                        return;
+                    }
                     stats.setIntl(intl);
                     break;
                 case "end":
@@ -160,11 +200,19 @@ public final class StatsSetCommand extends CommandBase {
                     if (end == null) {
                         return;
                     }
+                    if (end > getStatCap("end")) {
+                        ctx.sendMessage(Message.raw("END cap for server is set to " + getStatCap("end") + "."));
+                        return;
+                    }
                     stats.setEnd(end);
                     break;
                 case "cha":
                     Integer cha = toIntValue(ctx, "Cha", value);
                     if (cha == null) {
+                        return;
+                    }
+                    if (cha > getStatCap("cha")) {
+                        ctx.sendMessage(Message.raw("CHA cap for server is set to " + getStatCap("cha") + "."));
                         return;
                     }
                     stats.setCha(cha);
@@ -308,6 +356,13 @@ public final class StatsSetCommand extends CommandBase {
             first = false;
         }
         return summary.toString();
+    }
+
+    private int getStatCap(String attribute) {
+        if (config == null) {
+            return 25;
+        }
+        return config.getStatCap(attribute);
     }
 
     private String safeContains(Set<String> perms, String value) {

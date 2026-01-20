@@ -3,6 +3,7 @@ package com.bsnacks.rpgstats.commands;
 import com.bsnacks.rpgstats.RpgStatsPlugin;
 import com.bsnacks.rpgstats.components.RpgStats;
 import com.bsnacks.rpgstats.config.RpgStatsConfig;
+import com.bsnacks.rpgstats.permissions.PermissionChecks;
 import com.bsnacks.rpgstats.permissions.RpgStatsPermissions;
 import com.bsnacks.rpgstats.systems.ConstitutionHealthEffect;
 import com.bsnacks.rpgstats.systems.EnduranceStaminaEffect;
@@ -51,10 +52,16 @@ public final class StatsResetCommand extends CommandBase {
 
     @Override
     protected void executeSync(CommandContext ctx) {
-        CommandUtil.requirePermission(ctx.sender(), RpgStatsPermissions.STATS_RESET);
         String targetRaw = targetArg.get(ctx);
         if (!"self".equalsIgnoreCase(targetRaw)) {
-            CommandUtil.requirePermission(ctx.sender(), RpgStatsPermissions.STATS_RESET_OTHERS);
+            if (!PermissionChecks.requirePrivileged(ctx, RpgStatsPermissions.STATS_RESET_OTHERS)) {
+                plugin.logDebug("Denied /stats reset others: sender=" + ctx.sender().getDisplayName()
+                        + " uuid=" + ctx.sender().getUuid()
+                        + " target=" + targetRaw);
+                return;
+            }
+        } else {
+            CommandUtil.requirePermission(ctx.sender(), RpgStatsPermissions.STATS_RESET);
         }
         Target target = resolveTarget(ctx, targetRaw);
         if (target == null) {

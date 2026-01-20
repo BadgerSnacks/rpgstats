@@ -12,13 +12,12 @@ This project is a java plugin mod for the game Hytale. It gives each player RPG-
 - Awards XP on hostile NPC kills and shows chat updates. XP is determined by health of hostile entity.
 - Applies **Strength damage multiplier**: `damage = baseDamage * (str / damage_multiplier_base)`.
   - STR 10 = 1.0x, STR 11 = 1.1x, STR 20 = 2.0x, STR 25 = 2.5x.
-- Applies **Constitution max health**: `+health_per_point` per point above 10.
-- Applies **Intellect max mana**: `+mana_per_point` per point above 10.
-- Applies **Endurance max stamina**: `+stamina_per_point` per point above 10.
+- Applies **Constitution max health**: `+health_per_point` per point above 10; below 10 reduces max health (floor 10).
+- Applies **Intellect max mana**: `+mana_per_point` per point above 10; below 10 reduces max mana (floor 0).
+- Applies **Endurance max stamina**: `+stamina_per_point` per point above 10; below 10 reduces max stamina (floor 1).
 - Applies **Dexterity mining speed**: `mining_speed_base + mining_speed_per_point * (DEX - 10)` (clamped to `0.5x` min and `2.5x` max).
 - END replaces WIS (spent WIS points are migrated via stat history).
-
-If the level goes down, the **last spent point is undone first** (LIFO order).
+- Reduction in levels result in the last point spent on stats to be refunded. (LIFO order).
 
 ## How to Install:
 To use the mod on any server copy the jar into:
@@ -56,6 +55,7 @@ Admin-style commands:
 /stats reset OtherPlayer
 /stats reload
 ```
+When setting `level`, values above `max_level` are blocked with an error message.
 
 ## Permissions
 
@@ -70,6 +70,7 @@ Permission root: `rpgstats`
 - Reload config: `rpgstats.set`
 
 Note: LuckPerms requires explicit denies to block commands. If you don’t want players using a command, add a deny for the specific node (for example, `rpgstats.set`).
+Note: Without a permissions mod, only OP (wildcard `*`) can use `/stats set`, `/stats reset <player>`, or `/stats reload`. Players can still use `/stats`, `/stats add`, and `/stats reset self`.
 
 ## Config (config.toml)
 
@@ -85,7 +86,24 @@ mining_speed_per_point = 0.10
 health_per_point = 10.0 # (CON)
 mana_per_point = 10.0 # (INT)
 stamina_per_point = 1.0 # (END)
+str_cap = 25
+dex_cap = 25
+con_cap = 25
+int_cap = 25
+end_cap = 25
+cha_cap = 25
 ```
+If a player tries to set or add a stat above its cap, the command returns a message with the configured limit.
+
+XP blacklist (xp_blacklist.toml):
+```toml
+npc_types = []
+roles = []
+```
+Use `xp_blacklist.toml` to prevent specific NPCs from granting XP. Use the exact `npcTypeId` or role name shown in the diagnostics log (example: `Deer_Doe`). Entries are case-insensitive.
+New installs ship with a default non-hostile NPC list in `npc_types`.
+If you already have `xp_blacklist.toml`, keep your file and paste any new entries from the default list into your existing `npc_types` array (one entry per line is fine). Save the file and run `/stats reload`.
+Multi-line arrays are supported in `xp_blacklist.toml` if you want to keep long lists readable.
 
 ## Planned features
 - Ability points to spend on ability's per level that can be configured from the .toml file.

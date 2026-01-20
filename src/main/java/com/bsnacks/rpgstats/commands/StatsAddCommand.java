@@ -100,7 +100,19 @@ public final class StatsAddCommand extends CommandBase {
                 return;
             }
 
-            if (!stats.spendStatPoint(attributeRaw)) {
+            String attribute = normalizeAttribute(attributeRaw);
+            if (attribute == null) {
+                ctx.sendMessage(Message.raw("Unknown attribute '" + attributeRaw + "'. Try: str, dex, con, int, end, cha."));
+                return;
+            }
+            int cap = getStatCap(attribute);
+            int current = getStatValue(stats, attribute);
+            if (current >= cap) {
+                ctx.sendMessage(Message.raw(attribute.toUpperCase() + " cap for server is set to " + cap + "."));
+                return;
+            }
+
+            if (!stats.spendStatPoint(attribute)) {
                 ctx.sendMessage(Message.raw("Unknown attribute '" + attributeRaw + "'. Try: str, dex, con, int, end, cha."));
                 return;
             }
@@ -114,5 +126,53 @@ public final class StatsAddCommand extends CommandBase {
                     + ". Remaining points: " + stats.getAvailableStatPoints() + "."));
             plugin.logInfo("Player spent a point on " + attributeRaw + ": " + player.getDisplayName());
         });
+    }
+
+    private String normalizeAttribute(String attributeRaw) {
+        if (attributeRaw == null) {
+            return null;
+        }
+        String attribute = attributeRaw.trim().toLowerCase();
+        switch (attribute) {
+            case "str":
+            case "dex":
+            case "con":
+            case "end":
+            case "cha":
+                return attribute;
+            case "endurance":
+                return "end";
+            case "int":
+            case "intl":
+                return "int";
+            default:
+                return null;
+        }
+    }
+
+    private int getStatCap(String attribute) {
+        if (config == null) {
+            return 25;
+        }
+        return config.getStatCap(attribute);
+    }
+
+    private int getStatValue(RpgStats stats, String attribute) {
+        switch (attribute) {
+            case "str":
+                return stats.getStr();
+            case "dex":
+                return stats.getDex();
+            case "con":
+                return stats.getCon();
+            case "int":
+                return stats.getIntl();
+            case "end":
+                return stats.getEnd();
+            case "cha":
+                return stats.getCha();
+            default:
+                return 0;
+        }
     }
 }

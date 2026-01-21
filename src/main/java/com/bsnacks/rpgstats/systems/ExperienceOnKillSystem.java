@@ -3,6 +3,8 @@ package com.bsnacks.rpgstats.systems;
 import com.bsnacks.rpgstats.components.RpgStats;
 import com.bsnacks.rpgstats.config.RpgStatsConfig;
 import com.bsnacks.rpgstats.logging.RpgStatsFileLogger;
+import com.bsnacks.rpgstats.ui.RpgStatsHud;
+import com.bsnacks.rpgstats.ui.StatsPage;
 
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.ComponentType;
@@ -16,6 +18,7 @@ import com.hypixel.hytale.server.core.modules.entity.damage.Damage;
 import com.hypixel.hytale.server.core.modules.entity.damage.DeathComponent;
 import com.hypixel.hytale.server.core.modules.entity.damage.DeathSystems;
 import com.hypixel.hytale.server.core.modules.entitystats.EntityStatMap;
+import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.NPCPlugin;
 import com.hypixel.hytale.server.npc.entities.NPCEntity;
@@ -98,6 +101,11 @@ public final class ExperienceOnKillSystem extends DeathSystems.OnDeathSystem {
         stats.setXp(oldXp + xpGained);
 
         sendXpMessage(killer, stats, xpGained, oldLevel);
+        StatsPage.refreshIfOpen(attackerRef, store);
+        if (config == null || config.isHudEnabled()) {
+            PlayerRef playerRef = commandBuffer.getComponent(attackerRef, PlayerRef.getComponentType());
+            RpgStatsHud.refreshIfActive(playerRef, stats);
+        }
         logDebug("XP awarded: player=" + killer.getDisplayName() + " xp=" + xpGained
                 + " level=" + oldLevel + "->" + stats.getLevel());
     }

@@ -1,6 +1,6 @@
 # RPG Stats Plugin - Guided Walkthrough
 
-This project is a java plugin mod for the game Hytale. It gives each player RPG-style stats (level, XP, and attributes) and lets you view and edit them with commands (GUI Planned for later).
+This project is a java plugin mod for the game Hytale. It gives each player RPG-style stats (level, XP, and attributes) and lets you view and edit them with commands and an in-game GUI.
 
 ## What the mod does as of now
 
@@ -9,6 +9,8 @@ This project is a java plugin mod for the game Hytale. It gives each player RPG-
 - Earns **1 stat point per level** (level 2 = 1 point, level 3 = 2 points, etc).
 - Lets players spend points with `/stats add <stat>`.
 - Lets admins set or reset stats with `/stats set` and `/stats reset`.
+- Provides a stats GUI with tabs (Stats, Abilities placeholder, Reset) and an XP progress bar.
+- Shows an optional HUD XP bar (toggle with `hud_enabled` in `config.toml`).
 - Awards XP on hostile NPC kills and shows chat updates. XP is determined by health of hostile entity.
 - Applies **Strength damage multiplier**: `damage = baseDamage * (str / damage_multiplier_base)`.
   - STR 10 = 1.0x, STR 11 = 1.1x, STR 20 = 2.0x, STR 25 = 2.5x.
@@ -37,7 +39,11 @@ Basic command:
 ```text
 /stats
 ```
-Shows your level, total XP, available stat points, and attribute values.
+Opens the stats GUI (tabs for Stats, Abilities, and Reset).
+
+Reset your stats (GUI tab):
+- The Reset tab includes a warning and a button to reset your stats.
+- Requires `rpgstats.reset`.
 
 Spend a stat point:
 ```text
@@ -69,7 +75,7 @@ Permission root: `rpgstats`
 - Reset stats for others: `rpgstats.reset.others`
 - Reload config: `rpgstats.set`
 
-Note: LuckPerms requires explicit denies to block commands. If you don’t want players using a command, add a deny for the specific node (for example, `rpgstats.set`).
+Note: LuckPerms requires explicit denies to block commands. If you don't want players using a command, add a deny for the specific node (for example, `rpgstats.set`).
 Note: Without a permissions mod, only OP (wildcard `*`) can use `/stats set`, `/stats reset <player>`, or `/stats reload`. Players can still use `/stats`, `/stats add`, and `/stats reset self`.
 
 ## Config (config.toml)
@@ -78,6 +84,7 @@ The plugin writes `config.toml` to the plugin data directory on first run. Edit 
 
 Default keys:
 ```toml
+config_version = 1
 xp_multiplier = 0.35
 max_level = 25
 damage_multiplier_base = 10.0
@@ -86,6 +93,7 @@ mining_speed_per_point = 0.10
 health_per_point = 10.0 # (CON)
 mana_per_point = 10.0 # (INT)
 stamina_per_point = 1.0 # (END)
+hud_enabled = true
 str_cap = 25
 dex_cap = 25
 con_cap = 25
@@ -94,6 +102,7 @@ end_cap = 25
 cha_cap = 25
 ```
 If a player tries to set or add a stat above its cap, the command returns a message with the configured limit.
+Set `hud_enabled = false` to disable the HUD XP bar (useful for HUD mod conflicts like TextSigns).
 
 XP blacklist (xp_blacklist.toml):
 ```toml
@@ -111,7 +120,7 @@ Multi-line arrays are supported in `xp_blacklist.toml` if you want to keep long 
 - Ability's that will affect gameplay in non-destructive ways.
 - Classes (maybe if it fits).
 - Uses for the ability modifiers (DND style System).
-- GUI for displaying stats, current level, current xp, stat points available, and a way to distribute/reset stat points.
+- GUI enhancements (help buttons per stat and other UX polish).
 - A way to apply levels to NPC's
 - Weapon bonus, change for weapons to spawn with a +1,+2, and +3 variation.
 - Negative stat effects from poison

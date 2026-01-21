@@ -22,6 +22,7 @@ public final class RpgStatsConfig {
     private static final DateTimeFormatter BACKUP_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss");
     private static final String FILE_NAME = "config.toml";
     private static final String XP_BLACKLIST_FILE_NAME = "xp_blacklist.toml";
+    private static final int CURRENT_CONFIG_VERSION = 1;
     private static final double DEFAULT_XP_MULTIPLIER = 0.35;
     private static final int DEFAULT_MAX_LEVEL = 25;
     private static final int DEFAULT_STAT_CAP = 25;
@@ -31,7 +32,9 @@ public final class RpgStatsConfig {
     private static final double DEFAULT_HEALTH_PER_POINT = 10.0;
     private static final double DEFAULT_MANA_PER_POINT = 10.0;
     private static final double DEFAULT_STAMINA_PER_POINT = 1.0;
+    private static final boolean DEFAULT_HUD_ENABLED = true;
 
+    private int configVersion;
     private double xpMultiplier;
     private int maxLevel;
     private double damageMultiplierBase;
@@ -40,6 +43,7 @@ public final class RpgStatsConfig {
     private double healthPerPoint;
     private double manaPerPoint;
     private double staminaPerPoint;
+    private boolean hudEnabled;
     private int strCap;
     private int dexCap;
     private int conCap;
@@ -49,11 +53,13 @@ public final class RpgStatsConfig {
     private Set<String> xpBlacklistNpcTypes;
     private Set<String> xpBlacklistRoles;
 
-    private RpgStatsConfig(double xpMultiplier, int maxLevel, double damageMultiplierBase,
+    private RpgStatsConfig(int configVersion, double xpMultiplier, int maxLevel, double damageMultiplierBase,
                            double miningSpeedBase, double miningSpeedPerPoint,
                            double healthPerPoint, double manaPerPoint, double staminaPerPoint,
+                           boolean hudEnabled,
                            int strCap, int dexCap, int conCap, int intCap, int endCap, int chaCap,
                            Set<String> xpBlacklistNpcTypes, Set<String> xpBlacklistRoles) {
+        this.configVersion = configVersion;
         this.xpMultiplier = xpMultiplier;
         this.maxLevel = maxLevel;
         this.damageMultiplierBase = damageMultiplierBase;
@@ -62,6 +68,7 @@ public final class RpgStatsConfig {
         this.healthPerPoint = healthPerPoint;
         this.manaPerPoint = manaPerPoint;
         this.staminaPerPoint = staminaPerPoint;
+        this.hudEnabled = hudEnabled;
         this.strCap = strCap;
         this.dexCap = dexCap;
         this.conCap = conCap;
@@ -102,6 +109,10 @@ public final class RpgStatsConfig {
 
     public double getStaminaPerPoint() {
         return staminaPerPoint;
+    }
+
+    public boolean isHudEnabled() {
+        return hudEnabled;
     }
 
     public int getStatCap(String attribute) {
@@ -150,6 +161,7 @@ public final class RpgStatsConfig {
         if (other == null) {
             return;
         }
+        this.configVersion = other.configVersion;
         this.xpMultiplier = other.xpMultiplier;
         this.maxLevel = other.maxLevel;
         this.damageMultiplierBase = other.damageMultiplierBase;
@@ -158,6 +170,7 @@ public final class RpgStatsConfig {
         this.healthPerPoint = other.healthPerPoint;
         this.manaPerPoint = other.manaPerPoint;
         this.staminaPerPoint = other.staminaPerPoint;
+        this.hudEnabled = other.hudEnabled;
         this.strCap = other.strCap;
         this.dexCap = other.dexCap;
         this.conCap = other.conCap;
@@ -189,6 +202,7 @@ public final class RpgStatsConfig {
         if (!Files.exists(configPath)) {
             writeDefault(configPath, logger);
             return new RpgStatsConfig(
+                    CURRENT_CONFIG_VERSION,
                     DEFAULT_XP_MULTIPLIER,
                     DEFAULT_MAX_LEVEL,
                     DEFAULT_DAMAGE_MULTIPLIER_BASE,
@@ -197,6 +211,7 @@ public final class RpgStatsConfig {
                     DEFAULT_HEALTH_PER_POINT,
                     DEFAULT_MANA_PER_POINT,
                     DEFAULT_STAMINA_PER_POINT,
+                    DEFAULT_HUD_ENABLED,
                     DEFAULT_STAT_CAP,
                     DEFAULT_STAT_CAP,
                     DEFAULT_STAT_CAP,
@@ -209,6 +224,10 @@ public final class RpgStatsConfig {
         }
 
         Map<String, String> values = readKeyValues(configPath, logger);
+        int configVersion = parseInt(values.get("config_version"), 0, logger, "config_version");
+        if (configVersion < 1) {
+            logger.at(Level.INFO).log("[RPGStats] config_version missing or invalid. Assuming 0.");
+        }
         double multiplier = parseDouble(values.get("xp_multiplier"), DEFAULT_XP_MULTIPLIER, logger, "xp_multiplier");
         if (multiplier <= 0) {
             logger.at(Level.WARNING).log("[RPGStats] xp_multiplier must be > 0. Using default " + DEFAULT_XP_MULTIPLIER);
@@ -254,6 +273,8 @@ public final class RpgStatsConfig {
             staminaPerPoint = DEFAULT_STAMINA_PER_POINT;
         }
 
+        boolean hudEnabled = parseBoolean(values.get("hud_enabled"), DEFAULT_HUD_ENABLED, logger, "hud_enabled");
+
         int strCap = parseCap(values.get("str_cap"), "str_cap", logger);
         int dexCap = parseCap(values.get("dex_cap"), "dex_cap", logger);
         int conCap = parseCap(values.get("con_cap"), "con_cap", logger);
@@ -269,8 +290,9 @@ public final class RpgStatsConfig {
         Set<String> xpBlacklistNpcTypes = mergeSets(xpBlacklist.npcTypes, legacyNpcTypes);
         Set<String> xpBlacklistRoles = mergeSets(xpBlacklist.roles, legacyRoles);
 
-        return new RpgStatsConfig(multiplier, maxLevel, damageBase,
+        return new RpgStatsConfig(configVersion, multiplier, maxLevel, damageBase,
                 miningBase, miningPerPoint, healthPerPoint, manaPerPoint, staminaPerPoint,
+                hudEnabled,
                 strCap, dexCap, conCap, intCap, endCap, chaCap,
                 xpBlacklistNpcTypes, xpBlacklistRoles);
     }
@@ -364,6 +386,20 @@ public final class RpgStatsConfig {
         }
     }
 
+    private static boolean parseBoolean(String raw, boolean fallback, HytaleLogger logger, String key) {
+        if (raw == null || raw.isBlank()) {
+            return fallback;
+        }
+        if ("true".equalsIgnoreCase(raw)) {
+            return true;
+        }
+        if ("false".equalsIgnoreCase(raw)) {
+            return false;
+        }
+        logger.at(Level.WARNING).log("[RPGStats] Invalid " + key + " value '" + raw + "'. Using default " + fallback);
+        return fallback;
+    }
+
     private static int parseCap(String raw, String key, HytaleLogger logger) {
         int cap = parseInt(raw, DEFAULT_STAT_CAP, logger, key);
         if (cap < 1) {
@@ -428,6 +464,9 @@ public final class RpgStatsConfig {
         String content = ""
                 + "# RPGStats configuration\n"
                 + "#\n"
+                + "# Config version (do not change).\n"
+                + "config_version = " + CURRENT_CONFIG_VERSION + "\n"
+                + "\n"
                 + "# xp_multiplier controls how much XP a player gains from NPC kills (default " + DEFAULT_XP_MULTIPLIER + ").\n"
                 + "# Example: 0.35 means XP = maxHealth * 0.35 (before boss multiplier and clamping, max xp gain is set to 1000).\n"
                 + "xp_multiplier = " + DEFAULT_XP_MULTIPLIER + "\n"
@@ -450,6 +489,9 @@ public final class RpgStatsConfig {
                 + "health_per_point = " + DEFAULT_HEALTH_PER_POINT + "\n"
                 + "mana_per_point = " + DEFAULT_MANA_PER_POINT + "\n"
                 + "stamina_per_point = " + DEFAULT_STAMINA_PER_POINT + "\n"
+                + "\n"
+                + "# HUD XP bar (set false to disable the RPG stats HUD).\n"
+                + "hud_enabled = " + DEFAULT_HUD_ENABLED + "\n"
                 + "\n"
                 + "# Stat caps (default " + DEFAULT_STAT_CAP + "). Values below 1 revert to default.\n"
                 + "str_cap = " + DEFAULT_STAT_CAP + "\n"

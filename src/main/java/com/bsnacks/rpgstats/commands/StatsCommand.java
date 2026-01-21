@@ -8,14 +8,18 @@ import com.bsnacks.rpgstats.commands.StatsReloadCommand;
 import com.bsnacks.rpgstats.commands.StatsResetCommand;
 import com.bsnacks.rpgstats.commands.StatsSetCommand;
 import com.bsnacks.rpgstats.permissions.RpgStatsPermissions;
+import com.bsnacks.rpgstats.ui.StatsPage;
 
 import com.hypixel.hytale.component.ComponentType;
+import com.hypixel.hytale.component.Ref;
+import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.protocol.GameMode;
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.command.system.CommandUtil;
 import com.hypixel.hytale.server.core.command.system.CommandContext;
 import com.hypixel.hytale.server.core.command.system.basecommands.CommandBase;
 import com.hypixel.hytale.server.core.entity.entities.Player;
+import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 
 public final class StatsCommand extends CommandBase {
@@ -52,20 +56,46 @@ public final class StatsCommand extends CommandBase {
         }
 
         Player player = ctx.senderAs(Player.class);
-        var holder = player.toHolder();
-        RpgStats s = holder.ensureAndGetComponent(rpgStatsType);
-        s.migrateIfNeeded();
+        Ref<EntityStore> selfRef = ctx.senderAsPlayerRef();
+        if (selfRef == null || !selfRef.isValid()) {
+            ctx.sendMessage(Message.raw("You are not in the world right now."));
+            return;
+        }
 
-        String msg = "Level " + s.getLevel() + " (XP " + s.getXp() + "), (Stat Points " + s.getAvailableStatPoints() + ")\n"
-                + "STR " + s.getStr() + " (" + s.modifier(s.getStr()) + ")  "
-                + "DEX " + s.getDex() + " (" + s.modifier(s.getDex()) + ")  "
-                + "CON " + s.getCon() + " (" + s.modifier(s.getCon()) + ")\n"
-                + "INT " + s.getIntl() + " (" + s.modifier(s.getIntl()) + ")  "
-                + "END " + s.getEnd() + " (" + s.modifier(s.getEnd()) + ")  "
-                + "CHA " + s.getCha() + " (" + s.modifier(s.getCha()) + ")";
+        Store<EntityStore> store = selfRef.getStore();
+        if (store == null) {
+            ctx.sendMessage(Message.raw("You are not in the world right now."));
+            return;
+        }
 
-        ctx.sendMessage(Message.raw(msg));
-        plugin.logInfo("Player ran /stats: " + player.getDisplayName());
+        EntityStore entityStore = store.getExternalData();
+        if (entityStore == null) {
+            ctx.sendMessage(Message.raw("You are not in the world right now."));
+            return;
+        }
+
+        World world = entityStore.getWorld();
+        if (world == null) {
+            ctx.sendMessage(Message.raw("You are not in the world right now."));
+            return;
+        }
+
+        world.execute(() -> {
+            if (!selfRef.isValid()) {
+                ctx.sendMessage(Message.raw("You are not in the world right now."));
+                return;
+            }
+
+            Store<EntityStore> worldStore = selfRef.getStore();
+            if (worldStore == null) {
+                ctx.sendMessage(Message.raw("You are not in the world right now."));
+                return;
+            }
+
+            StatsPage page = new StatsPage(player.getPlayerRef(), rpgStatsType, config, plugin);
+            player.getPageManager().openCustomPage(selfRef, worldStore, page);
+            plugin.logInfo("Player opened stats UI: " + player.getDisplayName());
+        });
     }
 
 }

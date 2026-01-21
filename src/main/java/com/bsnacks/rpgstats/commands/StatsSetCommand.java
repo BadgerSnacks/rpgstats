@@ -8,6 +8,8 @@ import com.bsnacks.rpgstats.permissions.RpgStatsPermissions;
 import com.bsnacks.rpgstats.systems.ConstitutionHealthEffect;
 import com.bsnacks.rpgstats.systems.EnduranceStaminaEffect;
 import com.bsnacks.rpgstats.systems.IntellectManaEffect;
+import com.bsnacks.rpgstats.ui.RpgStatsHud;
+import com.bsnacks.rpgstats.ui.StatsPage;
 
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.Ref;
@@ -21,6 +23,7 @@ import com.hypixel.hytale.server.core.command.system.arguments.types.ArgTypes;
 import com.hypixel.hytale.server.core.command.system.basecommands.CommandBase;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.modules.entitystats.EntityStatMap;
+import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.permissions.PermissionsModule;
 import com.hypixel.hytale.server.core.permissions.provider.PermissionProvider;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
@@ -226,6 +229,11 @@ public final class StatsSetCommand extends CommandBase {
             ConstitutionHealthEffect.apply(statMap, stats, config);
             IntellectManaEffect.apply(statMap, stats, config);
             EnduranceStaminaEffect.apply(statMap, stats, config);
+            StatsPage.refreshIfOpen(target.ref, worldStore);
+            if (config == null || config.isHudEnabled()) {
+                PlayerRef playerRef = worldStore.getComponent(target.ref, PlayerRef.getComponentType());
+                RpgStatsHud.refreshIfActive(playerRef, stats);
+            }
 
             ctx.sendMessage(Message.raw("Set " + attribute.toUpperCase() + " for " + target.name + " to " + value + "."));
             plugin.logInfo("Set " + attribute + " for " + target.name + " to " + value);

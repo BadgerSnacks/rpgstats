@@ -72,6 +72,7 @@ public final class RpgStatsPlugin extends JavaPlugin {
         RpgStats.setMaxLevel(config.getMaxLevel());
         logInfo("Config reloaded (" + reason + "): xp_multiplier=" + config.getXpMultiplier()
                 + " max_level=" + config.getMaxLevel()
+                + " hud_enabled=" + config.isHudEnabled()
                 + " xp_blacklist_npc_types=" + config.getXpBlacklistNpcTypes().size()
                 + " xp_blacklist_roles=" + config.getXpBlacklistRoles().size());
         logDebug("XP blacklist loaded: npc_types=" + config.getXpBlacklistNpcTypes().size()

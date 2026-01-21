@@ -3,10 +3,12 @@ package com.bsnacks.rpgstats.commands;
 import com.bsnacks.rpgstats.RpgStatsPlugin;
 import com.bsnacks.rpgstats.components.RpgStats;
 import com.bsnacks.rpgstats.config.RpgStatsConfig;
+import com.bsnacks.rpgstats.permissions.PermissionChecks;
 import com.bsnacks.rpgstats.permissions.RpgStatsPermissions;
 import com.bsnacks.rpgstats.systems.ConstitutionHealthEffect;
 import com.bsnacks.rpgstats.systems.EnduranceStaminaEffect;
 import com.bsnacks.rpgstats.systems.IntellectManaEffect;
+import com.bsnacks.rpgstats.ui.StatsPage;
 
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.Ref;
@@ -38,7 +40,7 @@ public final class StatsAddCommand extends CommandBase {
         this.plugin = plugin;
         this.rpgStatsType = rpgStatsType;
         this.config = config;
-        attributeArg = withRequiredArg("attribute", "str, dex, con, int, end, cha", ArgTypes.STRING);
+        attributeArg = withRequiredArg("attribute", "str, dex, con, int, end, cha, ability", ArgTypes.STRING);
     }
 
     @Override
@@ -55,6 +57,7 @@ public final class StatsAddCommand extends CommandBase {
         }
 
         String attributeRaw = attributeArg.get(ctx);
+        boolean abilityPoints = isAbilityPointsAttribute(attributeRaw);
         Ref<EntityStore> selfRef = ctx.senderAsPlayerRef();
         if (selfRef == null || !selfRef.isValid()) {
             ctx.sendMessage(Message.raw("You are not in the world right now."));
@@ -95,6 +98,25 @@ public final class StatsAddCommand extends CommandBase {
             RpgStats stats = worldStore.ensureAndGetComponent(selfRef, rpgStatsType);
             stats.migrateIfNeeded();
 
+            if (abilityPoints) {
+                if (!PermissionChecks.requirePrivileged(ctx, RpgStatsPermissions.STATS_ADD_ABILITY)) {
+                    plugin.logDebug("Denied /stats add ability: sender=" + ctx.sender().getDisplayName()
+                            + " uuid=" + ctx.sender().getUuid());
+                    return;
+                }
+                int added = stats.addAbilityPoints(1);
+                if (added <= 0) {
+                    ctx.sendMessage(Message.raw("Ability points are already at the maximum."));
+                    return;
+                }
+                StatsPage.refreshIfOpen(selfRef, worldStore);
+                ctx.sendMessage(Message.raw("Added 1 ability point. Total ability points: "
+                        + stats.getAvailableAbilityPoints() + "."));
+                plugin.logInfo("Player granted ability point: " + player.getDisplayName()
+                        + " total=" + stats.getAvailableAbilityPoints());
+                return;
+            }
+
             if (stats.getAvailableStatPoints() <= 0) {
                 ctx.sendMessage(Message.raw("You do not have any stat points to spend."));
                 return;
@@ -102,7 +124,7 @@ public final class StatsAddCommand extends CommandBase {
 
             String attribute = normalizeAttribute(attributeRaw);
             if (attribute == null) {
-                ctx.sendMessage(Message.raw("Unknown attribute '" + attributeRaw + "'. Try: str, dex, con, int, end, cha."));
+                ctx.sendMessage(Message.raw("Unknown attribute '" + attributeRaw + "'. Try: str, dex, con, int, end, cha, ability."));
                 return;
             }
             int cap = getStatCap(attribute);
@@ -113,7 +135,7 @@ public final class StatsAddCommand extends CommandBase {
             }
 
             if (!stats.spendStatPoint(attribute)) {
-                ctx.sendMessage(Message.raw("Unknown attribute '" + attributeRaw + "'. Try: str, dex, con, int, end, cha."));
+                ctx.sendMessage(Message.raw("Unknown attribute '" + attributeRaw + "'. Try: str, dex, con, int, end, cha, ability."));
                 return;
             }
 
@@ -148,6 +170,14 @@ public final class StatsAddCommand extends CommandBase {
             default:
                 return null;
         }
+    }
+
+    private boolean isAbilityPointsAttribute(String attributeRaw) {
+        if (attributeRaw == null) {
+            return false;
+        }
+        String attribute = attributeRaw.trim().toLowerCase();
+        return "ability".equals(attribute) || "ability_points".equals(attribute) || "ap".equals(attribute);
     }
 
     private int getStatCap(String attribute) {

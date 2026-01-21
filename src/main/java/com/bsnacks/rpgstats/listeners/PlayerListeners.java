@@ -6,6 +6,7 @@ import com.bsnacks.rpgstats.config.RpgStatsConfig;
 import com.bsnacks.rpgstats.systems.ConstitutionHealthEffect;
 import com.bsnacks.rpgstats.systems.IntellectManaEffect;
 import com.bsnacks.rpgstats.systems.EnduranceStaminaEffect;
+import com.bsnacks.rpgstats.systems.LightFootSpeedEffect;
 import com.bsnacks.rpgstats.ui.RpgStatsHud;
 
 import com.hypixel.hytale.component.ComponentType;
@@ -45,6 +46,7 @@ public final class PlayerListeners {
         ConstitutionHealthEffect.apply(statMap, stats, config);
         IntellectManaEffect.apply(statMap, stats, config);
         EnduranceStaminaEffect.apply(statMap, stats, config);
+        applyAbilityEffects(player, stats);
 
         plugin.logInfo((created ? "Created" : "Loaded") + " stats for player: "
                 + player.getDisplayName() + " | Level=" + stats.getLevel() + " XP=" + stats.getXp());
@@ -55,7 +57,8 @@ public final class PlayerListeners {
         if (player == null) {
             return;
         }
-        PlayerRef playerRef = player.getPlayerRef();
+        var holder = player.toHolder();
+        PlayerRef playerRef = holder.getComponent(PlayerRef.getComponentType());
         if (playerRef == null) {
             return;
         }
@@ -85,5 +88,25 @@ public final class PlayerListeners {
             return;
         }
         RpgStatsHud.refreshIfActive(ref, store);
+    }
+
+    private void applyAbilityEffects(Player player, RpgStats stats) {
+        if (player == null) {
+            return;
+        }
+        var holder = player.toHolder();
+        PlayerRef playerRef = holder.getComponent(PlayerRef.getComponentType());
+        if (playerRef == null) {
+            return;
+        }
+        Ref<EntityStore> ref = playerRef.getReference();
+        if (ref == null || !ref.isValid()) {
+            return;
+        }
+        Store<EntityStore> store = ref.getStore();
+        if (store == null) {
+            return;
+        }
+        LightFootSpeedEffect.apply(ref, store, player, stats, config, plugin);
     }
 }

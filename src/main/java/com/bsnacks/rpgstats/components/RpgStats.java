@@ -11,12 +11,19 @@ import java.util.Arrays;
 public final class RpgStats implements Component<EntityStore> {
 
     public static final String COMPONENT_ID = "rpgstats";
-    public static final int CURRENT_VERSION = 4;
+    public static final int CURRENT_VERSION = 10;
     public static final int DEFAULT_MAX_LEVEL = 25;
     public static final int BASE_XP = 100;
     public static final int LINEAR_XP = 50;
     public static final int QUADRATIC_XP = 20;
     public static final int BASE_STAT = 10;
+    public static final int DEFAULT_ABILITY_POINTS_PER_LEVEL = 2;
+    public static final int LIGHT_FOOT_MAX_LEVEL = 3;
+    public static final int ARMOR_PROFICIENCY_MAX_LEVEL = 3;
+    public static final int HEALTH_REGEN_MAX_LEVEL = 3;
+    public static final int STAMINA_REGEN_MAX_LEVEL = 3;
+    public static final int GLANCING_BLOW_MAX_LEVEL = 3;
+    public static final int STRONG_LUNGS_MAX_LEVEL = 3;
 
     public static final BuilderCodec<RpgStats> CODEC =
             BuilderCodec.builder(RpgStats.class, RpgStats::new)
@@ -24,6 +31,20 @@ public final class RpgStats implements Component<EntityStore> {
                     .append(new KeyedCodec<>("Level", Codec.INTEGER), (d, v) -> d.level = v, d -> d.level).add()
                     .append(new KeyedCodec<>("Xp", Codec.LONG), (d, v) -> d.xp = v, d -> d.xp).add()
                     .append(new KeyedCodec<>("StatHistory", Codec.STRING_ARRAY), (d, v) -> d.statHistory = v, d -> d.statHistory).add()
+                    .append(new KeyedCodec<>("AbilityPointsBonus", Codec.INTEGER),
+                            (d, v) -> d.abilityPointsBonus = v, d -> d.abilityPointsBonus).add()
+                    .append(new KeyedCodec<>("LightFootLevel", Codec.INTEGER),
+                            (d, v) -> d.lightFootLevel = v, d -> d.lightFootLevel).add()
+                    .append(new KeyedCodec<>("ArmorProficiencyLevel", Codec.INTEGER),
+                            (d, v) -> d.armorProficiencyLevel = v, d -> d.armorProficiencyLevel).add()
+                    .append(new KeyedCodec<>("HealthRegenLevel", Codec.INTEGER),
+                            (d, v) -> d.healthRegenLevel = v, d -> d.healthRegenLevel).add()
+                    .append(new KeyedCodec<>("StaminaRegenLevel", Codec.INTEGER),
+                            (d, v) -> d.staminaRegenLevel = v, d -> d.staminaRegenLevel).add()
+                    .append(new KeyedCodec<>("GlancingBlowLevel", Codec.INTEGER),
+                            (d, v) -> d.glancingBlowLevel = v, d -> d.glancingBlowLevel).add()
+                    .append(new KeyedCodec<>("StrongLungsLevel", Codec.INTEGER),
+                            (d, v) -> d.strongLungsLevel = v, d -> d.strongLungsLevel).add()
 
                     .append(new KeyedCodec<>("Str", Codec.INTEGER), (d, v) -> d.str = v, d -> d.str).add()
                     .append(new KeyedCodec<>("Dex", Codec.INTEGER), (d, v) -> d.dex = v, d -> d.dex).add()
@@ -36,10 +57,18 @@ public final class RpgStats implements Component<EntityStore> {
     private int version =  CURRENT_VERSION;
 
     private static int maxLevel = DEFAULT_MAX_LEVEL;
+    private static int abilityPointsPerLevel = DEFAULT_ABILITY_POINTS_PER_LEVEL;
 
     private int level = 1;
     private long xp = 0L;
     private String[] statHistory = new String[0];
+    private int abilityPointsBonus = 0;
+    private int lightFootLevel = 0;
+    private int armorProficiencyLevel = 0;
+    private int healthRegenLevel = 0;
+    private int staminaRegenLevel = 0;
+    private int glancingBlowLevel = 0;
+    private int strongLungsLevel = 0;
     private boolean syncingLevel = false;
 
     private int str = BASE_STAT, dex = BASE_STAT, con = BASE_STAT, intl = BASE_STAT, end = BASE_STAT, cha = BASE_STAT;
@@ -62,6 +91,31 @@ public final class RpgStats implements Component<EntityStore> {
             syncLevelToXp();
             version = 4;
         }
+        if (version < 5) {
+            abilityPointsBonus = 0;
+            version = 5;
+        }
+        if (version < 6) {
+            lightFootLevel = 0;
+            version = 6;
+        }
+        if (version < 7) {
+            armorProficiencyLevel = 0;
+            version = 7;
+        }
+        if (version < 8) {
+            healthRegenLevel = 0;
+            staminaRegenLevel = 0;
+            version = 8;
+        }
+        if (version < 9) {
+            glancingBlowLevel = 0;
+            version = 9;
+        }
+        if (version < 10) {
+            strongLungsLevel = 0;
+            version = 10;
+        }
     }
 
     public int modifier(int score) {
@@ -73,6 +127,13 @@ public final class RpgStats implements Component<EntityStore> {
         statHistory = new String[0];
         xp = 0L;
         syncLevelToXp();
+        abilityPointsBonus = 0;
+        lightFootLevel = 0;
+        armorProficiencyLevel = 0;
+        healthRegenLevel = 0;
+        staminaRegenLevel = 0;
+        glancingBlowLevel = 0;
+        strongLungsLevel = 0;
         str = BASE_STAT;
         dex = BASE_STAT;
         con = BASE_STAT;
@@ -111,6 +172,12 @@ public final class RpgStats implements Component<EntityStore> {
         return Math.max(0, totalStatPointsEarned() - getStatHistorySize());
     }
 
+    public int getAvailableAbilityPoints() {
+        syncLevelToXp();
+        long total = totalAbilityPointsEarned() + (long) abilityPointsBonus - getAbilityPointsSpent();
+        return clampToInt(total);
+    }
+
     public long getXpIntoLevel() {
         long totalForLevel = totalXpForLevel(getLevel());
         return Math.max(0L, xp - totalForLevel);
@@ -130,6 +197,113 @@ public final class RpgStats implements Component<EntityStore> {
     public int getIntl() { return intl; }
     public int getEnd() { return end; }
     public int getCha() { return cha; }
+    public int getLightFootLevel() {
+        syncLevelToXp();
+        return lightFootLevel;
+    }
+
+    public boolean upgradeLightFoot() {
+        syncLevelToXp();
+        if (lightFootLevel >= LIGHT_FOOT_MAX_LEVEL) {
+            return false;
+        }
+        int cost = getAbilityUpgradeCost(lightFootLevel, LIGHT_FOOT_MAX_LEVEL);
+        if (getAvailableAbilityPoints() < cost) {
+            return false;
+        }
+        lightFootLevel++;
+        return true;
+    }
+
+    public int getArmorProficiencyLevel() {
+        syncLevelToXp();
+        return armorProficiencyLevel;
+    }
+
+    public boolean upgradeArmorProficiency() {
+        syncLevelToXp();
+        if (armorProficiencyLevel >= ARMOR_PROFICIENCY_MAX_LEVEL) {
+            return false;
+        }
+        int cost = getAbilityUpgradeCost(armorProficiencyLevel, ARMOR_PROFICIENCY_MAX_LEVEL);
+        if (getAvailableAbilityPoints() < cost) {
+            return false;
+        }
+        armorProficiencyLevel++;
+        return true;
+    }
+
+    public int getHealthRegenLevel() {
+        syncLevelToXp();
+        return healthRegenLevel;
+    }
+
+    public boolean upgradeHealthRegen() {
+        syncLevelToXp();
+        if (healthRegenLevel >= HEALTH_REGEN_MAX_LEVEL) {
+            return false;
+        }
+        int cost = getAbilityUpgradeCost(healthRegenLevel, HEALTH_REGEN_MAX_LEVEL);
+        if (getAvailableAbilityPoints() < cost) {
+            return false;
+        }
+        healthRegenLevel++;
+        return true;
+    }
+
+    public int getStaminaRegenLevel() {
+        syncLevelToXp();
+        return staminaRegenLevel;
+    }
+
+    public boolean upgradeStaminaRegen() {
+        syncLevelToXp();
+        if (staminaRegenLevel >= STAMINA_REGEN_MAX_LEVEL) {
+            return false;
+        }
+        int cost = getAbilityUpgradeCost(staminaRegenLevel, STAMINA_REGEN_MAX_LEVEL);
+        if (getAvailableAbilityPoints() < cost) {
+            return false;
+        }
+        staminaRegenLevel++;
+        return true;
+    }
+
+    public int getGlancingBlowLevel() {
+        syncLevelToXp();
+        return glancingBlowLevel;
+    }
+
+    public boolean upgradeGlancingBlow() {
+        syncLevelToXp();
+        if (glancingBlowLevel >= GLANCING_BLOW_MAX_LEVEL) {
+            return false;
+        }
+        int cost = getAbilityUpgradeCost(glancingBlowLevel, GLANCING_BLOW_MAX_LEVEL);
+        if (getAvailableAbilityPoints() < cost) {
+            return false;
+        }
+        glancingBlowLevel++;
+        return true;
+    }
+
+    public int getStrongLungsLevel() {
+        syncLevelToXp();
+        return strongLungsLevel;
+    }
+
+    public boolean upgradeStrongLungs() {
+        syncLevelToXp();
+        if (strongLungsLevel >= STRONG_LUNGS_MAX_LEVEL) {
+            return false;
+        }
+        int cost = getAbilityUpgradeCost(strongLungsLevel, STRONG_LUNGS_MAX_LEVEL);
+        if (getAvailableAbilityPoints() < cost) {
+            return false;
+        }
+        strongLungsLevel++;
+        return true;
+    }
 
     public boolean spendStatPoint(String attributeRaw) {
         if (getAvailableStatPoints() <= 0) {
@@ -151,6 +325,13 @@ public final class RpgStats implements Component<EntityStore> {
         copy.level = this.level;
         copy.xp = this.xp;
         copy.statHistory = statHistory == null ? new String[0] : Arrays.copyOf(statHistory, statHistory.length);
+        copy.abilityPointsBonus = this.abilityPointsBonus;
+        copy.lightFootLevel = this.lightFootLevel;
+        copy.armorProficiencyLevel = this.armorProficiencyLevel;
+        copy.healthRegenLevel = this.healthRegenLevel;
+        copy.staminaRegenLevel = this.staminaRegenLevel;
+        copy.glancingBlowLevel = this.glancingBlowLevel;
+        copy.strongLungsLevel = this.strongLungsLevel;
         copy.str = this.str;
         copy.dex = this.dex;
         copy.con = this.con;
@@ -171,6 +352,7 @@ public final class RpgStats implements Component<EntityStore> {
                 level = newLevel;
             }
             reconcileStatPoints();
+            reconcileAbilityPoints();
         } finally {
             syncingLevel = false;
         }
@@ -211,6 +393,123 @@ public final class RpgStats implements Component<EntityStore> {
 
     private int totalStatPointsEarned() {
         return Math.max(0, level - 1);
+    }
+
+    private int getAbilityPointsSpent() {
+        int spent = 0;
+        if (lightFootLevel > 0) {
+            spent += totalCostForLevels(lightFootLevel);
+        }
+        if (armorProficiencyLevel > 0) {
+            spent += totalCostForLevels(armorProficiencyLevel);
+        }
+        if (healthRegenLevel > 0) {
+            spent += totalCostForLevels(healthRegenLevel);
+        }
+        if (staminaRegenLevel > 0) {
+            spent += totalCostForLevels(staminaRegenLevel);
+        }
+        if (glancingBlowLevel > 0) {
+            spent += totalCostForLevels(glancingBlowLevel);
+        }
+        if (strongLungsLevel > 0) {
+            spent += totalCostForLevels(strongLungsLevel);
+        }
+        return Math.max(0, spent);
+    }
+
+    private long totalAbilityPointsEarned() {
+        if (abilityPointsPerLevel <= 0) {
+            return 0L;
+        }
+        long levels = Math.max(0, level - 1);
+        return levels * (long) abilityPointsPerLevel;
+    }
+
+    public int addAbilityPoints(int amount) {
+        if (amount == 0) {
+            return 0;
+        }
+        long next = (long) abilityPointsBonus + amount;
+        if (next < 0L) {
+            next = 0L;
+        } else if (next > Integer.MAX_VALUE) {
+            next = Integer.MAX_VALUE;
+        }
+        int applied = (int) next;
+        int delta = applied - abilityPointsBonus;
+        abilityPointsBonus = applied;
+        reconcileAbilityPoints();
+        return delta;
+    }
+
+    private void reconcileAbilityPoints() {
+        long total = totalAbilityPointsEarned() + (long) abilityPointsBonus;
+        int maxAllowed = clampToInt(total);
+        lightFootLevel = clamp(lightFootLevel, 0, LIGHT_FOOT_MAX_LEVEL);
+        armorProficiencyLevel = clamp(armorProficiencyLevel, 0, ARMOR_PROFICIENCY_MAX_LEVEL);
+        healthRegenLevel = clamp(healthRegenLevel, 0, HEALTH_REGEN_MAX_LEVEL);
+        staminaRegenLevel = clamp(staminaRegenLevel, 0, STAMINA_REGEN_MAX_LEVEL);
+        glancingBlowLevel = clamp(glancingBlowLevel, 0, GLANCING_BLOW_MAX_LEVEL);
+        strongLungsLevel = clamp(strongLungsLevel, 0, STRONG_LUNGS_MAX_LEVEL);
+
+        if (getAbilityPointsSpent() > maxAllowed) {
+            trimAbilityLevelsToPoints(maxAllowed);
+        }
+    }
+
+    public static int getAbilityUpgradeCost(int currentLevel, int maxLevel) {
+        if (currentLevel < 0) {
+            currentLevel = 0;
+        }
+        if (currentLevel >= maxLevel) {
+            return 0;
+        }
+        return currentLevel + 1;
+    }
+
+    private static int totalCostForLevels(int levels) {
+        int clamped = Math.max(0, levels);
+        return (clamped * (clamped + 1)) / 2;
+    }
+
+    private void trimAbilityLevelsToPoints(int maxAllowed) {
+        if (maxAllowed <= 0) {
+            lightFootLevel = 0;
+            armorProficiencyLevel = 0;
+            healthRegenLevel = 0;
+            staminaRegenLevel = 0;
+            glancingBlowLevel = 0;
+            return;
+        }
+        int guard = LIGHT_FOOT_MAX_LEVEL + ARMOR_PROFICIENCY_MAX_LEVEL + HEALTH_REGEN_MAX_LEVEL + STAMINA_REGEN_MAX_LEVEL + GLANCING_BLOW_MAX_LEVEL + STRONG_LUNGS_MAX_LEVEL + 2;
+        while (getAbilityPointsSpent() > maxAllowed && guard-- > 0) {
+            if (strongLungsLevel > 0) {
+                strongLungsLevel--;
+                continue;
+            }
+            if (glancingBlowLevel > 0) {
+                glancingBlowLevel--;
+                continue;
+            }
+            if (staminaRegenLevel > 0) {
+                staminaRegenLevel--;
+                continue;
+            }
+            if (healthRegenLevel > 0) {
+                healthRegenLevel--;
+                continue;
+            }
+            if (armorProficiencyLevel > 0) {
+                armorProficiencyLevel--;
+                continue;
+            }
+            if (lightFootLevel > 0) {
+                lightFootLevel--;
+            } else {
+                break;
+            }
+        }
     }
 
     private void migrateWisToEnd() {
@@ -315,6 +614,20 @@ public final class RpgStats implements Component<EntityStore> {
         maxLevel = clamp(newMaxLevel, 1, Integer.MAX_VALUE);
     }
 
+    public static int getAbilityPointsPerLevel() {
+        return abilityPointsPerLevel;
+    }
+
+    public static void setAbilityPointsPerLevel(int newAbilityPointsPerLevel) {
+        int maxAllowed = maxAbilityPointsPerLevel(maxLevel);
+        abilityPointsPerLevel = clamp(newAbilityPointsPerLevel, 0, maxAllowed);
+    }
+
+    private static int maxAbilityPointsPerLevel(int maxLevel) {
+        int levels = Math.max(1, maxLevel - 1);
+        return Integer.MAX_VALUE / levels;
+    }
+
     private static int clamp(int value, int min, int max) {
         if (value < min) {
             return min;
@@ -323,5 +636,15 @@ public final class RpgStats implements Component<EntityStore> {
             return max;
         }
         return value;
+    }
+
+    private static int clampToInt(long value) {
+        if (value < 0L) {
+            return 0;
+        }
+        if (value > Integer.MAX_VALUE) {
+            return Integer.MAX_VALUE;
+        }
+        return (int) value;
     }
 }

@@ -7,9 +7,16 @@ This project is a java plugin mod for the game Hytale. It gives each player RPG-
 - Tracks player stats (level, XP, STR, DEX, CON, INT, END, CHA).
 - Uses **total XP** for leveling (max level is configurable; default **25**).
 - Earns **1 stat point per level** (level 2 = 1 point, level 3 = 2 points, etc).
+- Tracks **ability points per level** (configurable via `ability_points_per_level`).
+- Light Foot ability with 3 levels (+5%, +10%, +15% movement speed).
+- Armor Proficiency ability with 3 levels (+5%, +10%, +15% Physical/Projectile resistance while wearing armor).
+- Glancing Blow ability with 3 levels (10%, 15%, 20% chance to dodge hostile NPC damage).
+- Health Regeneration ability with 3 levels (2/3/4 health per second).
+- Stamina Regeneration ability with 3 levels (0.75/1.0/1.25 stamina per second).
+- Strong Lungs ability with 3 levels (+50%, +100%, +150% oxygen).
 - Lets players spend points with `/stats add <stat>`.
 - Lets admins set or reset stats with `/stats set` and `/stats reset`.
-- Provides a stats GUI with tabs (Stats, Abilities placeholder, Reset) and an XP progress bar.
+- Provides a stats GUI with tabs (Stats, Abilities, Reset) and an XP progress bar.
 - Shows an optional HUD XP bar (toggle with `hud_enabled` in `config.toml`).
 - Awards XP on hostile NPC kills and shows chat updates. XP is determined by health of hostile entity.
 - Applies **Strength damage multiplier**: `damage = baseDamage * (str / damage_multiplier_base)`.
@@ -53,6 +60,15 @@ Spend a stat point:
 Valid stats: `str`, `dex`, `con`, `int`, `end`, `cha`.
 - CHA is currently an unused stat but will be implemented in the future.
 
+Spend ability points:
+- Open `/stats` and use the Abilities tab to upgrade Light Foot, Armor Proficiency, Glancing Blow, Health Regeneration, or Stamina Regeneration (max level 3 each).
+
+Manually add ability points (admin):
+```text
+/stats add ability
+```
+Requires `rpgstats.add.ability`.
+
 Admin-style commands:
 ```text
 /stats set str self 20
@@ -69,6 +85,7 @@ Permission root: `rpgstats`
 
 - View stats: `rpgstats.view`
 - Spend stat points: `rpgstats.add`
+- Grant ability points: `rpgstats.add.ability`
 - Set stats for self: `rpgstats.set`
 - Set stats for others: `rpgstats.set.others`
 - Reset stats for self: `rpgstats.reset`
@@ -84,9 +101,16 @@ The plugin writes `config.toml` to the plugin data directory on first run. Edit 
 
 Default keys:
 ```toml
-config_version = 1
+config_version = 4
 xp_multiplier = 0.35
 max_level = 25
+ability_points_per_level = 2
+light_foot_speed_per_level_pct = 5.0
+armor_proficiency_resistance_per_level_pct = 5.0
+glancing_blow_chance_per_level_pct = 5.0
+health_regen_per_level_per_sec = 1.0
+stamina_regen_per_level_per_sec = 0.5
+strong_lungs_oxygen_per_level_pct = 50.0
 damage_multiplier_base = 10.0
 mining_speed_base = 1.0
 mining_speed_per_point = 0.10
@@ -102,6 +126,14 @@ end_cap = 25
 cha_cap = 25
 ```
 If a player tries to set or add a stat above its cap, the command returns a message with the configured limit.
+Ability points are tracked per level using `ability_points_per_level` and shown in the Abilities tab.
+`ability_points_per_level` is clamped to prevent overflow: max is `floor(2147483647 / max(1, max_level - 1))`.
+Light Foot speed, Armor Proficiency resistance, and Glancing Blow dodge chance scale per level using
+`light_foot_speed_per_level_pct`, `armor_proficiency_resistance_per_level_pct`, and `glancing_blow_chance_per_level_pct`
+(values are percentages). Glancing Blow has a 5% base dodge chance, so levels 1-3 grant 10%, 15%, and 20% total dodge chance.
+Strong Lungs increases max oxygen per level using `strong_lungs_oxygen_per_level_pct` (percentage-based additive bonus).
+Health/Stamina regeneration abilities add per-level points per second using
+`health_regen_per_level_per_sec` and `stamina_regen_per_level_per_sec`.
 Set `hud_enabled = false` to disable the HUD XP bar (useful for HUD mod conflicts like TextSigns).
 
 XP blacklist (xp_blacklist.toml):
@@ -115,9 +147,8 @@ If you already have `xp_blacklist.toml`, keep your file and paste any new entrie
 Multi-line arrays are supported in `xp_blacklist.toml` if you want to keep long lists readable.
 
 ## Planned features
-- Ability points to spend on ability's per level that can be configured from the .toml file.
 - CHA will apply some kind of discount to NPC shops.
-- Ability's that will affect gameplay in non-destructive ways.
+- More abilities that affect gameplay in non-destructive ways.
 - Classes (maybe if it fits).
 - Uses for the ability modifiers (DND style System).
 - GUI enhancements (help buttons per stat and other UX polish).

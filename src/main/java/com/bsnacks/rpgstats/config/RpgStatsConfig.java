@@ -22,10 +22,22 @@ public final class RpgStatsConfig {
     private static final DateTimeFormatter BACKUP_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss");
     private static final String FILE_NAME = "config.toml";
     private static final String XP_BLACKLIST_FILE_NAME = "xp_blacklist.toml";
-    private static final int CURRENT_CONFIG_VERSION = 1;
+    private static final int CURRENT_CONFIG_VERSION = 4;
     private static final double DEFAULT_XP_MULTIPLIER = 0.35;
     private static final int DEFAULT_MAX_LEVEL = 25;
+    private static final int DEFAULT_ABILITY_POINTS_PER_LEVEL = 2;
+    private static final int MIN_ABILITY_POINTS_PER_LEVEL = 0;
     private static final int DEFAULT_STAT_CAP = 25;
+    private static final double DEFAULT_LIGHT_FOOT_SPEED_PER_LEVEL_PCT = 5.0;
+    private static final double DEFAULT_ARMOR_PROFICIENCY_RESISTANCE_PER_LEVEL_PCT = 5.0;
+    private static final double MIN_ABILITY_BONUS_PCT = 0.0;
+    private static final double MAX_ABILITY_BONUS_PCT = 100.0;
+    private static final double DEFAULT_HEALTH_REGEN_PER_LEVEL_PER_SEC = 1.0;
+    private static final double DEFAULT_STAMINA_REGEN_PER_LEVEL_PER_SEC = 0.15;
+    private static final double MIN_REGEN_PER_LEVEL_PER_SEC = 0.0;
+    private static final double MAX_REGEN_PER_LEVEL_PER_SEC = 100.0;
+    private static final double DEFAULT_GLANCING_BLOW_CHANCE_PER_LEVEL_PCT = 5.0;
+    private static final double DEFAULT_STRONG_LUNGS_OXYGEN_PER_LEVEL_PCT = 100.0;
     private static final double DEFAULT_DAMAGE_MULTIPLIER_BASE = 10.0;
     private static final double DEFAULT_MINING_SPEED_BASE = 1.0;
     private static final double DEFAULT_MINING_SPEED_PER_POINT = 0.10;
@@ -37,6 +49,12 @@ public final class RpgStatsConfig {
     private int configVersion;
     private double xpMultiplier;
     private int maxLevel;
+    private int abilityPointsPerLevel;
+    private double lightFootSpeedPerLevelPct;
+    private double armorProficiencyResistancePerLevelPct;
+    private double healthRegenPerLevelPerSec;
+    private double staminaRegenPerLevelPerSec;
+    private double glancingBlowChancePerLevelPct;
     private double damageMultiplierBase;
     private double miningSpeedBase;
     private double miningSpeedPerPoint;
@@ -52,16 +70,28 @@ public final class RpgStatsConfig {
     private int chaCap;
     private Set<String> xpBlacklistNpcTypes;
     private Set<String> xpBlacklistRoles;
+    private double strongLungsOxygenPerLevelPct;
 
-    private RpgStatsConfig(int configVersion, double xpMultiplier, int maxLevel, double damageMultiplierBase,
+    private RpgStatsConfig(int configVersion, double xpMultiplier, int maxLevel, int abilityPointsPerLevel,
+                           double lightFootSpeedPerLevelPct, double armorProficiencyResistancePerLevelPct,
+                           double healthRegenPerLevelPerSec, double staminaRegenPerLevelPerSec,
+                           double glancingBlowChancePerLevelPct,
+                           double damageMultiplierBase,
                            double miningSpeedBase, double miningSpeedPerPoint,
                            double healthPerPoint, double manaPerPoint, double staminaPerPoint,
                            boolean hudEnabled,
                            int strCap, int dexCap, int conCap, int intCap, int endCap, int chaCap,
-                           Set<String> xpBlacklistNpcTypes, Set<String> xpBlacklistRoles) {
+                           Set<String> xpBlacklistNpcTypes, Set<String> xpBlacklistRoles,
+                           double strongLungsOxygenPerLevelPct) {
         this.configVersion = configVersion;
         this.xpMultiplier = xpMultiplier;
         this.maxLevel = maxLevel;
+        this.abilityPointsPerLevel = abilityPointsPerLevel;
+        this.lightFootSpeedPerLevelPct = lightFootSpeedPerLevelPct;
+        this.armorProficiencyResistancePerLevelPct = armorProficiencyResistancePerLevelPct;
+        this.healthRegenPerLevelPerSec = healthRegenPerLevelPerSec;
+        this.staminaRegenPerLevelPerSec = staminaRegenPerLevelPerSec;
+        this.glancingBlowChancePerLevelPct = glancingBlowChancePerLevelPct;
         this.damageMultiplierBase = damageMultiplierBase;
         this.miningSpeedBase = miningSpeedBase;
         this.miningSpeedPerPoint = miningSpeedPerPoint;
@@ -77,6 +107,7 @@ public final class RpgStatsConfig {
         this.chaCap = chaCap;
         this.xpBlacklistNpcTypes = xpBlacklistNpcTypes;
         this.xpBlacklistRoles = xpBlacklistRoles;
+        this.strongLungsOxygenPerLevelPct = strongLungsOxygenPerLevelPct;
     }
 
     public double getXpMultiplier() {
@@ -85,6 +116,34 @@ public final class RpgStatsConfig {
 
     public int getMaxLevel() {
         return maxLevel;
+    }
+
+    public int getAbilityPointsPerLevel() {
+        return abilityPointsPerLevel;
+    }
+
+    public double getLightFootSpeedPerLevelPct() {
+        return lightFootSpeedPerLevelPct;
+    }
+
+    public double getArmorProficiencyResistancePerLevelPct() {
+        return armorProficiencyResistancePerLevelPct;
+    }
+
+    public double getHealthRegenPerLevelPerSec() {
+        return healthRegenPerLevelPerSec;
+    }
+
+    public double getStaminaRegenPerLevelPerSec() {
+        return staminaRegenPerLevelPerSec;
+    }
+
+    public double getGlancingBlowChancePerLevelPct() {
+        return glancingBlowChancePerLevelPct;
+    }
+
+    public double getStrongLungsOxygenPerLevelPct() {
+        return strongLungsOxygenPerLevelPct;
     }
 
     public double getDamageMultiplierBase() {
@@ -164,6 +223,13 @@ public final class RpgStatsConfig {
         this.configVersion = other.configVersion;
         this.xpMultiplier = other.xpMultiplier;
         this.maxLevel = other.maxLevel;
+        this.abilityPointsPerLevel = other.abilityPointsPerLevel;
+        this.lightFootSpeedPerLevelPct = other.lightFootSpeedPerLevelPct;
+        this.armorProficiencyResistancePerLevelPct = other.armorProficiencyResistancePerLevelPct;
+        this.healthRegenPerLevelPerSec = other.healthRegenPerLevelPerSec;
+        this.staminaRegenPerLevelPerSec = other.staminaRegenPerLevelPerSec;
+        this.glancingBlowChancePerLevelPct = other.glancingBlowChancePerLevelPct;
+        this.strongLungsOxygenPerLevelPct = other.strongLungsOxygenPerLevelPct;
         this.damageMultiplierBase = other.damageMultiplierBase;
         this.miningSpeedBase = other.miningSpeedBase;
         this.miningSpeedPerPoint = other.miningSpeedPerPoint;
@@ -205,6 +271,12 @@ public final class RpgStatsConfig {
                     CURRENT_CONFIG_VERSION,
                     DEFAULT_XP_MULTIPLIER,
                     DEFAULT_MAX_LEVEL,
+                    DEFAULT_ABILITY_POINTS_PER_LEVEL,
+                    DEFAULT_LIGHT_FOOT_SPEED_PER_LEVEL_PCT,
+                    DEFAULT_ARMOR_PROFICIENCY_RESISTANCE_PER_LEVEL_PCT,
+                    DEFAULT_HEALTH_REGEN_PER_LEVEL_PER_SEC,
+                    DEFAULT_STAMINA_REGEN_PER_LEVEL_PER_SEC,
+                    DEFAULT_GLANCING_BLOW_CHANCE_PER_LEVEL_PCT,
                     DEFAULT_DAMAGE_MULTIPLIER_BASE,
                     DEFAULT_MINING_SPEED_BASE,
                     DEFAULT_MINING_SPEED_PER_POINT,
@@ -219,7 +291,8 @@ public final class RpgStatsConfig {
                     DEFAULT_STAT_CAP,
                     DEFAULT_STAT_CAP,
                     xpBlacklist.npcTypes,
-                    xpBlacklist.roles
+                    xpBlacklist.roles,
+                    DEFAULT_STRONG_LUNGS_OXYGEN_PER_LEVEL_PCT
             );
         }
 
@@ -227,6 +300,10 @@ public final class RpgStatsConfig {
         int configVersion = parseInt(values.get("config_version"), 0, logger, "config_version");
         if (configVersion < 1) {
             logger.at(Level.INFO).log("[RPGStats] config_version missing or invalid. Assuming 0.");
+        }
+        if (configVersion > 0 && configVersion < CURRENT_CONFIG_VERSION) {
+            logger.at(Level.INFO).log("[RPGStats] config_version " + configVersion
+                    + " is older than latest " + CURRENT_CONFIG_VERSION + ". New settings may be missing.");
         }
         double multiplier = parseDouble(values.get("xp_multiplier"), DEFAULT_XP_MULTIPLIER, logger, "xp_multiplier");
         if (multiplier <= 0) {
@@ -239,6 +316,50 @@ public final class RpgStatsConfig {
             logger.at(Level.WARNING).log("[RPGStats] max_level must be >= 1. Using default " + DEFAULT_MAX_LEVEL);
             maxLevel = DEFAULT_MAX_LEVEL;
         }
+
+        int abilityPointsPerLevel = parseInt(values.get("ability_points_per_level"),
+                DEFAULT_ABILITY_POINTS_PER_LEVEL, logger, "ability_points_per_level");
+        if (abilityPointsPerLevel < MIN_ABILITY_POINTS_PER_LEVEL) {
+            logger.at(Level.WARNING).log("[RPGStats] ability_points_per_level must be >= "
+                    + MIN_ABILITY_POINTS_PER_LEVEL + ". Using default " + DEFAULT_ABILITY_POINTS_PER_LEVEL);
+            abilityPointsPerLevel = DEFAULT_ABILITY_POINTS_PER_LEVEL;
+        }
+        int maxAbilityPointsPerLevel = maxAbilityPointsPerLevel(maxLevel);
+        if (abilityPointsPerLevel > maxAbilityPointsPerLevel) {
+            logger.at(Level.WARNING).log("[RPGStats] ability_points_per_level must be <= "
+                    + maxAbilityPointsPerLevel + " for max_level " + maxLevel + ". Clamping.");
+            abilityPointsPerLevel = maxAbilityPointsPerLevel;
+        }
+
+        double lightFootSpeedPerLevelPct = parseDouble(values.get("light_foot_speed_per_level_pct"),
+                DEFAULT_LIGHT_FOOT_SPEED_PER_LEVEL_PCT, logger, "light_foot_speed_per_level_pct");
+        lightFootSpeedPerLevelPct = clampAbilityPct(lightFootSpeedPerLevelPct, logger, "light_foot_speed_per_level_pct",
+                DEFAULT_LIGHT_FOOT_SPEED_PER_LEVEL_PCT);
+
+        double armorProficiencyResistancePerLevelPct = parseDouble(values.get("armor_proficiency_resistance_per_level_pct"),
+                DEFAULT_ARMOR_PROFICIENCY_RESISTANCE_PER_LEVEL_PCT, logger, "armor_proficiency_resistance_per_level_pct");
+        armorProficiencyResistancePerLevelPct = clampAbilityPct(armorProficiencyResistancePerLevelPct, logger,
+                "armor_proficiency_resistance_per_level_pct", DEFAULT_ARMOR_PROFICIENCY_RESISTANCE_PER_LEVEL_PCT);
+
+        double healthRegenPerLevelPerSec = parseDouble(values.get("health_regen_per_level_per_sec"),
+                DEFAULT_HEALTH_REGEN_PER_LEVEL_PER_SEC, logger, "health_regen_per_level_per_sec");
+        healthRegenPerLevelPerSec = clampRegenPerLevel(healthRegenPerLevelPerSec, logger,
+                "health_regen_per_level_per_sec", DEFAULT_HEALTH_REGEN_PER_LEVEL_PER_SEC);
+
+        double staminaRegenPerLevelPerSec = parseDouble(values.get("stamina_regen_per_level_per_sec"),
+                DEFAULT_STAMINA_REGEN_PER_LEVEL_PER_SEC, logger, "stamina_regen_per_level_per_sec");
+        staminaRegenPerLevelPerSec = clampRegenPerLevel(staminaRegenPerLevelPerSec, logger,
+                "stamina_regen_per_level_per_sec", DEFAULT_STAMINA_REGEN_PER_LEVEL_PER_SEC);
+
+        double glancingBlowChancePerLevelPct = parseDouble(values.get("glancing_blow_chance_per_level_pct"),
+                DEFAULT_GLANCING_BLOW_CHANCE_PER_LEVEL_PCT, logger, "glancing_blow_chance_per_level_pct");
+        glancingBlowChancePerLevelPct = clampAbilityPct(glancingBlowChancePerLevelPct, logger,
+                "glancing_blow_chance_per_level_pct", DEFAULT_GLANCING_BLOW_CHANCE_PER_LEVEL_PCT);
+
+        double strongLungsOxygenPerLevelPct = parseDouble(values.get("strong_lungs_oxygen_per_level_pct"),
+                DEFAULT_STRONG_LUNGS_OXYGEN_PER_LEVEL_PCT, logger, "strong_lungs_oxygen_per_level_pct");
+        strongLungsOxygenPerLevelPct = clampAbilityPct(strongLungsOxygenPerLevelPct, logger,
+                "strong_lungs_oxygen_per_level_pct", DEFAULT_STRONG_LUNGS_OXYGEN_PER_LEVEL_PCT);
 
         double damageBase = parseDouble(values.get("damage_multiplier_base"), DEFAULT_DAMAGE_MULTIPLIER_BASE,
                 logger, "damage_multiplier_base");
@@ -290,11 +411,14 @@ public final class RpgStatsConfig {
         Set<String> xpBlacklistNpcTypes = mergeSets(xpBlacklist.npcTypes, legacyNpcTypes);
         Set<String> xpBlacklistRoles = mergeSets(xpBlacklist.roles, legacyRoles);
 
-        return new RpgStatsConfig(configVersion, multiplier, maxLevel, damageBase,
-                miningBase, miningPerPoint, healthPerPoint, manaPerPoint, staminaPerPoint,
+        return new RpgStatsConfig(configVersion, multiplier, maxLevel, abilityPointsPerLevel,
+                lightFootSpeedPerLevelPct, armorProficiencyResistancePerLevelPct,
+                healthRegenPerLevelPerSec, staminaRegenPerLevelPerSec, glancingBlowChancePerLevelPct,
+                damageBase, miningBase, miningPerPoint, healthPerPoint, manaPerPoint, staminaPerPoint,
                 hudEnabled,
                 strCap, dexCap, conCap, intCap, endCap, chaCap,
-                xpBlacklistNpcTypes, xpBlacklistRoles);
+                xpBlacklistNpcTypes, xpBlacklistRoles,
+                strongLungsOxygenPerLevelPct);
     }
 
     private static Map<String, String> readKeyValues(Path configPath, HytaleLogger logger) {
@@ -409,6 +533,39 @@ public final class RpgStatsConfig {
         return cap;
     }
 
+    private static double clampAbilityPct(double value, HytaleLogger logger, String key, double fallback) {
+        if (value < MIN_ABILITY_BONUS_PCT) {
+            logger.at(Level.WARNING).log("[RPGStats] " + key + " must be >= " + MIN_ABILITY_BONUS_PCT
+                    + ". Using default " + fallback);
+            return fallback;
+        }
+        if (value > MAX_ABILITY_BONUS_PCT) {
+            logger.at(Level.WARNING).log("[RPGStats] " + key + " must be <= " + MAX_ABILITY_BONUS_PCT
+                    + ". Clamping.");
+            return MAX_ABILITY_BONUS_PCT;
+        }
+        return value;
+    }
+
+    private static double clampRegenPerLevel(double value, HytaleLogger logger, String key, double fallback) {
+        if (value < MIN_REGEN_PER_LEVEL_PER_SEC) {
+            logger.at(Level.WARNING).log("[RPGStats] " + key + " must be >= " + MIN_REGEN_PER_LEVEL_PER_SEC
+                    + ". Using default " + fallback);
+            return fallback;
+        }
+        if (value > MAX_REGEN_PER_LEVEL_PER_SEC) {
+            logger.at(Level.WARNING).log("[RPGStats] " + key + " must be <= " + MAX_REGEN_PER_LEVEL_PER_SEC
+                    + ". Clamping.");
+            return MAX_REGEN_PER_LEVEL_PER_SEC;
+        }
+        return value;
+    }
+
+    private static int maxAbilityPointsPerLevel(int maxLevel) {
+        int levels = Math.max(1, maxLevel - 1);
+        return Integer.MAX_VALUE / levels;
+    }
+
     private static Set<String> parseStringSet(String raw) {
         if (raw == null) {
             return Collections.emptySet();
@@ -473,6 +630,33 @@ public final class RpgStatsConfig {
                 + "\n"
                 + "# Maximum player level (default " + DEFAULT_MAX_LEVEL + ").\n"
                 + "max_level = " + DEFAULT_MAX_LEVEL + "\n"
+                + "\n"
+                + "# Ability points earned per level (default " + DEFAULT_ABILITY_POINTS_PER_LEVEL + ").\n"
+                + "# Valid range: " + MIN_ABILITY_POINTS_PER_LEVEL
+                + " to floor(2147483647 / max(1, max_level - 1)).\n"
+                + "ability_points_per_level = " + DEFAULT_ABILITY_POINTS_PER_LEVEL + "\n"
+                + "\n"
+                + "# Light Foot bonus per level, in percent (default " + DEFAULT_LIGHT_FOOT_SPEED_PER_LEVEL_PCT + ").\n"
+                + "light_foot_speed_per_level_pct = " + DEFAULT_LIGHT_FOOT_SPEED_PER_LEVEL_PCT + "\n"
+                + "\n"
+                + "# Armor Proficiency bonus per level, in percent (default " + DEFAULT_ARMOR_PROFICIENCY_RESISTANCE_PER_LEVEL_PCT + ").\n"
+                + "armor_proficiency_resistance_per_level_pct = " + DEFAULT_ARMOR_PROFICIENCY_RESISTANCE_PER_LEVEL_PCT + "\n"
+                + "\n"
+                + "# Health regeneration bonus per level, in points per second (default " + DEFAULT_HEALTH_REGEN_PER_LEVEL_PER_SEC + ").\n"
+                + "# Valid range: " + MIN_REGEN_PER_LEVEL_PER_SEC + " to " + MAX_REGEN_PER_LEVEL_PER_SEC + ".\n"
+                + "health_regen_per_level_per_sec = " + DEFAULT_HEALTH_REGEN_PER_LEVEL_PER_SEC + "\n"
+                + "\n"
+                + "# Stamina regeneration bonus per level, in points per second (default " + DEFAULT_STAMINA_REGEN_PER_LEVEL_PER_SEC + ").\n"
+                + "# Valid range: " + MIN_REGEN_PER_LEVEL_PER_SEC + " to " + MAX_REGEN_PER_LEVEL_PER_SEC + ".\n"
+                + "stamina_regen_per_level_per_sec = " + DEFAULT_STAMINA_REGEN_PER_LEVEL_PER_SEC + "\n"
+                + "\n"
+                + "# Glancing Blow dodge chance per level, in percent (default " + DEFAULT_GLANCING_BLOW_CHANCE_PER_LEVEL_PCT + ").\n"
+                + "# Valid range: " + MIN_ABILITY_BONUS_PCT + " to " + MAX_ABILITY_BONUS_PCT + ".\n"
+                + "glancing_blow_chance_per_level_pct = " + DEFAULT_GLANCING_BLOW_CHANCE_PER_LEVEL_PCT + "\n"
+                + "\n"
+                + "# Strong Lungs oxygen bonus per level, in percent (default " + DEFAULT_STRONG_LUNGS_OXYGEN_PER_LEVEL_PCT + ").\n"
+                + "# Valid range: " + MIN_ABILITY_BONUS_PCT + " to " + MAX_ABILITY_BONUS_PCT + ".\n"
+                + "strong_lungs_oxygen_per_level_pct = " + DEFAULT_STRONG_LUNGS_OXYGEN_PER_LEVEL_PCT + "\n"
                 + "\n"
                 + "# Strength damage multiplier: damage *= (STR / damage_multiplier_base) (default " + DEFAULT_DAMAGE_MULTIPLIER_BASE + ").\n"
                 + "# Lower number = more damage. Each point spent into (STR) will add 0.10 to the multiplier.\n"

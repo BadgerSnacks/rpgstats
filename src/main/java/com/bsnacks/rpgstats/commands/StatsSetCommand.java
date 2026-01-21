@@ -8,6 +8,7 @@ import com.bsnacks.rpgstats.permissions.RpgStatsPermissions;
 import com.bsnacks.rpgstats.systems.ConstitutionHealthEffect;
 import com.bsnacks.rpgstats.systems.EnduranceStaminaEffect;
 import com.bsnacks.rpgstats.systems.IntellectManaEffect;
+import com.bsnacks.rpgstats.systems.LightFootSpeedEffect;
 import com.bsnacks.rpgstats.ui.RpgStatsHud;
 import com.bsnacks.rpgstats.ui.StatsPage;
 
@@ -229,6 +230,10 @@ public final class StatsSetCommand extends CommandBase {
             ConstitutionHealthEffect.apply(statMap, stats, config);
             IntellectManaEffect.apply(statMap, stats, config);
             EnduranceStaminaEffect.apply(statMap, stats, config);
+            Player targetPlayer = worldStore.getComponent(target.ref, Player.getComponentType());
+            if (targetPlayer != null) {
+                LightFootSpeedEffect.apply(target.ref, worldStore, targetPlayer, stats, config, plugin);
+            }
             StatsPage.refreshIfOpen(target.ref, worldStore);
             if (config == null || config.isHudEnabled()) {
                 PlayerRef playerRef = worldStore.getComponent(target.ref, PlayerRef.getComponentType());

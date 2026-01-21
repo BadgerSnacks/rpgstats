@@ -19,6 +19,7 @@ import com.hypixel.hytale.server.core.command.system.CommandUtil;
 import com.hypixel.hytale.server.core.command.system.CommandContext;
 import com.hypixel.hytale.server.core.command.system.basecommands.CommandBase;
 import com.hypixel.hytale.server.core.entity.entities.Player;
+import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 
@@ -92,7 +93,8 @@ public final class StatsCommand extends CommandBase {
                 return;
             }
 
-            StatsPage page = new StatsPage(player.getPlayerRef(), rpgStatsType, config, plugin);
+            PlayerRef playerRef = worldStore.getComponent(selfRef, PlayerRef.getComponentType());
+            StatsPage page = new StatsPage(playerRef, rpgStatsType, config, plugin);
             player.getPageManager().openCustomPage(selfRef, worldStore, page);
             plugin.logInfo("Player opened stats UI: " + player.getDisplayName());
         });

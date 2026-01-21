@@ -8,15 +8,21 @@ import com.bsnacks.rpgstats.listeners.PlayerListeners;
 import com.bsnacks.rpgstats.systems.DexterityMiningSpeedSystem;
 import com.bsnacks.rpgstats.systems.ExperienceOnKillSystem;
 import com.bsnacks.rpgstats.systems.StrengthDamageSystem;
+import com.bsnacks.rpgstats.systems.AbilityRegenSystem;
 import com.bsnacks.rpgstats.systems.ConstitutionHealthEffect;
 import com.bsnacks.rpgstats.systems.EnduranceStaminaEffect;
 import com.bsnacks.rpgstats.systems.IntellectManaEffect;
+import com.bsnacks.rpgstats.systems.StrongLungsOxygenEffect;
 import com.bsnacks.rpgstats.permissions.RpgStatsPermissions;
+import com.bsnacks.rpgstats.systems.LightFootSpeedEffect;
+import com.bsnacks.rpgstats.systems.ArmorProficiencySystem;
+import com.bsnacks.rpgstats.systems.GlancingBlowSystem;
 
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.server.core.event.events.player.PlayerReadyEvent;
+import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.modules.entitystats.EntityStatMap;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
@@ -60,6 +66,9 @@ public final class RpgStatsPlugin extends JavaPlugin {
         getEntityStoreRegistry().registerSystem(new StrengthDamageSystem(rpgStatsType, config));
         getEntityStoreRegistry().registerSystem(new DexterityMiningSpeedSystem(rpgStatsType, config));
         getEntityStoreRegistry().registerSystem(new ExperienceOnKillSystem(rpgStatsType, fileLogger, config));
+        getEntityStoreRegistry().registerSystem(new ArmorProficiencySystem(rpgStatsType, config));
+        getEntityStoreRegistry().registerSystem(new GlancingBlowSystem(rpgStatsType, config));
+        getEntityStoreRegistry().registerSystem(new AbilityRegenSystem(rpgStatsType, config));
     }
 
     public void reloadConfig(String reason) {
@@ -70,8 +79,15 @@ public final class RpgStatsPlugin extends JavaPlugin {
             config.applyFrom(loaded);
         }
         RpgStats.setMaxLevel(config.getMaxLevel());
+        RpgStats.setAbilityPointsPerLevel(config.getAbilityPointsPerLevel());
         logInfo("Config reloaded (" + reason + "): xp_multiplier=" + config.getXpMultiplier()
                 + " max_level=" + config.getMaxLevel()
+                + " ability_points_per_level=" + config.getAbilityPointsPerLevel()
+                + " light_foot_speed_per_level_pct=" + config.getLightFootSpeedPerLevelPct()
+                + " armor_proficiency_resistance_per_level_pct=" + config.getArmorProficiencyResistancePerLevelPct()
+                + " health_regen_per_level_per_sec=" + config.getHealthRegenPerLevelPerSec()
+                + " stamina_regen_per_level_per_sec=" + config.getStaminaRegenPerLevelPerSec()
+                + " glancing_blow_chance_per_level_pct=" + config.getGlancingBlowChancePerLevelPct()
                 + " hud_enabled=" + config.isHudEnabled()
                 + " xp_blacklist_npc_types=" + config.getXpBlacklistNpcTypes().size()
                 + " xp_blacklist_roles=" + config.getXpBlacklistRoles().size());
@@ -130,6 +146,11 @@ public final class RpgStatsPlugin extends JavaPlugin {
         ConstitutionHealthEffect.apply(statMap, stats, config);
         IntellectManaEffect.apply(statMap, stats, config);
         EnduranceStaminaEffect.apply(statMap, stats, config);
+        StrongLungsOxygenEffect.apply(statMap, stats, config);
+        Player player = store.getComponent(ref, Player.getComponentType());
+        if (player != null) {
+            LightFootSpeedEffect.apply(ref, store, player, stats, config, this);
+        }
     }
 
     public void logInfo(String msg) {

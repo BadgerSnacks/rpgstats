@@ -35,11 +35,18 @@ $C = "../Common.ui";
   Text: "+";
 };
 
+@AbilityDescriptionStyle = LabelStyle(
+  ...$C.@DefaultLabelStyle,
+  FontSize: 14,
+  TextColor: #c7d1d8,
+  Wrap: true
+);
+
 $C.@PageOverlay {
   LayoutMode: Middle;
 
   $C.@DecoratedContainer {
-    Anchor: (Width: 920, Height: 720);
+    Anchor: (Width: 1020, Height: 820);
 
     #Title {
       Group {
@@ -414,502 +421,497 @@ $C.@PageOverlay {
               LayoutMode: Top;
               Anchor: (Left: 0, Right: 0);
 
-              Group #LightFootCard {
+              Group #Row1 {
                 LayoutMode: Left;
-                Anchor: (Left: 0, Right: 0, Height: 128, Bottom: 12);
-                Background: (TexturePath: "../Common/ContainerPanelPatch.png", Border: 4);
-                Padding: (Full: 12);
+                Anchor: (Left: 0, Right: 0, Height: 120, Bottom: 8);
 
-                Group #LightFootIcon {
-                  Anchor: (Width: 64, Height: 64);
-                  Background: (Color: #000000);
-                }
-
-                Group {
-                  Anchor: (Width: 12);
-                }
-
-                Group {
-                  LayoutMode: Top;
+                Group #LightFootCard {
+                  LayoutMode: Left;
                   FlexWeight: 1;
+                  Background: (TexturePath: "../Common/ContainerPanelPatch.png", Border: 4);
+                  Padding: (Full: 10);
 
-                  Label #LightFootName {
-                    Style: @SectionTitleStyle;
-                    Text: "Light Foot";
-                    Anchor: (Bottom: 4);
+                  Group {
+                    LayoutMode: Top;
+                    FlexWeight: 1;
+
+                    Label #LightFootName {
+                      Style: @SectionTitleStyle;
+                      Text: "Light Foot";
+                      Anchor: (Bottom: 2);
+                    }
+
+                    Label #LightFootLevel {
+                      Style: (...$C.@DefaultLabelStyle, TextColor: #9fb3c8);
+                      Text: "Level 0/3 (+0%)";
+                      Anchor: (Bottom: 4);
+                    }
+
+                    Label #LightFootDescription {
+                      Style: @AbilityDescriptionStyle;
+                      Text: "Move 5%, 10%, and 15% faster at levels 1-3.";
+                    }
                   }
 
-                  Label #LightFootLevel {
-                    Style: (...$C.@DefaultLabelStyle, TextColor: #9fb3c8);
-                    Text: "Level 0/3 (+0%)";
-                    Anchor: (Bottom: 6);
-                  }
+                  Group {
+                    Anchor: (Width: 80);
+                    LayoutMode: Top;
 
-                  Label #LightFootDescription {
-                    Style: (...$C.@DefaultLabelStyle, TextColor: #c7d1d8, Wrap: true);
-                    Text: "Move 5%, 10%, and 15% faster at levels 1-3.";
+                    Group #LightFootIcon {
+                      Anchor: (Width: 48, Height: 48, Bottom: 4);
+                      Background: (Color: #2a3a4a);
+                    }
+
+                    Group { FlexWeight: 1; }
+
+                    $C.@SmallSecondaryTextButton #LightFootUpgrade {
+                      Anchor: (Width: 80, Height: 26);
+                      Text: "Upgrade";
+                    }
                   }
                 }
 
-                Group {
-                  Anchor: (Width: 120);
-                  LayoutMode: Top;
+                Group { Anchor: (Width: 8); }
 
-                  Group { FlexWeight: 1; }
+                Group #ArmorProficiencyCard {
+                  LayoutMode: Left;
+                  FlexWeight: 1;
+                  Background: (TexturePath: "../Common/ContainerPanelPatch.png", Border: 4);
+                  Padding: (Full: 10);
 
-                  $C.@SmallSecondaryTextButton #LightFootUpgrade {
-                    Anchor: (Width: 110, Height: 28);
-                    Text: "Upgrade";
+                  Group {
+                    LayoutMode: Top;
+                    FlexWeight: 1;
+
+                    Label #ArmorProficiencyName {
+                      Style: @SectionTitleStyle;
+                      Text: "Armor Proficiency";
+                      Anchor: (Bottom: 2);
+                    }
+
+                    Label #ArmorProficiencyLevel {
+                      Style: (...$C.@DefaultLabelStyle, TextColor: #9fb3c8);
+                      Text: "Level 0/3 (+0%)";
+                      Anchor: (Bottom: 4);
+                    }
+
+                    Label #ArmorProficiencyDescription {
+                      Style: @AbilityDescriptionStyle;
+                      Text: "Reduce Physical/Projectile damage by 5%, 10%, 15%.";
+                    }
+                  }
+
+                  Group {
+                    Anchor: (Width: 80);
+                    LayoutMode: Top;
+
+                    Group #ArmorProficiencyIcon {
+                      Anchor: (Width: 48, Height: 48, Bottom: 4);
+                      Background: (Color: #2a3a4a);
+                    }
+
+                    Group { FlexWeight: 1; }
+
+                    $C.@SmallSecondaryTextButton #ArmorProficiencyUpgrade {
+                      Anchor: (Width: 80, Height: 26);
+                      Text: "Upgrade";
+                    }
                   }
                 }
               }
 
-              Group #ArmorProficiencyCard {
+              Group #Row2 {
                 LayoutMode: Left;
-                Anchor: (Left: 0, Right: 0, Height: 128, Bottom: 12);
-                Background: (TexturePath: "../Common/ContainerPanelPatch.png", Border: 4);
-                Padding: (Full: 12);
+                Anchor: (Left: 0, Right: 0, Height: 120, Bottom: 8);
 
-                Group #ArmorProficiencyIcon {
-                  Anchor: (Width: 64, Height: 64);
-                  Background: (Color: #000000);
-                }
-
-                Group {
-                  Anchor: (Width: 12);
-                }
-
-                Group {
-                  LayoutMode: Top;
+                Group #GlancingBlowCard {
+                  LayoutMode: Left;
                   FlexWeight: 1;
+                  Background: (TexturePath: "../Common/ContainerPanelPatch.png", Border: 4);
+                  Padding: (Full: 10);
 
-                  Label #ArmorProficiencyName {
-                    Style: @SectionTitleStyle;
-                    Text: "Armor Proficiency";
-                    Anchor: (Bottom: 4);
+                  Group {
+                    LayoutMode: Top;
+                    FlexWeight: 1;
+
+                    Label #GlancingBlowName {
+                      Style: @SectionTitleStyle;
+                      Text: "Glancing Blow";
+                      Anchor: (Bottom: 2);
+                    }
+
+                    Label #GlancingBlowLevel {
+                      Style: (...$C.@DefaultLabelStyle, TextColor: #9fb3c8);
+                      Text: "Level 0/3 (0%)";
+                      Anchor: (Bottom: 4);
+                    }
+
+                    Label #GlancingBlowDescription {
+                      Style: @AbilityDescriptionStyle;
+                      Text: "Chance to dodge NPC damage: 10%, 15%, 20%.";
+                    }
                   }
 
-                  Label #ArmorProficiencyLevel {
-                    Style: (...$C.@DefaultLabelStyle, TextColor: #9fb3c8);
-                    Text: "Level 0/3 (+0%)";
-                    Anchor: (Bottom: 6);
-                  }
+                  Group {
+                    Anchor: (Width: 80);
+                    LayoutMode: Top;
 
-                  Label #ArmorProficiencyDescription {
-                    Style: (...$C.@DefaultLabelStyle, TextColor: #c7d1d8, Wrap: true);
-                    Text: "While wearing armor, reduce Physical and Projectile damage by 5%, 10%, and 15%.";
+                    Group #GlancingBlowIcon {
+                      Anchor: (Width: 48, Height: 48, Bottom: 4);
+                      Background: (Color: #2a3a4a);
+                    }
+
+                    Group { FlexWeight: 1; }
+
+                    $C.@SmallSecondaryTextButton #GlancingBlowUpgrade {
+                      Anchor: (Width: 80, Height: 26);
+                      Text: "Upgrade";
+                    }
                   }
                 }
 
-                Group {
-                  Anchor: (Width: 120);
-                  LayoutMode: Top;
+                Group { Anchor: (Width: 8); }
 
-                  Group { FlexWeight: 1; }
+                Group #HealthRegenCard {
+                  LayoutMode: Left;
+                  FlexWeight: 1;
+                  Background: (TexturePath: "../Common/ContainerPanelPatch.png", Border: 4);
+                  Padding: (Full: 10);
 
-                  $C.@SmallSecondaryTextButton #ArmorProficiencyUpgrade {
-                    Anchor: (Width: 110, Height: 28);
-                    Text: "Upgrade";
+                  Group {
+                    LayoutMode: Top;
+                    FlexWeight: 1;
+
+                    Label #HealthRegenName {
+                      Style: @SectionTitleStyle;
+                      Text: "Health Regeneration";
+                      Anchor: (Bottom: 2);
+                    }
+
+                    Label #HealthRegenLevel {
+                      Style: (...$C.@DefaultLabelStyle, TextColor: #9fb3c8);
+                      Text: "Level 0/3 (0/s)";
+                      Anchor: (Bottom: 4);
+                    }
+
+                    Label #HealthRegenDescription {
+                      Style: @AbilityDescriptionStyle;
+                      Text: "Regenerate 2, 3, 4 health/sec at levels 1-3.";
+                    }
+                  }
+
+                  Group {
+                    Anchor: (Width: 80);
+                    LayoutMode: Top;
+
+                    Group #HealthRegenIcon {
+                      Anchor: (Width: 48, Height: 48, Bottom: 4);
+                      Background: (Color: #2a3a4a);
+                    }
+
+                    Group { FlexWeight: 1; }
+
+                    $C.@SmallSecondaryTextButton #HealthRegenUpgrade {
+                      Anchor: (Width: 80, Height: 26);
+                      Text: "Upgrade";
+                    }
                   }
                 }
               }
 
-              Group #GlancingBlowCard {
+              Group #Row3 {
                 LayoutMode: Left;
-                Anchor: (Left: 0, Right: 0, Height: 128, Bottom: 12);
-                Background: (TexturePath: "../Common/ContainerPanelPatch.png", Border: 4);
-                Padding: (Full: 12);
+                Anchor: (Left: 0, Right: 0, Height: 120, Bottom: 8);
 
-                Group #GlancingBlowIcon {
-                  Anchor: (Width: 64, Height: 64);
-                  Background: (Color: #000000);
-                }
-
-                Group {
-                  Anchor: (Width: 12);
-                }
-
-                Group {
-                  LayoutMode: Top;
+                Group #StaminaRegenCard {
+                  LayoutMode: Left;
                   FlexWeight: 1;
+                  Background: (TexturePath: "../Common/ContainerPanelPatch.png", Border: 4);
+                  Padding: (Full: 10);
 
-                  Label #GlancingBlowName {
-                    Style: @SectionTitleStyle;
-                    Text: "Glancing Blow";
-                    Anchor: (Bottom: 4);
+                  Group {
+                    LayoutMode: Top;
+                    FlexWeight: 1;
+
+                    Label #StaminaRegenName {
+                      Style: @SectionTitleStyle;
+                      Text: "Stamina Regeneration";
+                      Anchor: (Bottom: 2);
+                    }
+
+                    Label #StaminaRegenLevel {
+                      Style: (...$C.@DefaultLabelStyle, TextColor: #9fb3c8);
+                      Text: "Level 0/3 (0/s)";
+                      Anchor: (Bottom: 4);
+                    }
+
+                    Label #StaminaRegenDescription {
+                      Style: @AbilityDescriptionStyle;
+                      Text: "Regenerate 1.5, 2, 2.5 stamina/sec at levels 1-3.";
+                    }
                   }
 
-                  Label #GlancingBlowLevel {
-                    Style: (...$C.@DefaultLabelStyle, TextColor: #9fb3c8);
-                    Text: "Level 0/3 (0%)";
-                    Anchor: (Bottom: 6);
-                  }
+                  Group {
+                    Anchor: (Width: 80);
+                    LayoutMode: Top;
 
-                  Label #GlancingBlowDescription {
-                    Style: (...$C.@DefaultLabelStyle, TextColor: #c7d1d8, Wrap: true);
-                    Text: "Chance to dodge hostile NPC damage: 10%, 15%, and 20%.";
+                    Group #StaminaRegenIcon {
+                      Anchor: (Width: 48, Height: 48, Bottom: 4);
+                      Background: (Color: #2a3a4a);
+                    }
+
+                    Group { FlexWeight: 1; }
+
+                    $C.@SmallSecondaryTextButton #StaminaRegenUpgrade {
+                      Anchor: (Width: 80, Height: 26);
+                      Text: "Upgrade";
+                    }
                   }
                 }
 
-                Group {
-                  Anchor: (Width: 120);
-                  LayoutMode: Top;
+                Group { Anchor: (Width: 8); }
 
-                  Group { FlexWeight: 1; }
+                Group #StrongLungsCard {
+                  LayoutMode: Left;
+                  FlexWeight: 1;
+                  Background: (TexturePath: "../Common/ContainerPanelPatch.png", Border: 4);
+                  Padding: (Full: 10);
 
-                  $C.@SmallSecondaryTextButton #GlancingBlowUpgrade {
-                    Anchor: (Width: 110, Height: 28);
-                    Text: "Upgrade";
+                  Group {
+                    LayoutMode: Top;
+                    FlexWeight: 1;
+
+                    Label #StrongLungsName {
+                      Style: @SectionTitleStyle;
+                      Text: "Strong Lungs";
+                      Anchor: (Bottom: 2);
+                    }
+
+                    Label #StrongLungsLevel {
+                      Style: (...$C.@DefaultLabelStyle, TextColor: #9fb3c8);
+                      Text: "Level 0/3 (+0%)";
+                      Anchor: (Bottom: 4);
+                    }
+
+                    Label #StrongLungsDescription {
+                      Style: @AbilityDescriptionStyle;
+                      Text: "Increase max oxygen by 50%, 100%, 150%.";
+                    }
+                  }
+
+                  Group {
+                    Anchor: (Width: 80);
+                    LayoutMode: Top;
+
+                    Group #StrongLungsIcon {
+                      Anchor: (Width: 48, Height: 48, Bottom: 4);
+                      Background: (Color: #2a3a4a);
+                    }
+
+                    Group { FlexWeight: 1; }
+
+                    $C.@SmallSecondaryTextButton #StrongLungsUpgrade {
+                      Anchor: (Width: 80, Height: 26);
+                      Text: "Upgrade";
+                    }
                   }
                 }
               }
 
-              Group #HealthRegenCard {
+              Group #Row4 {
                 LayoutMode: Left;
-                Anchor: (Left: 0, Right: 0, Height: 128, Bottom: 12);
-                Background: (TexturePath: "../Common/ContainerPanelPatch.png", Border: 4);
-                Padding: (Full: 12);
+                Anchor: (Left: 0, Right: 0, Height: 120, Bottom: 8);
 
-                Group #HealthRegenIcon {
-                  Anchor: (Width: 64, Height: 64);
-                  Background: (Color: #000000);
-                }
-
-                Group {
-                  Anchor: (Width: 12);
-                }
-
-                Group {
-                  LayoutMode: Top;
+                Group #LuckyShotCard {
+                  LayoutMode: Left;
                   FlexWeight: 1;
+                  Background: (TexturePath: "../Common/ContainerPanelPatch.png", Border: 4);
+                  Padding: (Full: 10);
 
-                  Label #HealthRegenName {
-                    Style: @SectionTitleStyle;
-                    Text: "Health Regeneration";
-                    Anchor: (Bottom: 4);
+                  Group {
+                    LayoutMode: Top;
+                    FlexWeight: 1;
+
+                    Label #LuckyShotName {
+                      Style: @SectionTitleStyle;
+                      Text: "Lucky Shot (WIP)";
+                      Anchor: (Bottom: 2);
+                    }
+
+                    Label #LuckyShotLevel {
+                      Style: (...$C.@DefaultLabelStyle, TextColor: #9fb3c8);
+                      Text: "Level 0/3 (0%)";
+                      Anchor: (Bottom: 4);
+                    }
+
+                    Label #LuckyShotDescription {
+                      Style: @AbilityDescriptionStyle;
+                      Text: "Chance to save ammo: 10%, 20%, 30%.";
+                    }
                   }
 
-                  Label #HealthRegenLevel {
-                    Style: (...$C.@DefaultLabelStyle, TextColor: #9fb3c8);
-                    Text: "Level 0/3 (0/s)";
-                    Anchor: (Bottom: 6);
-                  }
+                  Group {
+                    Anchor: (Width: 80);
+                    LayoutMode: Top;
 
-                  Label #HealthRegenDescription {
-                    Style: (...$C.@DefaultLabelStyle, TextColor: #c7d1d8, Wrap: true);
-                    Text: "Regenerate 2, 3, and 4 health per second at levels 1-3.";
+                    Group #LuckyShotIcon {
+                      Anchor: (Width: 48, Height: 48, Bottom: 4);
+                      Background: (Color: #2a3a4a);
+                    }
+
+                    Group { FlexWeight: 1; }
+
+                    $C.@SmallSecondaryTextButton #LuckyShotUpgrade {
+                      Anchor: (Width: 80, Height: 26);
+                      Text: "Upgrade";
+                    }
                   }
                 }
 
-                Group {
-                  Anchor: (Width: 120);
-                  LayoutMode: Top;
+                Group { Anchor: (Width: 8); }
 
-                  Group { FlexWeight: 1; }
+                Group #CriticalStrikeCard {
+                  LayoutMode: Left;
+                  FlexWeight: 1;
+                  Background: (TexturePath: "../Common/ContainerPanelPatch.png", Border: 4);
+                  Padding: (Full: 10);
 
-                  $C.@SmallSecondaryTextButton #HealthRegenUpgrade {
-                    Anchor: (Width: 110, Height: 28);
-                    Text: "Upgrade";
+                  Group {
+                    LayoutMode: Top;
+                    FlexWeight: 1;
+
+                    Label #CriticalStrikeName {
+                      Style: @SectionTitleStyle;
+                      Text: "Critical Strike";
+                      Anchor: (Bottom: 2);
+                    }
+
+                    Label #CriticalStrikeLevel {
+                      Style: (...$C.@DefaultLabelStyle, TextColor: #9fb3c8);
+                      Text: "Level 0/3 (0%)";
+                      Anchor: (Bottom: 4);
+                    }
+
+                    Label #CriticalStrikeDescription {
+                      Style: @AbilityDescriptionStyle;
+                      Text: "Chance for 1.5x damage: 10%, 15%, 20%.";
+                    }
+                  }
+
+                  Group {
+                    Anchor: (Width: 80);
+                    LayoutMode: Top;
+
+                    Group #CriticalStrikeIcon {
+                      Anchor: (Width: 48, Height: 48, Bottom: 4);
+                      Background: (Color: #2a3a4a);
+                    }
+
+                    Group { FlexWeight: 1; }
+
+                    $C.@SmallSecondaryTextButton #CriticalStrikeUpgrade {
+                      Anchor: (Width: 80, Height: 26);
+                      Text: "Upgrade";
+                    }
                   }
                 }
               }
 
-              Group #StaminaRegenCard {
+              Group #Row5 {
                 LayoutMode: Left;
-                Anchor: (Left: 0, Right: 0, Height: 128, Bottom: 12);
-                Background: (TexturePath: "../Common/ContainerPanelPatch.png", Border: 4);
-                Padding: (Full: 12);
+                Anchor: (Left: 0, Right: 0, Height: 120, Bottom: 8);
 
-                Group #StaminaRegenIcon {
-                  Anchor: (Width: 64, Height: 64);
-                  Background: (Color: #000000);
-                }
-
-                Group {
-                  Anchor: (Width: 12);
-                }
-
-                Group {
-                  LayoutMode: Top;
+                Group #LifestealCard {
+                  LayoutMode: Left;
                   FlexWeight: 1;
+                  Background: (TexturePath: "../Common/ContainerPanelPatch.png", Border: 4);
+                  Padding: (Full: 10);
 
-                  Label #StaminaRegenName {
-                    Style: @SectionTitleStyle;
-                    Text: "Stamina Regeneration";
-                    Anchor: (Bottom: 4);
+                  Group {
+                    LayoutMode: Top;
+                    FlexWeight: 1;
+
+                    Label #LifestealName {
+                      Style: @SectionTitleStyle;
+                      Text: "Lifesteal";
+                      Anchor: (Bottom: 2);
+                    }
+
+                    Label #LifestealLevel {
+                      Style: (...$C.@DefaultLabelStyle, TextColor: #9fb3c8);
+                      Text: "Level 0/3 (0%)";
+                      Anchor: (Bottom: 4);
+                    }
+
+                    Label #LifestealDescription {
+                      Style: @AbilityDescriptionStyle;
+                      Text: "Heal for 3%, 6%, 9% of damage dealt.";
+                    }
                   }
 
-                  Label #StaminaRegenLevel {
-                    Style: (...$C.@DefaultLabelStyle, TextColor: #9fb3c8);
-                    Text: "Level 0/3 (0/s)";
-                    Anchor: (Bottom: 6);
-                  }
+                  Group {
+                    Anchor: (Width: 80);
+                    LayoutMode: Top;
 
-                  Label #StaminaRegenDescription {
-                    Style: (...$C.@DefaultLabelStyle, TextColor: #c7d1d8, Wrap: true);
-                    Text: "Regenerate 2, 3, and 4 stamina per second at levels 1-3.";
+                    Group #LifestealIcon {
+                      Anchor: (Width: 48, Height: 48, Bottom: 4);
+                      Background: (Color: #2a3a4a);
+                    }
+
+                    Group { FlexWeight: 1; }
+
+                    $C.@SmallSecondaryTextButton #LifestealUpgrade {
+                      Anchor: (Width: 80, Height: 26);
+                      Text: "Upgrade";
+                    }
                   }
                 }
 
-                Group {
-                  Anchor: (Width: 120);
-                  LayoutMode: Top;
+                Group { Anchor: (Width: 8); }
 
-                  Group { FlexWeight: 1; }
-
-                  $C.@SmallSecondaryTextButton #StaminaRegenUpgrade {
-                    Anchor: (Width: 110, Height: 28);
-                    Text: "Upgrade";
-                  }
-                }
-              }
-
-              Group #StrongLungsCard {
-                LayoutMode: Left;
-                Anchor: (Left: 0, Right: 0, Height: 128, Bottom: 12);
-                Background: (TexturePath: "../Common/ContainerPanelPatch.png", Border: 4);
-                Padding: (Full: 12);
-
-                Group #StrongLungsIcon {
-                  Anchor: (Width: 64, Height: 64);
-                  Background: (Color: #000000);
-                }
-
-                Group {
-                  Anchor: (Width: 12);
-                }
-
-                Group {
-                  LayoutMode: Top;
+                Group #ThornsCard {
+                  LayoutMode: Left;
                   FlexWeight: 1;
+                  Background: (TexturePath: "../Common/ContainerPanelPatch.png", Border: 4);
+                  Padding: (Full: 10);
 
-                  Label #StrongLungsName {
-                    Style: @SectionTitleStyle;
-                    Text: "Strong Lungs";
-                    Anchor: (Bottom: 4);
+                  Group {
+                    LayoutMode: Top;
+                    FlexWeight: 1;
+
+                    Label #ThornsName {
+                      Style: @SectionTitleStyle;
+                      Text: "Thorns";
+                      Anchor: (Bottom: 2);
+                    }
+
+                    Label #ThornsLevel {
+                      Style: (...$C.@DefaultLabelStyle, TextColor: #9fb3c8);
+                      Text: "Level 0/3 (0%)";
+                      Anchor: (Bottom: 4);
+                    }
+
+                    Label #ThornsDescription {
+                      Style: @AbilityDescriptionStyle;
+                      Text: "Reflect 25%, 50%, 75% damage to attackers.";
+                    }
                   }
 
-                  Label #StrongLungsLevel {
-                    Style: (...$C.@DefaultLabelStyle, TextColor: #9fb3c8);
-                    Text: "Level 0/3 (+0%)";
-                    Anchor: (Bottom: 6);
-                  }
+                  Group {
+                    Anchor: (Width: 80);
+                    LayoutMode: Top;
 
-                  Label #StrongLungsDescription {
-                    Style: (...$C.@DefaultLabelStyle, TextColor: #c7d1d8, Wrap: true);
-                    Text: "Increase max oxygen by 50%, 100%, and 150% at levels 1-3.";
-                  }
-                }
+                    Group #ThornsIcon {
+                      Anchor: (Width: 48, Height: 48, Bottom: 4);
+                      Background: (Color: #2a3a4a);
+                    }
 
-                Group {
-                  Anchor: (Width: 120);
-                  LayoutMode: Top;
+                    Group { FlexWeight: 1; }
 
-                  Group { FlexWeight: 1; }
-
-                  $C.@SmallSecondaryTextButton #StrongLungsUpgrade {
-                    Anchor: (Width: 110, Height: 28);
-                    Text: "Upgrade";
-                  }
-                }
-              }
-
-              Group #LuckyShotCard {
-                LayoutMode: Left;
-                Anchor: (Left: 0, Right: 0, Height: 128, Bottom: 12);
-                Background: (TexturePath: "../Common/ContainerPanelPatch.png", Border: 4);
-                Padding: (Full: 12);
-
-                Group #LuckyShotIcon {
-                  Anchor: (Width: 64, Height: 64);
-                  Background: (Color: #000000);
-                }
-
-                Group {
-                  Anchor: (Width: 12);
-                }
-
-                Group {
-                  LayoutMode: Top;
-                  FlexWeight: 1;
-
-                  Label #LuckyShotName {
-                    Style: @SectionTitleStyle;
-                    Text: "Lucky Shot (WIP)";
-                    Anchor: (Bottom: 4);
-                  }
-
-                  Label #LuckyShotLevel {
-                    Style: (...$C.@DefaultLabelStyle, TextColor: #9fb3c8);
-                    Text: "Level 0/3 (0%)";
-                    Anchor: (Bottom: 6);
-                  }
-
-                  Label #LuckyShotDescription {
-                    Style: (...$C.@DefaultLabelStyle, TextColor: #c7d1d8, Wrap: true);
-                    Text: "Chance to not consume ammo with bow/crossbow: 10%, 20%, and 30%.";
-                  }
-                }
-
-                Group {
-                  Anchor: (Width: 120);
-                  LayoutMode: Top;
-
-                  Group { FlexWeight: 1; }
-
-                  $C.@SmallSecondaryTextButton #LuckyShotUpgrade {
-                    Anchor: (Width: 110, Height: 28);
-                    Text: "Upgrade";
-                  }
-                }
-              }
-
-              Group #CriticalStrikeCard {
-                LayoutMode: Left;
-                Anchor: (Left: 0, Right: 0, Height: 128, Bottom: 12);
-                Background: (TexturePath: "../Common/ContainerPanelPatch.png", Border: 4);
-                Padding: (Full: 12);
-
-                Group #CriticalStrikeIcon {
-                  Anchor: (Width: 64, Height: 64);
-                  Background: (Color: #000000);
-                }
-
-                Group {
-                  Anchor: (Width: 12);
-                }
-
-                Group {
-                  LayoutMode: Top;
-                  FlexWeight: 1;
-
-                  Label #CriticalStrikeName {
-                    Style: @SectionTitleStyle;
-                    Text: "Critical Strike";
-                    Anchor: (Bottom: 4);
-                  }
-
-                  Label #CriticalStrikeLevel {
-                    Style: (...$C.@DefaultLabelStyle, TextColor: #9fb3c8);
-                    Text: "Level 0/3 (0%)";
-                    Anchor: (Bottom: 6);
-                  }
-
-                  Label #CriticalStrikeDescription {
-                    Style: (...$C.@DefaultLabelStyle, TextColor: #c7d1d8, Wrap: true);
-                    Text: "Chance to deal 1.5x damage: 10%, 15%, and 20%.";
-                  }
-                }
-
-                Group {
-                  Anchor: (Width: 120);
-                  LayoutMode: Top;
-
-                  Group { FlexWeight: 1; }
-
-                  $C.@SmallSecondaryTextButton #CriticalStrikeUpgrade {
-                    Anchor: (Width: 110, Height: 28);
-                    Text: "Upgrade";
-                  }
-                }
-              }
-
-              Group #LifestealCard {
-                LayoutMode: Left;
-                Anchor: (Left: 0, Right: 0, Height: 128, Bottom: 12);
-                Background: (TexturePath: "../Common/ContainerPanelPatch.png", Border: 4);
-                Padding: (Full: 12);
-
-                Group #LifestealIcon {
-                  Anchor: (Width: 64, Height: 64);
-                  Background: (Color: #000000);
-                }
-
-                Group {
-                  Anchor: (Width: 12);
-                }
-
-                Group {
-                  LayoutMode: Top;
-                  FlexWeight: 1;
-
-                  Label #LifestealName {
-                    Style: @SectionTitleStyle;
-                    Text: "Lifesteal";
-                    Anchor: (Bottom: 4);
-                  }
-
-                  Label #LifestealLevel {
-                    Style: (...$C.@DefaultLabelStyle, TextColor: #9fb3c8);
-                    Text: "Level 0/3 (0%)";
-                    Anchor: (Bottom: 6);
-                  }
-
-                  Label #LifestealDescription {
-                    Style: (...$C.@DefaultLabelStyle, TextColor: #c7d1d8, Wrap: true);
-                    Text: "Heal for percentage of damage dealt: 3%, 6%, and 9%.";
-                  }
-                }
-
-                Group {
-                  Anchor: (Width: 120);
-                  LayoutMode: Top;
-
-                  Group { FlexWeight: 1; }
-
-                  $C.@SmallSecondaryTextButton #LifestealUpgrade {
-                    Anchor: (Width: 110, Height: 28);
-                    Text: "Upgrade";
-                  }
-                }
-              }
-
-              Group #ThornsCard {
-                LayoutMode: Left;
-                Anchor: (Left: 0, Right: 0, Height: 128, Bottom: 12);
-                Background: (TexturePath: "../Common/ContainerPanelPatch.png", Border: 4);
-                Padding: (Full: 12);
-
-                Group #ThornsIcon {
-                  Anchor: (Width: 64, Height: 64);
-                  Background: (Color: #000000);
-                }
-
-                Group {
-                  Anchor: (Width: 12);
-                }
-
-                Group {
-                  LayoutMode: Top;
-                  FlexWeight: 1;
-
-                  Label #ThornsName {
-                    Style: @SectionTitleStyle;
-                    Text: "Thorns";
-                    Anchor: (Bottom: 4);
-                  }
-
-                  Label #ThornsLevel {
-                    Style: (...$C.@DefaultLabelStyle, TextColor: #9fb3c8);
-                    Text: "Level 0/3 (0%)";
-                    Anchor: (Bottom: 6);
-                  }
-
-                  Label #ThornsDescription {
-                    Style: (...$C.@DefaultLabelStyle, TextColor: #c7d1d8, Wrap: true);
-                    Text: "Reflect damage back to attackers: 25%, 50%, and 75%.";
-                  }
-                }
-
-                Group {
-                  Anchor: (Width: 120);
-                  LayoutMode: Top;
-
-                  Group { FlexWeight: 1; }
-
-                  $C.@SmallSecondaryTextButton #ThornsUpgrade {
-                    Anchor: (Width: 110, Height: 28);
-                    Text: "Upgrade";
+                    $C.@SmallSecondaryTextButton #ThornsUpgrade {
+                      Anchor: (Width: 80, Height: 26);
+                      Text: "Upgrade";
+                    }
                   }
                 }
               }

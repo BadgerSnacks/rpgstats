@@ -11,7 +11,7 @@ import java.util.Arrays;
 public final class RpgStats implements Component<EntityStore> {
 
     public static final String COMPONENT_ID = "rpgstats";
-    public static final int CURRENT_VERSION = 12;
+    public static final int CURRENT_VERSION = 14;
     public static final int DEFAULT_MAX_LEVEL = 25;
     public static final int BASE_XP = 100;
     public static final int LINEAR_XP = 50;
@@ -26,6 +26,8 @@ public final class RpgStats implements Component<EntityStore> {
     public static final int STRONG_LUNGS_MAX_LEVEL = 3;
     public static final int LUCKY_SHOT_MAX_LEVEL = 3;
     public static final int CRITICAL_STRIKE_MAX_LEVEL = 3;
+    public static final int LIFESTEAL_MAX_LEVEL = 3;
+    public static final int THORNS_MAX_LEVEL = 3;
 
     public static final BuilderCodec<RpgStats> CODEC =
             BuilderCodec.builder(RpgStats.class, RpgStats::new)
@@ -51,6 +53,10 @@ public final class RpgStats implements Component<EntityStore> {
                             (d, v) -> d.luckyShotLevel = v, d -> d.luckyShotLevel).add()
                     .append(new KeyedCodec<>("CriticalStrikeLevel", Codec.INTEGER),
                             (d, v) -> d.criticalStrikeLevel = v, d -> d.criticalStrikeLevel).add()
+                    .append(new KeyedCodec<>("LifestealLevel", Codec.INTEGER),
+                            (d, v) -> d.lifestealLevel = v, d -> d.lifestealLevel).add()
+                    .append(new KeyedCodec<>("ThornsLevel", Codec.INTEGER),
+                            (d, v) -> d.thornsLevel = v, d -> d.thornsLevel).add()
 
                     .append(new KeyedCodec<>("Str", Codec.INTEGER), (d, v) -> d.str = v, d -> d.str).add()
                     .append(new KeyedCodec<>("Dex", Codec.INTEGER), (d, v) -> d.dex = v, d -> d.dex).add()
@@ -77,6 +83,8 @@ public final class RpgStats implements Component<EntityStore> {
     private int strongLungsLevel = 0;
     private int luckyShotLevel = 0;
     private int criticalStrikeLevel = 0;
+    private int lifestealLevel = 0;
+    private int thornsLevel = 0;
     private boolean syncingLevel = false;
 
     private int str = BASE_STAT, dex = BASE_STAT, con = BASE_STAT, intl = BASE_STAT, end = BASE_STAT, cha = BASE_STAT;
@@ -132,6 +140,14 @@ public final class RpgStats implements Component<EntityStore> {
             criticalStrikeLevel = 0;
             version = 12;
         }
+        if (version < 13) {
+            lifestealLevel = 0;
+            version = 13;
+        }
+        if (version < 14) {
+            thornsLevel = 0;
+            version = 14;
+        }
     }
 
     public int modifier(int score) {
@@ -152,6 +168,8 @@ public final class RpgStats implements Component<EntityStore> {
         strongLungsLevel = 0;
         luckyShotLevel = 0;
         criticalStrikeLevel = 0;
+        lifestealLevel = 0;
+        thornsLevel = 0;
         str = BASE_STAT;
         dex = BASE_STAT;
         con = BASE_STAT;
@@ -359,6 +377,42 @@ public final class RpgStats implements Component<EntityStore> {
         return true;
     }
 
+    public int getLifestealLevel() {
+        syncLevelToXp();
+        return lifestealLevel;
+    }
+
+    public boolean upgradeLifesteal() {
+        syncLevelToXp();
+        if (lifestealLevel >= LIFESTEAL_MAX_LEVEL) {
+            return false;
+        }
+        int cost = getAbilityUpgradeCost(lifestealLevel, LIFESTEAL_MAX_LEVEL);
+        if (getAvailableAbilityPoints() < cost) {
+            return false;
+        }
+        lifestealLevel++;
+        return true;
+    }
+
+    public int getThornsLevel() {
+        syncLevelToXp();
+        return thornsLevel;
+    }
+
+    public boolean upgradeThorns() {
+        syncLevelToXp();
+        if (thornsLevel >= THORNS_MAX_LEVEL) {
+            return false;
+        }
+        int cost = getAbilityUpgradeCost(thornsLevel, THORNS_MAX_LEVEL);
+        if (getAvailableAbilityPoints() < cost) {
+            return false;
+        }
+        thornsLevel++;
+        return true;
+    }
+
     public boolean spendStatPoint(String attributeRaw) {
         if (getAvailableStatPoints() <= 0) {
             return false;
@@ -388,6 +442,8 @@ public final class RpgStats implements Component<EntityStore> {
         copy.strongLungsLevel = this.strongLungsLevel;
         copy.luckyShotLevel = this.luckyShotLevel;
         copy.criticalStrikeLevel = this.criticalStrikeLevel;
+        copy.lifestealLevel = this.lifestealLevel;
+        copy.thornsLevel = this.thornsLevel;
         copy.str = this.str;
         copy.dex = this.dex;
         copy.con = this.con;
@@ -477,6 +533,12 @@ public final class RpgStats implements Component<EntityStore> {
         if (criticalStrikeLevel > 0) {
             spent += totalCostForLevels(criticalStrikeLevel);
         }
+        if (lifestealLevel > 0) {
+            spent += totalCostForLevels(lifestealLevel);
+        }
+        if (thornsLevel > 0) {
+            spent += totalCostForLevels(thornsLevel);
+        }
         return Math.max(0, spent);
     }
 
@@ -516,6 +578,8 @@ public final class RpgStats implements Component<EntityStore> {
         strongLungsLevel = clamp(strongLungsLevel, 0, STRONG_LUNGS_MAX_LEVEL);
         luckyShotLevel = clamp(luckyShotLevel, 0, LUCKY_SHOT_MAX_LEVEL);
         criticalStrikeLevel = clamp(criticalStrikeLevel, 0, CRITICAL_STRIKE_MAX_LEVEL);
+        lifestealLevel = clamp(lifestealLevel, 0, LIFESTEAL_MAX_LEVEL);
+        thornsLevel = clamp(thornsLevel, 0, THORNS_MAX_LEVEL);
 
         if (getAbilityPointsSpent() > maxAllowed) {
             trimAbilityLevelsToPoints(maxAllowed);
@@ -547,10 +611,20 @@ public final class RpgStats implements Component<EntityStore> {
             strongLungsLevel = 0;
             luckyShotLevel = 0;
             criticalStrikeLevel = 0;
+            lifestealLevel = 0;
+            thornsLevel = 0;
             return;
         }
-        int guard = LIGHT_FOOT_MAX_LEVEL + ARMOR_PROFICIENCY_MAX_LEVEL + HEALTH_REGEN_MAX_LEVEL + STAMINA_REGEN_MAX_LEVEL + GLANCING_BLOW_MAX_LEVEL + STRONG_LUNGS_MAX_LEVEL + LUCKY_SHOT_MAX_LEVEL + CRITICAL_STRIKE_MAX_LEVEL + 2;
+        int guard = LIGHT_FOOT_MAX_LEVEL + ARMOR_PROFICIENCY_MAX_LEVEL + HEALTH_REGEN_MAX_LEVEL + STAMINA_REGEN_MAX_LEVEL + GLANCING_BLOW_MAX_LEVEL + STRONG_LUNGS_MAX_LEVEL + LUCKY_SHOT_MAX_LEVEL + CRITICAL_STRIKE_MAX_LEVEL + LIFESTEAL_MAX_LEVEL + THORNS_MAX_LEVEL + 2;
         while (getAbilityPointsSpent() > maxAllowed && guard-- > 0) {
+            if (thornsLevel > 0) {
+                thornsLevel--;
+                continue;
+            }
+            if (lifestealLevel > 0) {
+                lifestealLevel--;
+                continue;
+            }
             if (criticalStrikeLevel > 0) {
                 criticalStrikeLevel--;
                 continue;

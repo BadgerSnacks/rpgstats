@@ -7,6 +7,7 @@
 - Strong Lungs ability with 3 ranks that increases oxygen capacity (+50%/+100%/+150%).
 - Lucky Shot ability with 3 ranks that provides a chance to not consume ammo when firing bows/crossbows (10%/20%/30%) - **WIP: awaiting Hytale API hook for projectile events**.
 - Critical Strike ability with 3 ranks that provides a chance to deal bonus damage (10%/15%/20% chance at 1.5x damage).
+- Lifesteal ability with 3 ranks that heals for a percentage of damage dealt (3%/6%/9%).
 - Ability regeneration system for health and stamina.
 - `/stats reload` command to hot-reload configuration without server restart.
 - Comprehensive Hytale modding best practices documentation in `AGENTS.md`.
@@ -14,10 +15,10 @@
 
 ### Changed
 
-- Complete ability system with 8 abilities fully implemented and configurable.
+- Complete ability system with 9 abilities fully implemented and configurable.
 - All ability scaling values are now configurable via `config.toml`.
 - Improved permission system with LuckPerms compatibility.
-- Component version bumped to 12 for Critical Strike support.
+- Component version bumped to 13 for Lifesteal support.
 
 ### Fixed
 

@@ -13,6 +13,8 @@ import com.bsnacks.rpgstats.systems.GlancingBlowSystem;
 import com.bsnacks.rpgstats.systems.StrongLungsOxygenEffect;
 import com.bsnacks.rpgstats.systems.LuckyShotSystem;
 import com.bsnacks.rpgstats.systems.CriticalStrikeSystem;
+import com.bsnacks.rpgstats.systems.LifestealSystem;
+import com.bsnacks.rpgstats.systems.ThornsSystem;
 
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
@@ -53,6 +55,8 @@ public final class StatsPage extends InteractiveCustomUIPage<StatsPage.StatsPage
     private static final String ABILITY_STRONG_LUNGS = "strong_lungs";
     private static final String ABILITY_LUCKY_SHOT = "lucky_shot";
     private static final String ABILITY_CRITICAL_STRIKE = "critical_strike";
+    private static final String ABILITY_LIFESTEAL = "lifesteal";
+    private static final String ABILITY_THORNS = "thorns";
     private static final int DEFAULT_STAT_CAP = 25;
     private static final double BASE_REGEN_PER_SEC = 1.0;
 
@@ -133,6 +137,8 @@ public final class StatsPage extends InteractiveCustomUIPage<StatsPage.StatsPage
         bindAbilityButton(uiEventBuilder, "#StrongLungsUpgrade", ABILITY_STRONG_LUNGS);
         bindAbilityButton(uiEventBuilder, "#LuckyShotUpgrade", ABILITY_LUCKY_SHOT);
         bindAbilityButton(uiEventBuilder, "#CriticalStrikeUpgrade", ABILITY_CRITICAL_STRIKE);
+        bindAbilityButton(uiEventBuilder, "#LifestealUpgrade", ABILITY_LIFESTEAL);
+        bindAbilityButton(uiEventBuilder, "#ThornsUpgrade", ABILITY_THORNS);
         uiEventBuilder.addEventBinding(CustomUIEventBindingType.Activating, "#ResetStatsButton",
                 new EventData()
                         .append(StatsPageEventData.KEY_TYPE, ACTION_RESET_STATS));
@@ -491,6 +497,70 @@ public final class StatsPage extends InteractiveCustomUIPage<StatsPage.StatsPage
             return;
         }
 
+        if (ABILITY_LIFESTEAL.equalsIgnoreCase(abilityId)) {
+            int currentLevel = stats.getLifestealLevel();
+            int cost = RpgStats.getAbilityUpgradeCost(currentLevel, RpgStats.LIFESTEAL_MAX_LEVEL);
+            int available = stats.getAvailableAbilityPoints();
+            if (cost == 0) {
+                player.sendMessage(Message.raw("Lifesteal is already at max level."));
+                refreshUI(ref, store, player);
+                return;
+            }
+            if (available < cost) {
+                player.sendMessage(Message.raw("You need " + cost + " ability point"
+                        + (cost == 1 ? "" : "s") + " to upgrade Lifesteal."));
+                refreshUI(ref, store, player);
+                return;
+            }
+            if (!stats.upgradeLifesteal()) {
+                player.sendMessage(Message.raw("Lifesteal is already at max level."));
+                refreshUI(ref, store, player);
+                return;
+            }
+            int level = stats.getLifestealLevel();
+            float lifestealPct = LifestealSystem.getLifestealPercent(level, config);
+            player.sendMessage(Message.raw("Lifesteal upgraded to level " + level
+                    + " (" + formatPercent(lifestealPct) + "% of damage healed)."
+                    + " Remaining ability points: " + stats.getAvailableAbilityPoints() + "."));
+            if (plugin != null) {
+                plugin.logInfo("Player upgraded Lifesteal to " + level + ": " + player.getDisplayName());
+            }
+            refreshUI(ref, store, player);
+            return;
+        }
+
+        if (ABILITY_THORNS.equalsIgnoreCase(abilityId)) {
+            int currentLevel = stats.getThornsLevel();
+            int cost = RpgStats.getAbilityUpgradeCost(currentLevel, RpgStats.THORNS_MAX_LEVEL);
+            int available = stats.getAvailableAbilityPoints();
+            if (cost == 0) {
+                player.sendMessage(Message.raw("Thorns is already at max level."));
+                refreshUI(ref, store, player);
+                return;
+            }
+            if (available < cost) {
+                player.sendMessage(Message.raw("You need " + cost + " ability point"
+                        + (cost == 1 ? "" : "s") + " to upgrade Thorns."));
+                refreshUI(ref, store, player);
+                return;
+            }
+            if (!stats.upgradeThorns()) {
+                player.sendMessage(Message.raw("Thorns is already at max level."));
+                refreshUI(ref, store, player);
+                return;
+            }
+            int level = stats.getThornsLevel();
+            float thornsPct = ThornsSystem.getThornsReflectPercent(level, config);
+            player.sendMessage(Message.raw("Thorns upgraded to level " + level
+                    + " (" + formatPercent(thornsPct) + "% damage reflected)."
+                    + " Remaining ability points: " + stats.getAvailableAbilityPoints() + "."));
+            if (plugin != null) {
+                plugin.logInfo("Player upgraded Thorns to " + level + ": " + player.getDisplayName());
+            }
+            refreshUI(ref, store, player);
+            return;
+        }
+
         player.sendMessage(Message.raw("Unknown ability '" + abilityId + "'."));
         refreshUI(ref, store, player);
     }
@@ -703,6 +773,34 @@ public final class StatsPage extends InteractiveCustomUIPage<StatsPage.StatsPage
         boolean canUpgradeCriticalStrike = canSpend && criticalStrikeCost > 0 && points >= criticalStrikeCost;
         uiCommandBuilder.set("#CriticalStrikeUpgrade.HitTestVisible", canUpgradeCriticalStrike);
         uiCommandBuilder.set("#CriticalStrikeUpgrade.Text", criticalStrikeCost == 0 ? "Maxed" : String.valueOf(criticalStrikeCost));
+
+        int lifestealLevel = stats.getLifestealLevel();
+        float lifestealPct = LifestealSystem.getLifestealPercent(lifestealLevel, config);
+        double lifestealPerLevel = config == null ? 3.0 : config.getLifestealPerLevelPct();
+        uiCommandBuilder.set("#LifestealLevel.Text", "Level " + lifestealLevel + "/" + RpgStats.LIFESTEAL_MAX_LEVEL
+                + " (" + formatPercent(lifestealPct) + "%)");
+        uiCommandBuilder.set("#LifestealDescription.Text", "Heal for percentage of damage dealt: "
+                + formatPercent(lifestealPerLevel) + "%, "
+                + formatPercent(lifestealPerLevel * 2.0) + "%, and "
+                + formatPercent(lifestealPerLevel * 3.0) + "% at levels 1-3.");
+        int lifestealCost = RpgStats.getAbilityUpgradeCost(lifestealLevel, RpgStats.LIFESTEAL_MAX_LEVEL);
+        boolean canUpgradeLifesteal = canSpend && lifestealCost > 0 && points >= lifestealCost;
+        uiCommandBuilder.set("#LifestealUpgrade.HitTestVisible", canUpgradeLifesteal);
+        uiCommandBuilder.set("#LifestealUpgrade.Text", lifestealCost == 0 ? "Maxed" : String.valueOf(lifestealCost));
+
+        int thornsLevel = stats.getThornsLevel();
+        float thornsPct = ThornsSystem.getThornsReflectPercent(thornsLevel, config);
+        double thornsPerLevel = config == null ? 25.0 : config.getThornsReflectPerLevelPct();
+        uiCommandBuilder.set("#ThornsLevel.Text", "Level " + thornsLevel + "/" + RpgStats.THORNS_MAX_LEVEL
+                + " (" + formatPercent(thornsPct) + "%)");
+        uiCommandBuilder.set("#ThornsDescription.Text", "Reflect damage back to attackers: "
+                + formatPercent(thornsPerLevel) + "%, "
+                + formatPercent(thornsPerLevel * 2.0) + "%, and "
+                + formatPercent(thornsPerLevel * 3.0) + "% at levels 1-3.");
+        int thornsCost = RpgStats.getAbilityUpgradeCost(thornsLevel, RpgStats.THORNS_MAX_LEVEL);
+        boolean canUpgradeThorns = canSpend && thornsCost > 0 && points >= thornsCost;
+        uiCommandBuilder.set("#ThornsUpgrade.HitTestVisible", canUpgradeThorns);
+        uiCommandBuilder.set("#ThornsUpgrade.Text", thornsCost == 0 ? "Maxed" : String.valueOf(thornsCost));
     }
 
     private void setAddButtonState(UICommandBuilder uiCommandBuilder, String buttonId, boolean enabled) {

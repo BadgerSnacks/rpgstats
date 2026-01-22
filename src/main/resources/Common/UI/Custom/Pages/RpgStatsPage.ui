@@ -39,7 +39,7 @@ $C.@PageOverlay {
   LayoutMode: Middle;
 
   $C.@DecoratedContainer {
-    Anchor: (Width: 920, Height: 620);
+    Anchor: (Width: 920, Height: 720);
 
     #Title {
       Group {
@@ -808,6 +808,106 @@ $C.@PageOverlay {
                   Group { FlexWeight: 1; }
 
                   $C.@SmallSecondaryTextButton #CriticalStrikeUpgrade {
+                    Anchor: (Width: 110, Height: 28);
+                    Text: "Upgrade";
+                  }
+                }
+              }
+
+              Group #LifestealCard {
+                LayoutMode: Left;
+                Anchor: (Left: 0, Right: 0, Height: 128, Bottom: 12);
+                Background: (TexturePath: "../Common/ContainerPanelPatch.png", Border: 4);
+                Padding: (Full: 12);
+
+                Group #LifestealIcon {
+                  Anchor: (Width: 64, Height: 64);
+                  Background: (Color: #000000);
+                }
+
+                Group {
+                  Anchor: (Width: 12);
+                }
+
+                Group {
+                  LayoutMode: Top;
+                  FlexWeight: 1;
+
+                  Label #LifestealName {
+                    Style: @SectionTitleStyle;
+                    Text: "Lifesteal";
+                    Anchor: (Bottom: 4);
+                  }
+
+                  Label #LifestealLevel {
+                    Style: (...$C.@DefaultLabelStyle, TextColor: #9fb3c8);
+                    Text: "Level 0/3 (0%)";
+                    Anchor: (Bottom: 6);
+                  }
+
+                  Label #LifestealDescription {
+                    Style: (...$C.@DefaultLabelStyle, TextColor: #c7d1d8, Wrap: true);
+                    Text: "Heal for percentage of damage dealt: 3%, 6%, and 9%.";
+                  }
+                }
+
+                Group {
+                  Anchor: (Width: 120);
+                  LayoutMode: Top;
+
+                  Group { FlexWeight: 1; }
+
+                  $C.@SmallSecondaryTextButton #LifestealUpgrade {
+                    Anchor: (Width: 110, Height: 28);
+                    Text: "Upgrade";
+                  }
+                }
+              }
+
+              Group #ThornsCard {
+                LayoutMode: Left;
+                Anchor: (Left: 0, Right: 0, Height: 128, Bottom: 12);
+                Background: (TexturePath: "../Common/ContainerPanelPatch.png", Border: 4);
+                Padding: (Full: 12);
+
+                Group #ThornsIcon {
+                  Anchor: (Width: 64, Height: 64);
+                  Background: (Color: #000000);
+                }
+
+                Group {
+                  Anchor: (Width: 12);
+                }
+
+                Group {
+                  LayoutMode: Top;
+                  FlexWeight: 1;
+
+                  Label #ThornsName {
+                    Style: @SectionTitleStyle;
+                    Text: "Thorns";
+                    Anchor: (Bottom: 4);
+                  }
+
+                  Label #ThornsLevel {
+                    Style: (...$C.@DefaultLabelStyle, TextColor: #9fb3c8);
+                    Text: "Level 0/3 (0%)";
+                    Anchor: (Bottom: 6);
+                  }
+
+                  Label #ThornsDescription {
+                    Style: (...$C.@DefaultLabelStyle, TextColor: #c7d1d8, Wrap: true);
+                    Text: "Reflect damage back to attackers: 25%, 50%, and 75%.";
+                  }
+                }
+
+                Group {
+                  Anchor: (Width: 120);
+                  LayoutMode: Top;
+
+                  Group { FlexWeight: 1; }
+
+                  $C.@SmallSecondaryTextButton #ThornsUpgrade {
                     Anchor: (Width: 110, Height: 28);
                     Text: "Upgrade";
                   }

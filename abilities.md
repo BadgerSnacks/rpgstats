@@ -126,7 +126,7 @@ This document contains ability specifications for implementation. Each entry inc
 **Notes:** Uses DamageEventSystem pattern. Displays "Critical strike!" message when triggered.
 
 ### Lifesteal
-**Status:** Idea
+**Status:** Implemented
 **Effect Type:** On-Hit Effect + Regeneration
 **Description:** Heal for a percentage of damage dealt
 **Max Ranks:** 3
@@ -139,7 +139,7 @@ This document contains ability specifications for implementation. Each entry inc
 **Upgrade Cost:** 1 / 2 / 3
 **Config Keys:**
 - `lifesteal_per_level_pct` (default 3.0)
-**Notes:** Heals attacker after damage is dealt. Uses DamageEventSystem to detect player attacks.
+**Notes:** Heals attacker after damage is dealt using EntityStatMap.addStatValue().
 
 ### Mana Regeneration
 **Status:** Idea
@@ -190,17 +190,17 @@ This document contains ability specifications for implementation. Each entry inc
 **Notes:** Modifies ExperienceOnKillSystem XP calculation. Good use for Charisma stat synergy.
 
 ### Thorns
-**Status:** Idea
+**Status:** Implemented
 **Effect Type:** On-Damage Effect + Damage Modifier
 **Description:** Reflect a percentage of damage back to attackers
 **Max Ranks:** 3
 **Scaling per Rank:**
-- Rank 1: 10% reflect
-- Rank 2: 20% reflect
-- Rank 3: 30% reflect
+- Rank 1: 25% reflect
+- Rank 2: 50% reflect
+- Rank 3: 75% reflect
 **Activation:** On Event (when taking damage from an attacker)
 **Requirements:** Attacker must be a valid entity
 **Upgrade Cost:** 1 / 2 / 3
 **Config Keys:**
-- `thorns_reflect_per_level_pct` (default 10.0)
-**Notes:** Uses DamageEventSystem to detect incoming damage and apply counter-damage to attacker.
+- `thorns_reflect_per_level_pct` (default 25.0)
+**Notes:** Uses DamageEventSystem to detect incoming damage and apply counter-damage to attacker via EntityStatMap.addStatValue() with negative health.

@@ -42,6 +42,8 @@ public final class RpgStatsConfig {
     private static final double DEFAULT_CRITICAL_STRIKE_CHANCE_PER_LEVEL_PCT = 5.0;
     private static final double DEFAULT_CRITICAL_STRIKE_BASE_CHANCE_PCT = 5.0;
     private static final double DEFAULT_CRITICAL_STRIKE_DAMAGE_MULTIPLIER = 1.5;
+    private static final double DEFAULT_LIFESTEAL_PER_LEVEL_PCT = 3.0;
+    private static final double DEFAULT_THORNS_REFLECT_PER_LEVEL_PCT = 25.0;
     private static final double DEFAULT_DAMAGE_MULTIPLIER_BASE = 10.0;
     private static final double DEFAULT_MINING_SPEED_BASE = 1.0;
     private static final double DEFAULT_MINING_SPEED_PER_POINT = 0.10;
@@ -79,6 +81,8 @@ public final class RpgStatsConfig {
     private double criticalStrikeChancePerLevelPct;
     private double criticalStrikeBaseChancePct;
     private double criticalStrikeDamageMultiplier;
+    private double lifestealPerLevelPct;
+    private double thornsReflectPerLevelPct;
 
     private RpgStatsConfig(int configVersion, double xpMultiplier, int maxLevel, int abilityPointsPerLevel,
                            double lightFootSpeedPerLevelPct, double armorProficiencyResistancePerLevelPct,
@@ -92,7 +96,8 @@ public final class RpgStatsConfig {
                            Set<String> xpBlacklistNpcTypes, Set<String> xpBlacklistRoles,
                            double strongLungsOxygenPerLevelPct, double luckyShotChancePerLevelPct,
                            double criticalStrikeChancePerLevelPct, double criticalStrikeBaseChancePct,
-                           double criticalStrikeDamageMultiplier) {
+                           double criticalStrikeDamageMultiplier, double lifestealPerLevelPct,
+                           double thornsReflectPerLevelPct) {
         this.configVersion = configVersion;
         this.xpMultiplier = xpMultiplier;
         this.maxLevel = maxLevel;
@@ -122,6 +127,8 @@ public final class RpgStatsConfig {
         this.criticalStrikeChancePerLevelPct = criticalStrikeChancePerLevelPct;
         this.criticalStrikeBaseChancePct = criticalStrikeBaseChancePct;
         this.criticalStrikeDamageMultiplier = criticalStrikeDamageMultiplier;
+        this.lifestealPerLevelPct = lifestealPerLevelPct;
+        this.thornsReflectPerLevelPct = thornsReflectPerLevelPct;
     }
 
     public double getXpMultiplier() {
@@ -174,6 +181,14 @@ public final class RpgStatsConfig {
 
     public double getCriticalStrikeDamageMultiplier() {
         return criticalStrikeDamageMultiplier;
+    }
+
+    public double getLifestealPerLevelPct() {
+        return lifestealPerLevelPct;
+    }
+
+    public double getThornsReflectPerLevelPct() {
+        return thornsReflectPerLevelPct;
     }
 
     public double getDamageMultiplierBase() {
@@ -279,6 +294,8 @@ public final class RpgStatsConfig {
         this.criticalStrikeChancePerLevelPct = other.criticalStrikeChancePerLevelPct;
         this.criticalStrikeBaseChancePct = other.criticalStrikeBaseChancePct;
         this.criticalStrikeDamageMultiplier = other.criticalStrikeDamageMultiplier;
+        this.lifestealPerLevelPct = other.lifestealPerLevelPct;
+        this.thornsReflectPerLevelPct = other.thornsReflectPerLevelPct;
     }
 
     public static Path resolveConfigPath(Path dataDirectory) {
@@ -330,7 +347,9 @@ public final class RpgStatsConfig {
                     DEFAULT_LUCKY_SHOT_CHANCE_PER_LEVEL_PCT,
                     DEFAULT_CRITICAL_STRIKE_CHANCE_PER_LEVEL_PCT,
                     DEFAULT_CRITICAL_STRIKE_BASE_CHANCE_PCT,
-                    DEFAULT_CRITICAL_STRIKE_DAMAGE_MULTIPLIER
+                    DEFAULT_CRITICAL_STRIKE_DAMAGE_MULTIPLIER,
+                    DEFAULT_LIFESTEAL_PER_LEVEL_PCT,
+                    DEFAULT_THORNS_REFLECT_PER_LEVEL_PCT
             );
         }
 
@@ -421,6 +440,16 @@ public final class RpgStatsConfig {
             criticalStrikeDamageMultiplier = DEFAULT_CRITICAL_STRIKE_DAMAGE_MULTIPLIER;
         }
 
+        double lifestealPerLevelPct = parseDouble(values.get("lifesteal_per_level_pct"),
+                DEFAULT_LIFESTEAL_PER_LEVEL_PCT, logger, "lifesteal_per_level_pct");
+        lifestealPerLevelPct = clampAbilityPct(lifestealPerLevelPct, logger,
+                "lifesteal_per_level_pct", DEFAULT_LIFESTEAL_PER_LEVEL_PCT);
+
+        double thornsReflectPerLevelPct = parseDouble(values.get("thorns_reflect_per_level_pct"),
+                DEFAULT_THORNS_REFLECT_PER_LEVEL_PCT, logger, "thorns_reflect_per_level_pct");
+        thornsReflectPerLevelPct = clampAbilityPct(thornsReflectPerLevelPct, logger,
+                "thorns_reflect_per_level_pct", DEFAULT_THORNS_REFLECT_PER_LEVEL_PCT);
+
         double damageBase = parseDouble(values.get("damage_multiplier_base"), DEFAULT_DAMAGE_MULTIPLIER_BASE,
                 logger, "damage_multiplier_base");
         if (damageBase <= 0) {
@@ -479,7 +508,8 @@ public final class RpgStatsConfig {
                 strCap, dexCap, conCap, intCap, endCap, chaCap,
                 xpBlacklistNpcTypes, xpBlacklistRoles,
                 strongLungsOxygenPerLevelPct, luckyShotChancePerLevelPct,
-                criticalStrikeChancePerLevelPct, criticalStrikeBaseChancePct, criticalStrikeDamageMultiplier);
+                criticalStrikeChancePerLevelPct, criticalStrikeBaseChancePct, criticalStrikeDamageMultiplier,
+                lifestealPerLevelPct, thornsReflectPerLevelPct);
     }
 
     private static Map<String, String> readKeyValues(Path configPath, HytaleLogger logger) {
@@ -733,6 +763,16 @@ public final class RpgStatsConfig {
                 + "# Critical Strike damage multiplier (default " + DEFAULT_CRITICAL_STRIKE_DAMAGE_MULTIPLIER + ").\n"
                 + "# When a critical strike occurs, damage is multiplied by this value.\n"
                 + "critical_strike_damage_multiplier = " + DEFAULT_CRITICAL_STRIKE_DAMAGE_MULTIPLIER + "\n"
+                + "\n"
+                + "# Lifesteal percentage per level (default " + DEFAULT_LIFESTEAL_PER_LEVEL_PCT + ").\n"
+                + "# Heals you for this percentage of damage dealt per level. 3%/6%/9% at levels 1-3.\n"
+                + "# Valid range: " + MIN_ABILITY_BONUS_PCT + " to " + MAX_ABILITY_BONUS_PCT + ".\n"
+                + "lifesteal_per_level_pct = " + DEFAULT_LIFESTEAL_PER_LEVEL_PCT + "\n"
+                + "\n"
+                + "# Thorns reflect percentage per level (default " + DEFAULT_THORNS_REFLECT_PER_LEVEL_PCT + ").\n"
+                + "# Reflects this percentage of damage taken back to attackers. 10%/20%/30% at levels 1-3.\n"
+                + "# Valid range: " + MIN_ABILITY_BONUS_PCT + " to " + MAX_ABILITY_BONUS_PCT + ".\n"
+                + "thorns_reflect_per_level_pct = " + DEFAULT_THORNS_REFLECT_PER_LEVEL_PCT + "\n"
                 + "\n"
                 + "# Strength damage multiplier: damage *= (STR / damage_multiplier_base) (default " + DEFAULT_DAMAGE_MULTIPLIER_BASE + ").\n"
                 + "# Lower number = more damage. Each point spent into (STR) will add 0.10 to the multiplier.\n"

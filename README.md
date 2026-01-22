@@ -14,6 +14,7 @@ This project is a java plugin mod for the game Hytale. It gives each player RPG-
 - Health Regeneration ability with 3 levels (2/3/4 health per second).
 - Stamina Regeneration ability with 3 levels (0.75/1.0/1.25 stamina per second).
 - Strong Lungs ability with 3 levels (+50%, +100%, +150% oxygen).
+- Lucky Shot ability with 3 levels (10%, 20%, 30% chance to not consume ammo) - **WIP: Effect not yet functional**.
 - Lets players spend points with `/stats add <stat>`.
 - Lets admins set or reset stats with `/stats set` and `/stats reset`.
 - Provides a stats GUI with tabs (Stats, Abilities, Reset) and an XP progress bar.

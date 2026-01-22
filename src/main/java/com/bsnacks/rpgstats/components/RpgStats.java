@@ -11,7 +11,7 @@ import java.util.Arrays;
 public final class RpgStats implements Component<EntityStore> {
 
     public static final String COMPONENT_ID = "rpgstats";
-    public static final int CURRENT_VERSION = 10;
+    public static final int CURRENT_VERSION = 12;
     public static final int DEFAULT_MAX_LEVEL = 25;
     public static final int BASE_XP = 100;
     public static final int LINEAR_XP = 50;
@@ -24,6 +24,8 @@ public final class RpgStats implements Component<EntityStore> {
     public static final int STAMINA_REGEN_MAX_LEVEL = 3;
     public static final int GLANCING_BLOW_MAX_LEVEL = 3;
     public static final int STRONG_LUNGS_MAX_LEVEL = 3;
+    public static final int LUCKY_SHOT_MAX_LEVEL = 3;
+    public static final int CRITICAL_STRIKE_MAX_LEVEL = 3;
 
     public static final BuilderCodec<RpgStats> CODEC =
             BuilderCodec.builder(RpgStats.class, RpgStats::new)
@@ -45,6 +47,10 @@ public final class RpgStats implements Component<EntityStore> {
                             (d, v) -> d.glancingBlowLevel = v, d -> d.glancingBlowLevel).add()
                     .append(new KeyedCodec<>("StrongLungsLevel", Codec.INTEGER),
                             (d, v) -> d.strongLungsLevel = v, d -> d.strongLungsLevel).add()
+                    .append(new KeyedCodec<>("LuckyShotLevel", Codec.INTEGER),
+                            (d, v) -> d.luckyShotLevel = v, d -> d.luckyShotLevel).add()
+                    .append(new KeyedCodec<>("CriticalStrikeLevel", Codec.INTEGER),
+                            (d, v) -> d.criticalStrikeLevel = v, d -> d.criticalStrikeLevel).add()
 
                     .append(new KeyedCodec<>("Str", Codec.INTEGER), (d, v) -> d.str = v, d -> d.str).add()
                     .append(new KeyedCodec<>("Dex", Codec.INTEGER), (d, v) -> d.dex = v, d -> d.dex).add()
@@ -69,6 +75,8 @@ public final class RpgStats implements Component<EntityStore> {
     private int staminaRegenLevel = 0;
     private int glancingBlowLevel = 0;
     private int strongLungsLevel = 0;
+    private int luckyShotLevel = 0;
+    private int criticalStrikeLevel = 0;
     private boolean syncingLevel = false;
 
     private int str = BASE_STAT, dex = BASE_STAT, con = BASE_STAT, intl = BASE_STAT, end = BASE_STAT, cha = BASE_STAT;
@@ -116,6 +124,14 @@ public final class RpgStats implements Component<EntityStore> {
             strongLungsLevel = 0;
             version = 10;
         }
+        if (version < 11) {
+            luckyShotLevel = 0;
+            version = 11;
+        }
+        if (version < 12) {
+            criticalStrikeLevel = 0;
+            version = 12;
+        }
     }
 
     public int modifier(int score) {
@@ -134,6 +150,8 @@ public final class RpgStats implements Component<EntityStore> {
         staminaRegenLevel = 0;
         glancingBlowLevel = 0;
         strongLungsLevel = 0;
+        luckyShotLevel = 0;
+        criticalStrikeLevel = 0;
         str = BASE_STAT;
         dex = BASE_STAT;
         con = BASE_STAT;
@@ -305,6 +323,42 @@ public final class RpgStats implements Component<EntityStore> {
         return true;
     }
 
+    public int getLuckyShotLevel() {
+        syncLevelToXp();
+        return luckyShotLevel;
+    }
+
+    public boolean upgradeLuckyShot() {
+        syncLevelToXp();
+        if (luckyShotLevel >= LUCKY_SHOT_MAX_LEVEL) {
+            return false;
+        }
+        int cost = getAbilityUpgradeCost(luckyShotLevel, LUCKY_SHOT_MAX_LEVEL);
+        if (getAvailableAbilityPoints() < cost) {
+            return false;
+        }
+        luckyShotLevel++;
+        return true;
+    }
+
+    public int getCriticalStrikeLevel() {
+        syncLevelToXp();
+        return criticalStrikeLevel;
+    }
+
+    public boolean upgradeCriticalStrike() {
+        syncLevelToXp();
+        if (criticalStrikeLevel >= CRITICAL_STRIKE_MAX_LEVEL) {
+            return false;
+        }
+        int cost = getAbilityUpgradeCost(criticalStrikeLevel, CRITICAL_STRIKE_MAX_LEVEL);
+        if (getAvailableAbilityPoints() < cost) {
+            return false;
+        }
+        criticalStrikeLevel++;
+        return true;
+    }
+
     public boolean spendStatPoint(String attributeRaw) {
         if (getAvailableStatPoints() <= 0) {
             return false;
@@ -332,6 +386,8 @@ public final class RpgStats implements Component<EntityStore> {
         copy.staminaRegenLevel = this.staminaRegenLevel;
         copy.glancingBlowLevel = this.glancingBlowLevel;
         copy.strongLungsLevel = this.strongLungsLevel;
+        copy.luckyShotLevel = this.luckyShotLevel;
+        copy.criticalStrikeLevel = this.criticalStrikeLevel;
         copy.str = this.str;
         copy.dex = this.dex;
         copy.con = this.con;
@@ -415,6 +471,12 @@ public final class RpgStats implements Component<EntityStore> {
         if (strongLungsLevel > 0) {
             spent += totalCostForLevels(strongLungsLevel);
         }
+        if (luckyShotLevel > 0) {
+            spent += totalCostForLevels(luckyShotLevel);
+        }
+        if (criticalStrikeLevel > 0) {
+            spent += totalCostForLevels(criticalStrikeLevel);
+        }
         return Math.max(0, spent);
     }
 
@@ -452,6 +514,8 @@ public final class RpgStats implements Component<EntityStore> {
         staminaRegenLevel = clamp(staminaRegenLevel, 0, STAMINA_REGEN_MAX_LEVEL);
         glancingBlowLevel = clamp(glancingBlowLevel, 0, GLANCING_BLOW_MAX_LEVEL);
         strongLungsLevel = clamp(strongLungsLevel, 0, STRONG_LUNGS_MAX_LEVEL);
+        luckyShotLevel = clamp(luckyShotLevel, 0, LUCKY_SHOT_MAX_LEVEL);
+        criticalStrikeLevel = clamp(criticalStrikeLevel, 0, CRITICAL_STRIKE_MAX_LEVEL);
 
         if (getAbilityPointsSpent() > maxAllowed) {
             trimAbilityLevelsToPoints(maxAllowed);
@@ -480,10 +544,21 @@ public final class RpgStats implements Component<EntityStore> {
             healthRegenLevel = 0;
             staminaRegenLevel = 0;
             glancingBlowLevel = 0;
+            strongLungsLevel = 0;
+            luckyShotLevel = 0;
+            criticalStrikeLevel = 0;
             return;
         }
-        int guard = LIGHT_FOOT_MAX_LEVEL + ARMOR_PROFICIENCY_MAX_LEVEL + HEALTH_REGEN_MAX_LEVEL + STAMINA_REGEN_MAX_LEVEL + GLANCING_BLOW_MAX_LEVEL + STRONG_LUNGS_MAX_LEVEL + 2;
+        int guard = LIGHT_FOOT_MAX_LEVEL + ARMOR_PROFICIENCY_MAX_LEVEL + HEALTH_REGEN_MAX_LEVEL + STAMINA_REGEN_MAX_LEVEL + GLANCING_BLOW_MAX_LEVEL + STRONG_LUNGS_MAX_LEVEL + LUCKY_SHOT_MAX_LEVEL + CRITICAL_STRIKE_MAX_LEVEL + 2;
         while (getAbilityPointsSpent() > maxAllowed && guard-- > 0) {
+            if (criticalStrikeLevel > 0) {
+                criticalStrikeLevel--;
+                continue;
+            }
+            if (luckyShotLevel > 0) {
+                luckyShotLevel--;
+                continue;
+            }
             if (strongLungsLevel > 0) {
                 strongLungsLevel--;
                 continue;

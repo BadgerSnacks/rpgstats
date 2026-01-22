@@ -17,6 +17,8 @@ import com.bsnacks.rpgstats.permissions.RpgStatsPermissions;
 import com.bsnacks.rpgstats.systems.LightFootSpeedEffect;
 import com.bsnacks.rpgstats.systems.ArmorProficiencySystem;
 import com.bsnacks.rpgstats.systems.GlancingBlowSystem;
+import com.bsnacks.rpgstats.systems.LuckyShotSystem;
+import com.bsnacks.rpgstats.systems.CriticalStrikeSystem;
 
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.Ref;
@@ -69,6 +71,11 @@ public final class RpgStatsPlugin extends JavaPlugin {
         getEntityStoreRegistry().registerSystem(new ArmorProficiencySystem(rpgStatsType, config));
         getEntityStoreRegistry().registerSystem(new GlancingBlowSystem(rpgStatsType, config));
         getEntityStoreRegistry().registerSystem(new AbilityRegenSystem(rpgStatsType, config));
+        getEntityStoreRegistry().registerSystem(new CriticalStrikeSystem(rpgStatsType, config));
+
+        // Lucky Shot utility - ability tracking works, effect trigger needs proper Hytale API hook
+        // The tryLuckyShot() method is ready to be called when the correct event is identified
+        new LuckyShotSystem(rpgStatsType, config, this);
     }
 
     public void reloadConfig(String reason) {
@@ -88,6 +95,7 @@ public final class RpgStatsPlugin extends JavaPlugin {
                 + " health_regen_per_level_per_sec=" + config.getHealthRegenPerLevelPerSec()
                 + " stamina_regen_per_level_per_sec=" + config.getStaminaRegenPerLevelPerSec()
                 + " glancing_blow_chance_per_level_pct=" + config.getGlancingBlowChancePerLevelPct()
+                + " lucky_shot_chance_per_level_pct=" + config.getLuckyShotChancePerLevelPct()
                 + " hud_enabled=" + config.isHudEnabled()
                 + " xp_blacklist_npc_types=" + config.getXpBlacklistNpcTypes().size()
                 + " xp_blacklist_roles=" + config.getXpBlacklistRoles().size());

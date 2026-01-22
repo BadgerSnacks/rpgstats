@@ -1,0 +1,53 @@
+$C = "../Common.ui";
+
+@HudLabelStyle = LabelStyle(
+  ...$C.@DefaultLabelStyle,
+  FontSize: 12,
+  TextColor: #bfcdd5,
+  RenderBold: true,
+  RenderUppercase: true
+);
+
+Group {
+  Anchor: (Bottom: 135, Left: 0, Right: 0, Height: 36);
+  LayoutMode: Center;
+
+  Group #XpHudContainer {
+    Anchor: (Width: 260, Height: 32);
+    Background: (TexturePath: "../Common/ContainerPanelPatch.png", Border: 4);
+    Padding: (Full: 6);
+    LayoutMode: Top;
+
+    Group {
+      Anchor: (Height: 12, Bottom: 4);
+      LayoutMode: Left;
+
+      Label #XpHudLevel {
+        Style: @HudLabelStyle;
+        Text: "LV 1";
+        Anchor: (Right: 6);
+      }
+
+      Group { FlexWeight: 1; }
+
+      Label #XpHudText {
+        Style: @HudLabelStyle;
+        Text: "XP 0/100";
+      }
+    }
+
+    Group {
+      Anchor: (Height: 8, Left: 0, Right: 0);
+      Background: "../Common/ProgressBar.png";
+      Padding: (Full: 2);
+
+      ProgressBar #XpHudBar {
+        BarTexturePath: "../Common/ProgressBarFill.png";
+        EffectTexturePath: "../Common/ProgressBarEffect.png";
+        EffectWidth: 40;
+        EffectHeight: 16;
+        EffectOffset: 30;
+      }
+    }
+  }
+}

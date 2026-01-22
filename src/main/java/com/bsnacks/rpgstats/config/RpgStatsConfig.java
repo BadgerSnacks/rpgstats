@@ -38,6 +38,10 @@ public final class RpgStatsConfig {
     private static final double MAX_REGEN_PER_LEVEL_PER_SEC = 100.0;
     private static final double DEFAULT_GLANCING_BLOW_CHANCE_PER_LEVEL_PCT = 5.0;
     private static final double DEFAULT_STRONG_LUNGS_OXYGEN_PER_LEVEL_PCT = 100.0;
+    private static final double DEFAULT_LUCKY_SHOT_CHANCE_PER_LEVEL_PCT = 10.0;
+    private static final double DEFAULT_CRITICAL_STRIKE_CHANCE_PER_LEVEL_PCT = 5.0;
+    private static final double DEFAULT_CRITICAL_STRIKE_BASE_CHANCE_PCT = 5.0;
+    private static final double DEFAULT_CRITICAL_STRIKE_DAMAGE_MULTIPLIER = 1.5;
     private static final double DEFAULT_DAMAGE_MULTIPLIER_BASE = 10.0;
     private static final double DEFAULT_MINING_SPEED_BASE = 1.0;
     private static final double DEFAULT_MINING_SPEED_PER_POINT = 0.10;
@@ -71,6 +75,10 @@ public final class RpgStatsConfig {
     private Set<String> xpBlacklistNpcTypes;
     private Set<String> xpBlacklistRoles;
     private double strongLungsOxygenPerLevelPct;
+    private double luckyShotChancePerLevelPct;
+    private double criticalStrikeChancePerLevelPct;
+    private double criticalStrikeBaseChancePct;
+    private double criticalStrikeDamageMultiplier;
 
     private RpgStatsConfig(int configVersion, double xpMultiplier, int maxLevel, int abilityPointsPerLevel,
                            double lightFootSpeedPerLevelPct, double armorProficiencyResistancePerLevelPct,
@@ -82,7 +90,9 @@ public final class RpgStatsConfig {
                            boolean hudEnabled,
                            int strCap, int dexCap, int conCap, int intCap, int endCap, int chaCap,
                            Set<String> xpBlacklistNpcTypes, Set<String> xpBlacklistRoles,
-                           double strongLungsOxygenPerLevelPct) {
+                           double strongLungsOxygenPerLevelPct, double luckyShotChancePerLevelPct,
+                           double criticalStrikeChancePerLevelPct, double criticalStrikeBaseChancePct,
+                           double criticalStrikeDamageMultiplier) {
         this.configVersion = configVersion;
         this.xpMultiplier = xpMultiplier;
         this.maxLevel = maxLevel;
@@ -108,6 +118,10 @@ public final class RpgStatsConfig {
         this.xpBlacklistNpcTypes = xpBlacklistNpcTypes;
         this.xpBlacklistRoles = xpBlacklistRoles;
         this.strongLungsOxygenPerLevelPct = strongLungsOxygenPerLevelPct;
+        this.luckyShotChancePerLevelPct = luckyShotChancePerLevelPct;
+        this.criticalStrikeChancePerLevelPct = criticalStrikeChancePerLevelPct;
+        this.criticalStrikeBaseChancePct = criticalStrikeBaseChancePct;
+        this.criticalStrikeDamageMultiplier = criticalStrikeDamageMultiplier;
     }
 
     public double getXpMultiplier() {
@@ -144,6 +158,22 @@ public final class RpgStatsConfig {
 
     public double getStrongLungsOxygenPerLevelPct() {
         return strongLungsOxygenPerLevelPct;
+    }
+
+    public double getLuckyShotChancePerLevelPct() {
+        return luckyShotChancePerLevelPct;
+    }
+
+    public double getCriticalStrikeChancePerLevelPct() {
+        return criticalStrikeChancePerLevelPct;
+    }
+
+    public double getCriticalStrikeBaseChancePct() {
+        return criticalStrikeBaseChancePct;
+    }
+
+    public double getCriticalStrikeDamageMultiplier() {
+        return criticalStrikeDamageMultiplier;
     }
 
     public double getDamageMultiplierBase() {
@@ -230,6 +260,7 @@ public final class RpgStatsConfig {
         this.staminaRegenPerLevelPerSec = other.staminaRegenPerLevelPerSec;
         this.glancingBlowChancePerLevelPct = other.glancingBlowChancePerLevelPct;
         this.strongLungsOxygenPerLevelPct = other.strongLungsOxygenPerLevelPct;
+        this.luckyShotChancePerLevelPct = other.luckyShotChancePerLevelPct;
         this.damageMultiplierBase = other.damageMultiplierBase;
         this.miningSpeedBase = other.miningSpeedBase;
         this.miningSpeedPerPoint = other.miningSpeedPerPoint;
@@ -245,6 +276,9 @@ public final class RpgStatsConfig {
         this.chaCap = other.chaCap;
         this.xpBlacklistNpcTypes = other.xpBlacklistNpcTypes;
         this.xpBlacklistRoles = other.xpBlacklistRoles;
+        this.criticalStrikeChancePerLevelPct = other.criticalStrikeChancePerLevelPct;
+        this.criticalStrikeBaseChancePct = other.criticalStrikeBaseChancePct;
+        this.criticalStrikeDamageMultiplier = other.criticalStrikeDamageMultiplier;
     }
 
     public static Path resolveConfigPath(Path dataDirectory) {
@@ -292,7 +326,11 @@ public final class RpgStatsConfig {
                     DEFAULT_STAT_CAP,
                     xpBlacklist.npcTypes,
                     xpBlacklist.roles,
-                    DEFAULT_STRONG_LUNGS_OXYGEN_PER_LEVEL_PCT
+                    DEFAULT_STRONG_LUNGS_OXYGEN_PER_LEVEL_PCT,
+                    DEFAULT_LUCKY_SHOT_CHANCE_PER_LEVEL_PCT,
+                    DEFAULT_CRITICAL_STRIKE_CHANCE_PER_LEVEL_PCT,
+                    DEFAULT_CRITICAL_STRIKE_BASE_CHANCE_PCT,
+                    DEFAULT_CRITICAL_STRIKE_DAMAGE_MULTIPLIER
             );
         }
 
@@ -361,6 +399,28 @@ public final class RpgStatsConfig {
         strongLungsOxygenPerLevelPct = clampAbilityPct(strongLungsOxygenPerLevelPct, logger,
                 "strong_lungs_oxygen_per_level_pct", DEFAULT_STRONG_LUNGS_OXYGEN_PER_LEVEL_PCT);
 
+        double luckyShotChancePerLevelPct = parseDouble(values.get("lucky_shot_chance_per_level_pct"),
+                DEFAULT_LUCKY_SHOT_CHANCE_PER_LEVEL_PCT, logger, "lucky_shot_chance_per_level_pct");
+        luckyShotChancePerLevelPct = clampAbilityPct(luckyShotChancePerLevelPct, logger,
+                "lucky_shot_chance_per_level_pct", DEFAULT_LUCKY_SHOT_CHANCE_PER_LEVEL_PCT);
+
+        double criticalStrikeChancePerLevelPct = parseDouble(values.get("critical_strike_chance_per_level_pct"),
+                DEFAULT_CRITICAL_STRIKE_CHANCE_PER_LEVEL_PCT, logger, "critical_strike_chance_per_level_pct");
+        criticalStrikeChancePerLevelPct = clampAbilityPct(criticalStrikeChancePerLevelPct, logger,
+                "critical_strike_chance_per_level_pct", DEFAULT_CRITICAL_STRIKE_CHANCE_PER_LEVEL_PCT);
+
+        double criticalStrikeBaseChancePct = parseDouble(values.get("critical_strike_base_chance_pct"),
+                DEFAULT_CRITICAL_STRIKE_BASE_CHANCE_PCT, logger, "critical_strike_base_chance_pct");
+        criticalStrikeBaseChancePct = clampAbilityPct(criticalStrikeBaseChancePct, logger,
+                "critical_strike_base_chance_pct", DEFAULT_CRITICAL_STRIKE_BASE_CHANCE_PCT);
+
+        double criticalStrikeDamageMultiplier = parseDouble(values.get("critical_strike_damage_multiplier"),
+                DEFAULT_CRITICAL_STRIKE_DAMAGE_MULTIPLIER, logger, "critical_strike_damage_multiplier");
+        if (criticalStrikeDamageMultiplier < 1.0) {
+            logger.at(Level.WARNING).log("[RPGStats] critical_strike_damage_multiplier must be >= 1.0. Using default " + DEFAULT_CRITICAL_STRIKE_DAMAGE_MULTIPLIER);
+            criticalStrikeDamageMultiplier = DEFAULT_CRITICAL_STRIKE_DAMAGE_MULTIPLIER;
+        }
+
         double damageBase = parseDouble(values.get("damage_multiplier_base"), DEFAULT_DAMAGE_MULTIPLIER_BASE,
                 logger, "damage_multiplier_base");
         if (damageBase <= 0) {
@@ -418,7 +478,8 @@ public final class RpgStatsConfig {
                 hudEnabled,
                 strCap, dexCap, conCap, intCap, endCap, chaCap,
                 xpBlacklistNpcTypes, xpBlacklistRoles,
-                strongLungsOxygenPerLevelPct);
+                strongLungsOxygenPerLevelPct, luckyShotChancePerLevelPct,
+                criticalStrikeChancePerLevelPct, criticalStrikeBaseChancePct, criticalStrikeDamageMultiplier);
     }
 
     private static Map<String, String> readKeyValues(Path configPath, HytaleLogger logger) {
@@ -657,6 +718,21 @@ public final class RpgStatsConfig {
                 + "# Strong Lungs oxygen bonus per level, in percent (default " + DEFAULT_STRONG_LUNGS_OXYGEN_PER_LEVEL_PCT + ").\n"
                 + "# Valid range: " + MIN_ABILITY_BONUS_PCT + " to " + MAX_ABILITY_BONUS_PCT + ".\n"
                 + "strong_lungs_oxygen_per_level_pct = " + DEFAULT_STRONG_LUNGS_OXYGEN_PER_LEVEL_PCT + "\n"
+                + "\n"
+                + "# Lucky Shot chance per level, in percent (default " + DEFAULT_LUCKY_SHOT_CHANCE_PER_LEVEL_PCT + ").\n"
+                + "# Chance to not consume ammo when firing a bow or crossbow.\n"
+                + "# Valid range: " + MIN_ABILITY_BONUS_PCT + " to " + MAX_ABILITY_BONUS_PCT + ".\n"
+                + "lucky_shot_chance_per_level_pct = " + DEFAULT_LUCKY_SHOT_CHANCE_PER_LEVEL_PCT + "\n"
+                + "\n"
+                + "# Critical Strike chance per level, in percent (default " + DEFAULT_CRITICAL_STRIKE_CHANCE_PER_LEVEL_PCT + ").\n"
+                + "# Total chance = base + (per_level * level). With defaults: 10%/15%/20% at levels 1-3.\n"
+                + "# Valid range: " + MIN_ABILITY_BONUS_PCT + " to " + MAX_ABILITY_BONUS_PCT + ".\n"
+                + "critical_strike_chance_per_level_pct = " + DEFAULT_CRITICAL_STRIKE_CHANCE_PER_LEVEL_PCT + "\n"
+                + "critical_strike_base_chance_pct = " + DEFAULT_CRITICAL_STRIKE_BASE_CHANCE_PCT + "\n"
+                + "\n"
+                + "# Critical Strike damage multiplier (default " + DEFAULT_CRITICAL_STRIKE_DAMAGE_MULTIPLIER + ").\n"
+                + "# When a critical strike occurs, damage is multiplied by this value.\n"
+                + "critical_strike_damage_multiplier = " + DEFAULT_CRITICAL_STRIKE_DAMAGE_MULTIPLIER + "\n"
                 + "\n"
                 + "# Strength damage multiplier: damage *= (STR / damage_multiplier_base) (default " + DEFAULT_DAMAGE_MULTIPLIER_BASE + ").\n"
                 + "# Lower number = more damage. Each point spent into (STR) will add 0.10 to the multiplier.\n"

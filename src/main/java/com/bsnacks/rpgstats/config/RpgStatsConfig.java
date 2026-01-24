@@ -22,11 +22,15 @@ public final class RpgStatsConfig {
     private static final DateTimeFormatter BACKUP_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss");
     private static final String FILE_NAME = "config.toml";
     private static final String XP_BLACKLIST_FILE_NAME = "xp_blacklist.toml";
-    private static final int CURRENT_CONFIG_VERSION = 4;
+    private static final int CURRENT_CONFIG_VERSION = 5;
     private static final double DEFAULT_XP_MULTIPLIER = 0.35;
     private static final int DEFAULT_MAX_LEVEL = 25;
     private static final int DEFAULT_ABILITY_POINTS_PER_LEVEL = 2;
     private static final int MIN_ABILITY_POINTS_PER_LEVEL = 0;
+    private static final int DEFAULT_ABILITY_RANK1_COST = 1;
+    private static final int DEFAULT_ABILITY_RANK2_COST = 2;
+    private static final int DEFAULT_ABILITY_RANK3_COST = 3;
+    private static final int MIN_ABILITY_RANK_COST = 0;
     private static final int DEFAULT_STAT_CAP = 25;
     private static final double DEFAULT_LIGHT_FOOT_SPEED_PER_LEVEL_PCT = 5.0;
     private static final double DEFAULT_ARMOR_PROFICIENCY_RESISTANCE_PER_LEVEL_PCT = 5.0;
@@ -83,6 +87,9 @@ public final class RpgStatsConfig {
     private double criticalStrikeDamageMultiplier;
     private double lifestealPerLevelPct;
     private double thornsReflectPerLevelPct;
+    private int abilityRank1Cost;
+    private int abilityRank2Cost;
+    private int abilityRank3Cost;
 
     private RpgStatsConfig(int configVersion, double xpMultiplier, int maxLevel, int abilityPointsPerLevel,
                            double lightFootSpeedPerLevelPct, double armorProficiencyResistancePerLevelPct,
@@ -97,7 +104,8 @@ public final class RpgStatsConfig {
                            double strongLungsOxygenPerLevelPct, double luckyShotChancePerLevelPct,
                            double criticalStrikeChancePerLevelPct, double criticalStrikeBaseChancePct,
                            double criticalStrikeDamageMultiplier, double lifestealPerLevelPct,
-                           double thornsReflectPerLevelPct) {
+                           double thornsReflectPerLevelPct,
+                           int abilityRank1Cost, int abilityRank2Cost, int abilityRank3Cost) {
         this.configVersion = configVersion;
         this.xpMultiplier = xpMultiplier;
         this.maxLevel = maxLevel;
@@ -129,6 +137,9 @@ public final class RpgStatsConfig {
         this.criticalStrikeDamageMultiplier = criticalStrikeDamageMultiplier;
         this.lifestealPerLevelPct = lifestealPerLevelPct;
         this.thornsReflectPerLevelPct = thornsReflectPerLevelPct;
+        this.abilityRank1Cost = abilityRank1Cost;
+        this.abilityRank2Cost = abilityRank2Cost;
+        this.abilityRank3Cost = abilityRank3Cost;
     }
 
     public double getXpMultiplier() {
@@ -189,6 +200,18 @@ public final class RpgStatsConfig {
 
     public double getThornsReflectPerLevelPct() {
         return thornsReflectPerLevelPct;
+    }
+
+    public int getAbilityRank1Cost() {
+        return abilityRank1Cost;
+    }
+
+    public int getAbilityRank2Cost() {
+        return abilityRank2Cost;
+    }
+
+    public int getAbilityRank3Cost() {
+        return abilityRank3Cost;
     }
 
     public double getDamageMultiplierBase() {
@@ -296,6 +319,9 @@ public final class RpgStatsConfig {
         this.criticalStrikeDamageMultiplier = other.criticalStrikeDamageMultiplier;
         this.lifestealPerLevelPct = other.lifestealPerLevelPct;
         this.thornsReflectPerLevelPct = other.thornsReflectPerLevelPct;
+        this.abilityRank1Cost = other.abilityRank1Cost;
+        this.abilityRank2Cost = other.abilityRank2Cost;
+        this.abilityRank3Cost = other.abilityRank3Cost;
     }
 
     public static Path resolveConfigPath(Path dataDirectory) {
@@ -349,7 +375,10 @@ public final class RpgStatsConfig {
                     DEFAULT_CRITICAL_STRIKE_BASE_CHANCE_PCT,
                     DEFAULT_CRITICAL_STRIKE_DAMAGE_MULTIPLIER,
                     DEFAULT_LIFESTEAL_PER_LEVEL_PCT,
-                    DEFAULT_THORNS_REFLECT_PER_LEVEL_PCT
+                    DEFAULT_THORNS_REFLECT_PER_LEVEL_PCT,
+                    DEFAULT_ABILITY_RANK1_COST,
+                    DEFAULT_ABILITY_RANK2_COST,
+                    DEFAULT_ABILITY_RANK3_COST
             );
         }
 
@@ -450,6 +479,30 @@ public final class RpgStatsConfig {
         thornsReflectPerLevelPct = clampAbilityPct(thornsReflectPerLevelPct, logger,
                 "thorns_reflect_per_level_pct", DEFAULT_THORNS_REFLECT_PER_LEVEL_PCT);
 
+        int abilityRank1Cost = parseInt(values.get("ability_rank1_cost"),
+                DEFAULT_ABILITY_RANK1_COST, logger, "ability_rank1_cost");
+        if (abilityRank1Cost < MIN_ABILITY_RANK_COST) {
+            logger.at(Level.WARNING).log("[RPGStats] ability_rank1_cost must be >= "
+                    + MIN_ABILITY_RANK_COST + ". Using default " + DEFAULT_ABILITY_RANK1_COST);
+            abilityRank1Cost = DEFAULT_ABILITY_RANK1_COST;
+        }
+
+        int abilityRank2Cost = parseInt(values.get("ability_rank2_cost"),
+                DEFAULT_ABILITY_RANK2_COST, logger, "ability_rank2_cost");
+        if (abilityRank2Cost < MIN_ABILITY_RANK_COST) {
+            logger.at(Level.WARNING).log("[RPGStats] ability_rank2_cost must be >= "
+                    + MIN_ABILITY_RANK_COST + ". Using default " + DEFAULT_ABILITY_RANK2_COST);
+            abilityRank2Cost = DEFAULT_ABILITY_RANK2_COST;
+        }
+
+        int abilityRank3Cost = parseInt(values.get("ability_rank3_cost"),
+                DEFAULT_ABILITY_RANK3_COST, logger, "ability_rank3_cost");
+        if (abilityRank3Cost < MIN_ABILITY_RANK_COST) {
+            logger.at(Level.WARNING).log("[RPGStats] ability_rank3_cost must be >= "
+                    + MIN_ABILITY_RANK_COST + ". Using default " + DEFAULT_ABILITY_RANK3_COST);
+            abilityRank3Cost = DEFAULT_ABILITY_RANK3_COST;
+        }
+
         double damageBase = parseDouble(values.get("damage_multiplier_base"), DEFAULT_DAMAGE_MULTIPLIER_BASE,
                 logger, "damage_multiplier_base");
         if (damageBase <= 0) {
@@ -509,7 +562,8 @@ public final class RpgStatsConfig {
                 xpBlacklistNpcTypes, xpBlacklistRoles,
                 strongLungsOxygenPerLevelPct, luckyShotChancePerLevelPct,
                 criticalStrikeChancePerLevelPct, criticalStrikeBaseChancePct, criticalStrikeDamageMultiplier,
-                lifestealPerLevelPct, thornsReflectPerLevelPct);
+                lifestealPerLevelPct, thornsReflectPerLevelPct,
+                abilityRank1Cost, abilityRank2Cost, abilityRank3Cost);
     }
 
     private static Map<String, String> readKeyValues(Path configPath, HytaleLogger logger) {
@@ -726,6 +780,13 @@ public final class RpgStatsConfig {
                 + "# Valid range: " + MIN_ABILITY_POINTS_PER_LEVEL
                 + " to floor(2147483647 / max(1, max_level - 1)).\n"
                 + "ability_points_per_level = " + DEFAULT_ABILITY_POINTS_PER_LEVEL + "\n"
+                + "\n"
+                + "# Ability rank upgrade costs (points required to upgrade to each rank).\n"
+                + "# Default: rank 1 costs 1 point, rank 2 costs 2 points, rank 3 costs 3 points.\n"
+                + "# Total cost to max an ability = rank1 + rank2 + rank3 (default: 6 points).\n"
+                + "ability_rank1_cost = " + DEFAULT_ABILITY_RANK1_COST + "\n"
+                + "ability_rank2_cost = " + DEFAULT_ABILITY_RANK2_COST + "\n"
+                + "ability_rank3_cost = " + DEFAULT_ABILITY_RANK3_COST + "\n"
                 + "\n"
                 + "# Light Foot bonus per level, in percent (default " + DEFAULT_LIGHT_FOOT_SPEED_PER_LEVEL_PCT + ").\n"
                 + "light_foot_speed_per_level_pct = " + DEFAULT_LIGHT_FOOT_SPEED_PER_LEVEL_PCT + "\n"

@@ -70,6 +70,9 @@ public final class RpgStats implements Component<EntityStore> {
 
     private static int maxLevel = DEFAULT_MAX_LEVEL;
     private static int abilityPointsPerLevel = DEFAULT_ABILITY_POINTS_PER_LEVEL;
+    private static int abilityRank1Cost = 1;
+    private static int abilityRank2Cost = 2;
+    private static int abilityRank3Cost = 3;
 
     private int level = 1;
     private long xp = 0L;
@@ -593,12 +596,29 @@ public final class RpgStats implements Component<EntityStore> {
         if (currentLevel >= maxLevel) {
             return 0;
         }
-        return currentLevel + 1;
+        return getAbilityRankCost(currentLevel + 1);
+    }
+
+    public static int getAbilityRankCost(int rank) {
+        switch (rank) {
+            case 1:
+                return abilityRank1Cost;
+            case 2:
+                return abilityRank2Cost;
+            case 3:
+                return abilityRank3Cost;
+            default:
+                return rank; // Fallback for ranks beyond 3
+        }
     }
 
     private static int totalCostForLevels(int levels) {
         int clamped = Math.max(0, levels);
-        return (clamped * (clamped + 1)) / 2;
+        int total = 0;
+        for (int i = 1; i <= clamped; i++) {
+            total += getAbilityRankCost(i);
+        }
+        return total;
     }
 
     private void trimAbilityLevelsToPoints(int maxAllowed) {
@@ -770,6 +790,24 @@ public final class RpgStats implements Component<EntityStore> {
     public static void setAbilityPointsPerLevel(int newAbilityPointsPerLevel) {
         int maxAllowed = maxAbilityPointsPerLevel(maxLevel);
         abilityPointsPerLevel = clamp(newAbilityPointsPerLevel, 0, maxAllowed);
+    }
+
+    public static void setAbilityRankCosts(int rank1Cost, int rank2Cost, int rank3Cost) {
+        abilityRank1Cost = Math.max(0, rank1Cost);
+        abilityRank2Cost = Math.max(0, rank2Cost);
+        abilityRank3Cost = Math.max(0, rank3Cost);
+    }
+
+    public static int getAbilityRank1Cost() {
+        return abilityRank1Cost;
+    }
+
+    public static int getAbilityRank2Cost() {
+        return abilityRank2Cost;
+    }
+
+    public static int getAbilityRank3Cost() {
+        return abilityRank3Cost;
     }
 
     private static int maxAbilityPointsPerLevel(int maxLevel) {

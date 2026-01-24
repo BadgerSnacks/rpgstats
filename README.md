@@ -15,6 +15,9 @@ This project is a java plugin mod for the game Hytale. It gives each player RPG-
 - Stamina Regeneration ability with 3 levels (0.75/1.0/1.25 stamina per second).
 - Strong Lungs ability with 3 levels (+50%, +100%, +150% oxygen).
 - Lucky Shot ability with 3 levels (10%, 20%, 30% chance to not consume ammo) - **WIP: Effect not yet functional**.
+- Critical Strike ability with 3 levels (10%/15%/20% chance to deal 1.5x damage).
+- Lifesteal ability with 3 levels (3%/6%/9% of damage dealt heals you).
+- Thorns ability with 3 levels (25%/50%/75% of damage taken reflected to attackers).
 - Lets players spend points with `/stats add <stat>`.
 - Lets admins set or reset stats with `/stats set` and `/stats reset`.
 - Provides a stats GUI with tabs (Stats, Abilities, Reset) and an XP progress bar.
@@ -62,7 +65,9 @@ Valid stats: `str`, `dex`, `con`, `int`, `end`, `cha`.
 - CHA is currently an unused stat but will be implemented in the future.
 
 Spend ability points:
-- Open `/stats` and use the Abilities tab to upgrade Light Foot, Armor Proficiency, Glancing Blow, Health Regeneration, or Stamina Regeneration (max level 3 each).
+- Open `/stats` and use the Abilities tab to upgrade abilities (max level 3 each):
+  - Light Foot, Armor Proficiency, Glancing Blow, Health Regen, Stamina Regen
+  - Strong Lungs, Lucky Shot (WIP), Critical Strike, Lifesteal, Thorns
 
 Manually add ability points (admin):
 ```text
@@ -102,16 +107,25 @@ The plugin writes `config.toml` to the plugin data directory on first run. Edit 
 
 Default keys:
 ```toml
-config_version = 4
+config_version = 5
 xp_multiplier = 0.35
 max_level = 25
 ability_points_per_level = 2
+ability_rank1_cost = 1
+ability_rank2_cost = 2
+ability_rank3_cost = 3
 light_foot_speed_per_level_pct = 5.0
 armor_proficiency_resistance_per_level_pct = 5.0
 glancing_blow_chance_per_level_pct = 5.0
 health_regen_per_level_per_sec = 1.0
-stamina_regen_per_level_per_sec = 0.5
-strong_lungs_oxygen_per_level_pct = 50.0
+stamina_regen_per_level_per_sec = 0.15
+strong_lungs_oxygen_per_level_pct = 100.0
+lucky_shot_chance_per_level_pct = 10.0
+critical_strike_chance_per_level_pct = 5.0
+critical_strike_base_chance_pct = 5.0
+critical_strike_damage_multiplier = 1.5
+lifesteal_per_level_pct = 3.0
+thorns_reflect_per_level_pct = 25.0
 damage_multiplier_base = 10.0
 mining_speed_base = 1.0
 mining_speed_per_point = 0.10
@@ -129,10 +143,15 @@ cha_cap = 25
 If a player tries to set or add a stat above its cap, the command returns a message with the configured limit.
 Ability points are tracked per level using `ability_points_per_level` and shown in the Abilities tab.
 `ability_points_per_level` is clamped to prevent overflow: max is `floor(2147483647 / max(1, max_level - 1))`.
+`ability_rank1_cost`, `ability_rank2_cost`, `ability_rank3_cost` control how many points each rank costs (default: 1/2/3).
+Total cost to max an ability = rank1 + rank2 + rank3 (default: 6 points).
 Light Foot speed, Armor Proficiency resistance, and Glancing Blow dodge chance scale per level using
 `light_foot_speed_per_level_pct`, `armor_proficiency_resistance_per_level_pct`, and `glancing_blow_chance_per_level_pct`
 (values are percentages). Glancing Blow has a 5% base dodge chance, so levels 1-3 grant 10%, 15%, and 20% total dodge chance.
 Strong Lungs increases max oxygen per level using `strong_lungs_oxygen_per_level_pct` (percentage-based additive bonus).
+Critical Strike chance is calculated as `base + (per_level * level)` with configurable damage multiplier.
+Lifesteal heals you for a percentage of damage dealt, scaling with `lifesteal_per_level_pct`.
+Thorns reflects a percentage of damage taken back to attackers, scaling with `thorns_reflect_per_level_pct`.
 Health/Stamina regeneration abilities add per-level points per second using
 `health_regen_per_level_per_sec` and `stamina_regen_per_level_per_sec`.
 Set `hud_enabled = false` to disable the HUD XP bar (useful for HUD mod conflicts like TextSigns).

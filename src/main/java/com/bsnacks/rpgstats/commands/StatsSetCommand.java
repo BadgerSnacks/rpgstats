@@ -236,8 +236,7 @@ public final class StatsSetCommand extends CommandBase {
             }
             StatsPage.refreshIfOpen(target.ref, worldStore);
             if (config == null || config.isHudEnabled()) {
-                PlayerRef playerRef = worldStore.getComponent(target.ref, PlayerRef.getComponentType());
-                RpgStatsHud.refreshIfActive(playerRef, stats);
+                RpgStatsHud.refreshIfActive(target.ref, worldStore);
             }
 
             ctx.sendMessage(Message.raw("Set " + attribute.toUpperCase() + " for " + target.name + " to " + value + "."));

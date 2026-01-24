@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.2.1
+
+### Added
+- Configurable ability rank costs via `config.toml` (`ability_rank1_cost`, `ability_rank2_cost`, `ability_rank3_cost`).
+  - Server admins can now customize the point cost for each ability rank (default: 1/2/3 points for ranks 1/2/3).
+  - Total cost to max an ability is configurable (default: 6 points).
+
+### Changed
+- `config_version` bumped to 5.
+
+### Fixed
+- GUI crash when killing enemies.
+
 ## 0.2.0
 
 ### Added
@@ -12,6 +25,12 @@
 - `/stats reload` command to hot-reload configuration without server restart.
 - Comprehensive Hytale modding best practices documentation in `AGENTS.md`.
 - Ability specification document `abilities.md` for tracking ability ideas.
+- GUI size increased to 1020x820 pixels for better visibility.
+- Abilities tab now displays two abilities per row in a grid layout.
+- Ability description font size increased to 14.
+- Ability card icons added (48x48 placeholder images).
+- Upgrade button width increased to 80 pixels.
+- Thorns ability scaling changed from 10%/20%/30% to 25%/50%/75%.
 
 ### Changed
 

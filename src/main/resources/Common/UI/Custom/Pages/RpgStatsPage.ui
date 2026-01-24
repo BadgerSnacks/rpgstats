@@ -428,7 +428,7 @@ $C.@PageOverlay {
                 Group #LightFootCard {
                   LayoutMode: Left;
                   FlexWeight: 1;
-                  Background: (TexturePath: "../Common/ContainerPanelPatch.png", Border: 4);
+                  Background: (TexturePath: "../Common/stone_bg_dark01.png", Border: 4);
                   Padding: (Full: 10);
 
                   Group {
@@ -459,7 +459,7 @@ $C.@PageOverlay {
 
                     Group #LightFootIcon {
                       Anchor: (Width: 48, Height: 48, Bottom: 4);
-                      Background: (Color: #2a3a4a);
+                      Background: (TexturePath: "../Common/light_foot_icon.png");
                     }
 
                     Group { FlexWeight: 1; }
@@ -476,7 +476,7 @@ $C.@PageOverlay {
                 Group #ArmorProficiencyCard {
                   LayoutMode: Left;
                   FlexWeight: 1;
-                  Background: (TexturePath: "../Common/ContainerPanelPatch.png", Border: 4);
+                  Background: (TexturePath: "../Common/stone_bg_dark02.png", Border: 4);
                   Padding: (Full: 10);
 
                   Group {
@@ -507,7 +507,7 @@ $C.@PageOverlay {
 
                     Group #ArmorProficiencyIcon {
                       Anchor: (Width: 48, Height: 48, Bottom: 4);
-                      Background: (Color: #2a3a4a);
+                      Background: (TexturePath: "../Common/armor_proficiency_icon.png");
                     }
 
                     Group { FlexWeight: 1; }
@@ -527,7 +527,7 @@ $C.@PageOverlay {
                 Group #GlancingBlowCard {
                   LayoutMode: Left;
                   FlexWeight: 1;
-                  Background: (TexturePath: "../Common/ContainerPanelPatch.png", Border: 4);
+                  Background: (TexturePath: "../Common/stone_bg_dark03.png", Border: 4);
                   Padding: (Full: 10);
 
                   Group {
@@ -558,7 +558,7 @@ $C.@PageOverlay {
 
                     Group #GlancingBlowIcon {
                       Anchor: (Width: 48, Height: 48, Bottom: 4);
-                      Background: (Color: #2a3a4a);
+                      Background: (TexturePath: "../Common/glancing_blow_icon.png");
                     }
 
                     Group { FlexWeight: 1; }
@@ -575,7 +575,7 @@ $C.@PageOverlay {
                 Group #HealthRegenCard {
                   LayoutMode: Left;
                   FlexWeight: 1;
-                  Background: (TexturePath: "../Common/ContainerPanelPatch.png", Border: 4);
+                  Background: (TexturePath: "../Common/stone_bg_dark04.png", Border: 4);
                   Padding: (Full: 10);
 
                   Group {
@@ -606,7 +606,7 @@ $C.@PageOverlay {
 
                     Group #HealthRegenIcon {
                       Anchor: (Width: 48, Height: 48, Bottom: 4);
-                      Background: (Color: #2a3a4a);
+                      Background: (TexturePath: "../Common/health_regeneration_icon.png");
                     }
 
                     Group { FlexWeight: 1; }
@@ -626,7 +626,7 @@ $C.@PageOverlay {
                 Group #StaminaRegenCard {
                   LayoutMode: Left;
                   FlexWeight: 1;
-                  Background: (TexturePath: "../Common/ContainerPanelPatch.png", Border: 4);
+                  Background: (TexturePath: "../Common/stone_bg_dark01.png", Border: 4);
                   Padding: (Full: 10);
 
                   Group {
@@ -657,7 +657,7 @@ $C.@PageOverlay {
 
                     Group #StaminaRegenIcon {
                       Anchor: (Width: 48, Height: 48, Bottom: 4);
-                      Background: (Color: #2a3a4a);
+                      Background: (TexturePath: "../Common/stamina_regeneration_icon.png");
                     }
 
                     Group { FlexWeight: 1; }
@@ -674,7 +674,7 @@ $C.@PageOverlay {
                 Group #StrongLungsCard {
                   LayoutMode: Left;
                   FlexWeight: 1;
-                  Background: (TexturePath: "../Common/ContainerPanelPatch.png", Border: 4);
+                  Background: (TexturePath: "../Common/stone_bg_dark02.png", Border: 4);
                   Padding: (Full: 10);
 
                   Group {
@@ -705,7 +705,7 @@ $C.@PageOverlay {
 
                     Group #StrongLungsIcon {
                       Anchor: (Width: 48, Height: 48, Bottom: 4);
-                      Background: (Color: #2a3a4a);
+                      Background: (TexturePath: "../Common/strong_lungs_icon.png");
                     }
 
                     Group { FlexWeight: 1; }
@@ -725,7 +725,7 @@ $C.@PageOverlay {
                 Group #LuckyShotCard {
                   LayoutMode: Left;
                   FlexWeight: 1;
-                  Background: (TexturePath: "../Common/ContainerPanelPatch.png", Border: 4);
+                  Background: (TexturePath: "../Common/stone_bg_dark03.png", Border: 4);
                   Padding: (Full: 10);
 
                   Group {
@@ -756,7 +756,7 @@ $C.@PageOverlay {
 
                     Group #LuckyShotIcon {
                       Anchor: (Width: 48, Height: 48, Bottom: 4);
-                      Background: (Color: #2a3a4a);
+                      Background: (TexturePath: "../Common/lucky_shot_icon.png");
                     }
 
                     Group { FlexWeight: 1; }
@@ -773,7 +773,7 @@ $C.@PageOverlay {
                 Group #CriticalStrikeCard {
                   LayoutMode: Left;
                   FlexWeight: 1;
-                  Background: (TexturePath: "../Common/ContainerPanelPatch.png", Border: 4);
+                  Background: (TexturePath: "../Common/stone_bg_dark04.png", Border: 4);
                   Padding: (Full: 10);
 
                   Group {
@@ -804,7 +804,7 @@ $C.@PageOverlay {
 
                     Group #CriticalStrikeIcon {
                       Anchor: (Width: 48, Height: 48, Bottom: 4);
-                      Background: (Color: #2a3a4a);
+                      Background: (TexturePath: "../Common/critical_strike_icon.png");
                     }
 
                     Group { FlexWeight: 1; }
@@ -824,7 +824,7 @@ $C.@PageOverlay {
                 Group #LifestealCard {
                   LayoutMode: Left;
                   FlexWeight: 1;
-                  Background: (TexturePath: "../Common/ContainerPanelPatch.png", Border: 4);
+                  Background: (TexturePath: "../Common/stone_bg_dark01.png", Border: 4);
                   Padding: (Full: 10);
 
                   Group {
@@ -855,7 +855,7 @@ $C.@PageOverlay {
 
                     Group #LifestealIcon {
                       Anchor: (Width: 48, Height: 48, Bottom: 4);
-                      Background: (Color: #2a3a4a);
+                      Background: (TexturePath: "../Common/life_steal_icon.png");
                     }
 
                     Group { FlexWeight: 1; }
@@ -872,7 +872,7 @@ $C.@PageOverlay {
                 Group #ThornsCard {
                   LayoutMode: Left;
                   FlexWeight: 1;
-                  Background: (TexturePath: "../Common/ContainerPanelPatch.png", Border: 4);
+                  Background: (TexturePath: "../Common/stone_bg_dark02.png", Border: 4);
                   Padding: (Full: 10);
 
                   Group {
@@ -903,7 +903,7 @@ $C.@PageOverlay {
 
                     Group #ThornsIcon {
                       Anchor: (Width: 48, Height: 48, Bottom: 4);
-                      Background: (Color: #2a3a4a);
+                      Background: (TexturePath: "../Common/thorns_icon.png");
                     }
 
                     Group { FlexWeight: 1; }

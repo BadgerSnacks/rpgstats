@@ -69,7 +69,7 @@ public final class RpgStatsHud extends CustomUIHud {
         }
         UICommandBuilder builder = new UICommandBuilder();
         applyState(stats, builder);
-        sendUpdate(getPlayerRef(), builder);
+        update(false, builder);
     }
 
     public static void refreshIfActive(Ref<EntityStore> ref, Store<EntityStore> store) {
@@ -93,6 +93,20 @@ public final class RpgStatsHud extends CustomUIHud {
         UICommandBuilder builder = new UICommandBuilder();
         applyState(stats, builder);
         sendUpdate(playerRef, builder);
+    }
+
+    /**
+     * Safe to call from inside a system. Uses the already-fetched Player and RpgStats
+     * without calling any store methods.
+     */
+    public static void refreshIfActive(Player player, RpgStats stats) {
+        if (player == null || stats == null) {
+            return;
+        }
+        var customHud = player.getHudManager().getCustomHud();
+        if (customHud instanceof RpgStatsHud rpgStatsHud) {
+            rpgStatsHud.refresh(stats);
+        }
     }
 
     private static void sendUpdate(PlayerRef playerRef, UICommandBuilder builder) {

@@ -885,6 +885,15 @@ public final class StatsPage extends InteractiveCustomUIPage<StatsPage.StatsPage
         }
     }
 
+    /**
+     * Safe to call from inside a system. Skips refresh since store methods cannot be
+     * called from systems. The page will update on next player interaction.
+     */
+    public static void refreshIfOpen(Player player, RpgStats stats) {
+        // Cannot refresh from inside a system because refreshUI requires store access.
+        // The page will update when the player interacts with it next.
+    }
+
     public static final class StatsPageEventData {
         static final String KEY_TYPE = "Type";
         static final String KEY_STAT = "Stat";

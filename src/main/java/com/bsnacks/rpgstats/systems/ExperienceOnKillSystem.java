@@ -101,10 +101,9 @@ public final class ExperienceOnKillSystem extends DeathSystems.OnDeathSystem {
         stats.setXp(oldXp + xpGained);
 
         sendXpMessage(killer, stats, xpGained, oldLevel);
-        StatsPage.refreshIfOpen(attackerRef, store);
+        StatsPage.refreshIfOpen(killer, stats);
         if (config == null || config.isHudEnabled()) {
-            PlayerRef playerRef = commandBuffer.getComponent(attackerRef, PlayerRef.getComponentType());
-            RpgStatsHud.refreshIfActive(playerRef, stats);
+            RpgStatsHud.refreshIfActive(killer, stats);
         }
         logDebug("XP awarded: player=" + killer.getDisplayName() + " xp=" + xpGained
                 + " level=" + oldLevel + "->" + stats.getLevel());

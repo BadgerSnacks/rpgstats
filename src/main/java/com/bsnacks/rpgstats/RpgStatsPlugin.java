@@ -91,6 +91,7 @@ public final class RpgStatsPlugin extends JavaPlugin {
         }
         RpgStats.setMaxLevel(config.getMaxLevel());
         RpgStats.setAbilityPointsPerLevel(config.getAbilityPointsPerLevel());
+        RpgStats.setAbilityRankCosts(config.getAbilityRank1Cost(), config.getAbilityRank2Cost(), config.getAbilityRank3Cost());
         logInfo("Config reloaded (" + reason + "): xp_multiplier=" + config.getXpMultiplier()
                 + " max_level=" + config.getMaxLevel()
                 + " ability_points_per_level=" + config.getAbilityPointsPerLevel()
@@ -100,6 +101,7 @@ public final class RpgStatsPlugin extends JavaPlugin {
                 + " stamina_regen_per_level_per_sec=" + config.getStaminaRegenPerLevelPerSec()
                 + " glancing_blow_chance_per_level_pct=" + config.getGlancingBlowChancePerLevelPct()
                 + " lucky_shot_chance_per_level_pct=" + config.getLuckyShotChancePerLevelPct()
+                + " ability_rank_costs=" + config.getAbilityRank1Cost() + "/" + config.getAbilityRank2Cost() + "/" + config.getAbilityRank3Cost()
                 + " hud_enabled=" + config.isHudEnabled()
                 + " xp_blacklist_npc_types=" + config.getXpBlacklistNpcTypes().size()
                 + " xp_blacklist_roles=" + config.getXpBlacklistRoles().size());

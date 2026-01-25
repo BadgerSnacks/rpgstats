@@ -97,13 +97,13 @@ $C.@PageOverlay {
         Group #StatsPanel {
           Anchor: (Width: 300);
           LayoutMode: Top;
-          Background: (TexturePath: "../Common/ContainerPanelPatch.png", Border: 4);
-          Padding: (Full: 12);
+          Background: (TexturePath: "../Common/stone_bg.png", Border: 80);
+          Padding: (Top: 34, Bottom: 38, Left: 28, Right: 28);
 
           Label {
-            Style: @SectionTitleStyle;
+            Style: (...@SectionTitleStyle, HorizontalAlignment: Center, FontSize: 22, TextColor: #f1cb71, RenderBold: true);
             Text: "Attributes";
-            Anchor: (Bottom: 10);
+            Anchor: (Bottom: 10, Left: 0, Right: 0);
           }
 
           Group #StatsList {
@@ -317,8 +317,9 @@ $C.@PageOverlay {
             }
 
             Label #XpText {
-              Style: (...$C.@DefaultLabelStyle, FontSize: 13, TextColor: #bfcdd5);
+              Style: (...$C.@DefaultLabelStyle, FontSize: 13, TextColor: #bfcdd5, HorizontalAlignment: Center);
               Text: "XP 0/100";
+              Anchor: (Bottom: 10, Left: 0, Right: 0);
             }
           }
         }
@@ -330,49 +331,86 @@ $C.@PageOverlay {
 
           Group {
             FlexWeight: 1;
-            Background: (TexturePath: "../Common/ContainerPanelPatch.png", Border: 4);
-            Padding: (Full: 16);
+            Background: (TexturePath: "../Common/stone_bg.png", Border: 80);
+            Padding: (Top: 34, Bottom: 34, Left: 28, Right: 24);
             LayoutMode: Top;
 
             Label {
-              Style: @SectionTitleStyle;
+              Style: (...@SectionTitleStyle, HorizontalAlignment: Center, FontSize: 22, TextColor: #f1cb71, RenderBold: true);
               Text: "How stats work";
-              Anchor: (Bottom: 10);
+              Anchor: (Bottom: 10, Left: 0, Right: 0);
+            }
+
+            Label {
+              Style: (...$C.@DefaultLabelStyle, TextColor: #f1cb71, RenderBold: true);
+              Text: "Strength (STR)";
+              Anchor: (Bottom: 6, Left: 6);
             }
 
             Label {
               Style: (...$C.@DefaultLabelStyle, TextColor: #c7d1d8, Wrap: true);
-              Text: "STR: Raises your damage. Higher STR makes each hit land harder.";
-              Anchor: (Bottom: 6);
+              Text: "Hit harder and put more power into your bow! Every point you spend in this stat will make you one step closer to a pwoerhouse.";
+              Anchor: (Bottom: 6, Left: 12);
+            }
+
+            Label {
+              Style: (...$C.@DefaultLabelStyle, TextColor: #f1cb71, RenderBold: true);
+              Text: "Dexterity (DEX)";
+              Anchor: (Bottom: 6, Left: 6);
             }
 
             Label {
               Style: (...$C.@DefaultLabelStyle, TextColor: #c7d1d8, Wrap: true);
-              Text: "DEX: Improves mining speed so blocks break faster. Higher DEX feels snappier.";
-              Anchor: (Bottom: 6);
+              Text: "Dig faster and bring down trees more effecentyly. With each point into dexterity you get more comfortable with your work as it beomces easier to find the weak spots in the stone walls, packed earth, and tree trunks.";
+              Anchor: (Bottom: 6, Left: 12);
+            }
+
+            Label {
+              Style: (...$C.@DefaultLabelStyle, TextColor: #f1cb71, RenderBold: true);
+              Text: "Constitution (CON)";
+              Anchor: (Bottom: 6, Left: 6);
             }
 
             Label {
               Style: (...$C.@DefaultLabelStyle, TextColor: #c7d1d8, Wrap: true);
-              Text: "CON: Increases max health so you can take more hits before going down.";
-              Anchor: (Bottom: 6);
+              Text: "Spend some time training your body, as you improve your constitution you become a little harder to kill. You can take a few more hits before you succumb to your wounds.";
+              Anchor: (Bottom: 12, Left: 12);
+            }
+
+            Label {
+              Style: (...$C.@DefaultLabelStyle, TextColor: #f1cb71, RenderBold: true);
+              Text: "Intelligence (INT)";
+              Anchor: (Bottom: 6, Left: 6, Top: 16);
             }
 
             Label {
               Style: (...$C.@DefaultLabelStyle, TextColor: #c7d1d8, Wrap: true);
-              Text: "INT: Increases max mana so you can cast more before running dry.";
-              Anchor: (Bottom: 6);
+              Text: "You spend more time with your studys commiting the anchient texts to memory, as you spead points into intelligence you gain a litte more magical power.";
+              Anchor: (Bottom: 6, Left: 12);
+            }
+
+            Label {
+              Style: (...$C.@DefaultLabelStyle, TextColor: #f1cb71, RenderBold: true);
+              Text: "Endurance (END)";
+              Anchor: (Bottom: 6, Left: 6);
             }
 
             Label {
               Style: (...$C.@DefaultLabelStyle, TextColor: #c7d1d8, Wrap: true);
-              Text: "END: Increases max stamina for longer sprints and actions.";
-              Anchor: (Bottom: 6);
+              Text: "The feel of wind on your face brings a sence of freedom to your soul, endurance give you more stamina to keep running.";
+              Anchor: (Bottom: 6, Left: 12);
+            }
+
+            Label {
+              Style: (...$C.@DefaultLabelStyle, TextColor: #f1cb71, RenderBold: true);
+              Text: "Charisma (CHA)";
+              Anchor: (Bottom: 6, Left: 6);
             }
 
             Label {
               Style: (...$C.@DefaultLabelStyle, TextColor: #c7d1d8, Wrap: true);
-              Text: "CHA: Reserved for future perks like better NPC prices and social bonuses.";
+              Text: "Everyone seems to like you! as you spend points into charisma you find that people are a little kinder to you and more likely to do favors for you. (CHA is currently a WIP and is not implemented into the mod.)";
+              Anchor: (Bottom: 6, Left: 12);
             }
           }
         }

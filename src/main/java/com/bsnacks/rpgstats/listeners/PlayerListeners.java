@@ -8,6 +8,7 @@ import com.bsnacks.rpgstats.systems.IntellectManaEffect;
 import com.bsnacks.rpgstats.systems.EnduranceStaminaEffect;
 import com.bsnacks.rpgstats.systems.LightFootSpeedEffect;
 import com.bsnacks.rpgstats.ui.RpgStatsHud;
+import com.bsnacks.rpgstats.utils.HudHelper;
 
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.Ref;
@@ -62,21 +63,17 @@ public final class PlayerListeners {
         if (playerRef == null) {
             return;
         }
-        var hudManager = player.getHudManager();
         if (config != null && !config.isHudEnabled()) {
-            var existingHud = hudManager.getCustomHud();
-            if (existingHud instanceof RpgStatsHud) {
-                hudManager.setCustomHud(playerRef, null);
-                plugin.logDebug("RPG stats HUD disabled by config for player: " + player.getDisplayName());
-            }
+            HudHelper.hideCustomHud(player, playerRef);
+            plugin.logDebug("RPG stats HUD disabled by config for player: " + player.getDisplayName());
             return;
         }
-        var existingHud = hudManager.getCustomHud();
+        var existingHud = HudHelper.getCustomHud(player, playerRef);
         if (!(existingHud instanceof RpgStatsHud)) {
-            if (existingHud != null) {
+            if (existingHud != null && !HudHelper.isMultipleHudAvailable()) {
                 plugin.logDebug("Replacing custom HUD for player: " + player.getDisplayName());
             }
-            hudManager.setCustomHud(playerRef, new RpgStatsHud(playerRef, rpgStatsType));
+            HudHelper.setCustomHud(player, playerRef, new RpgStatsHud(playerRef, rpgStatsType));
             plugin.logDebug("RPG stats HUD enabled for player: " + player.getDisplayName());
         }
         Ref<EntityStore> ref = playerRef.getReference();
@@ -87,7 +84,7 @@ public final class PlayerListeners {
         if (store == null) {
             return;
         }
-        RpgStatsHud.refreshIfActive(ref, store);
+        RpgStatsHud.refreshIfActive(player, ref, store);
     }
 
     private void applyAbilityEffects(Player player, RpgStats stats) {

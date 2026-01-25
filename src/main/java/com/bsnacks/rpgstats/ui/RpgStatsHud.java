@@ -1,6 +1,7 @@
 package com.bsnacks.rpgstats.ui;
 
 import com.bsnacks.rpgstats.components.RpgStats;
+import com.bsnacks.rpgstats.utils.HudHelper;
 
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.Ref;
@@ -10,7 +11,6 @@ import com.hypixel.hytale.server.core.entity.entities.player.hud.CustomUIHud;
 import com.hypixel.hytale.server.core.ui.builder.UICommandBuilder;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import com.hypixel.hytale.protocol.packets.interface_.CustomHud;
 
 public final class RpgStatsHud extends CustomUIHud {
 
@@ -80,19 +80,25 @@ public final class RpgStatsHud extends CustomUIHud {
         if (player == null) {
             return;
         }
-        var customHud = player.getHudManager().getCustomHud();
+        refreshIfActive(player, ref, store);
+    }
+
+    /**
+     * Refresh HUD using Player, Ref, and Store. Properly checks for MultipleHUD support.
+     */
+    public static void refreshIfActive(Player player, Ref<EntityStore> ref, Store<EntityStore> store) {
+        if (player == null || ref == null || !ref.isValid() || store == null) {
+            return;
+        }
+        var holder = player.toHolder();
+        PlayerRef playerRef = holder.getComponent(PlayerRef.getComponentType());
+        if (playerRef == null) {
+            return;
+        }
+        var customHud = HudHelper.getCustomHud(player, playerRef);
         if (customHud instanceof RpgStatsHud rpgStatsHud) {
             rpgStatsHud.refresh(ref, store);
         }
-    }
-
-    public static void refreshIfActive(PlayerRef playerRef, RpgStats stats) {
-        if (playerRef == null || stats == null) {
-            return;
-        }
-        UICommandBuilder builder = new UICommandBuilder();
-        applyState(stats, builder);
-        sendUpdate(playerRef, builder);
     }
 
     /**
@@ -103,16 +109,14 @@ public final class RpgStatsHud extends CustomUIHud {
         if (player == null || stats == null) {
             return;
         }
-        var customHud = player.getHudManager().getCustomHud();
+        var holder = player.toHolder();
+        PlayerRef playerRef = holder.getComponent(PlayerRef.getComponentType());
+        if (playerRef == null) {
+            return;
+        }
+        var customHud = HudHelper.getCustomHud(player, playerRef);
         if (customHud instanceof RpgStatsHud rpgStatsHud) {
             rpgStatsHud.refresh(stats);
         }
-    }
-
-    private static void sendUpdate(PlayerRef playerRef, UICommandBuilder builder) {
-        if (playerRef == null || builder == null) {
-            return;
-        }
-        playerRef.getPacketHandler().writeNoCache(new CustomHud(false, builder.getCommands()));
     }
 }

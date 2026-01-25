@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.3.0
+
+### Added
+- MultipleHUD mod support - RPGStats HUD now coexists with other HUD mods when MultipleHUD is installed.
+- `HudHelper` utility class for managing HUD compatibility with other mods.
+
+### Changed
+
+### Fixed
+- HUD not updating when PartyPlugin (or other HUD mods) are installed.
+- HUD updates now properly check if RPGStats HUD is active before sending updates.
+
 ## 0.2.1
 
 ### Added

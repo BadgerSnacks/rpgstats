@@ -204,3 +204,132 @@ This document contains ability specifications for implementation. Each entry inc
 **Config Keys:**
 - `thorns_reflect_per_level_pct` (default 25.0)
 **Notes:** Uses DamageEventSystem to detect incoming damage and apply counter-damage to attacker via EntityStatMap.addStatValue() with negative health.
+
+### Tool Proficiency
+**Status:** TODO
+**Effect Type:** Stat Modifier (tool durability)
+**Description:** Your tools last longer before breaking
+**Max Ranks:** 3
+**Scaling per Rank:**
+- Rank 1: +50% durability
+- Rank 2: +100% durability
+- Rank 3: +150% durability
+**Activation:** Passive (when using tools)
+**Requirements:** Must be using a tool (pickaxe, axe, shovel, hoe, etc.)
+**Upgrade Cost:** 1 / 2 / 3
+**Config Keys:**
+- `tool_proficiency_durability_per_level_pct` (default 50.0)
+**Notes:** Needs to hook into tool durability consumption events. May reduce durability loss per use or increase max durability.
+
+### Lucky Miner
+**Status:** TODO
+**Effect Type:** Chance-Based + Resource Modifier
+**Description:** Chance to receive bonus ore when mining
+**Max Ranks:** 3
+**Scaling per Rank:**
+- Rank 1: 10% chance for +1 ore
+- Rank 2: 20% chance for +1 ore
+- Rank 3: 30% chance for +1 ore
+**Activation:** On Event (when mining ore blocks)
+**Requirements:** Must be mining an ore block
+**Upgrade Cost:** 1 / 2 / 3
+**Config Keys:**
+- `lucky_miner_chance_per_level_pct` (default 10.0)
+- `lucky_miner_bonus_amount` (default 1)
+**Notes:** Needs to hook into block break/loot events. Should only trigger for ore-type blocks. Could potentially scale bonus amount at higher ranks instead of chance.
+
+### Flame Touch
+**Status:** TODO
+**Effect Type:** On-Hit Effect + Damage Modifier
+**Description:** Your weapon attacks deal bonus fire damage
+**Max Ranks:** 3
+**Scaling per Rank:**
+- Rank 1: +2 fire damage
+- Rank 2: +4 fire damage
+- Rank 3: +6 fire damage
+**Activation:** On Event (when dealing melee/ranged damage)
+**Requirements:** None
+**Upgrade Cost:** 1 / 2 / 3
+**Config Keys:**
+- `flame_touch_damage_per_level` (default 2.0)
+**Notes:** Needs to hook into damage events and apply fire damage type. May also apply burning status effect at higher ranks.
+
+### Night Owl
+**Status:** TODO
+**Effect Type:** Stat Modifier (vision)
+**Description:** See clearly in dark environments
+**Max Ranks:** 3
+**Scaling per Rank:**
+- Rank 1: Slight night vision
+- Rank 2: Moderate night vision
+- Rank 3: Full night vision
+**Activation:** Passive (always active)
+**Requirements:** None
+**Upgrade Cost:** 1 / 2 / 3
+**Config Keys:**
+- `night_owl_vision_per_level_pct` (default 33.0)
+**Notes:** Needs to hook into player vision/gamma settings. May use shader effects or brightness modifiers.
+
+### Deep Pockets
+**Status:** TODO
+**Effect Type:** Stat Modifier (inventory)
+**Description:** Increase the maximum stack size of items in your inventory
+**Max Ranks:** 3
+**Scaling per Rank:**
+- Rank 1: +25% stack size
+- Rank 2: +50% stack size
+- Rank 3: +100% stack size
+**Activation:** Passive (always active)
+**Requirements:** None
+**Upgrade Cost:** 1 / 2 / 3
+**Config Keys:**
+- `deep_pockets_stack_per_level_pct` (default 25.0)
+**Notes:** Needs to hook into inventory/item stack system. May require client-side sync for UI display.
+
+### Magnetic Pull
+**Status:** TODO
+**Effect Type:** Stat Modifier (pickup range)
+**Description:** Attract nearby dropped items from a greater distance
+**Max Ranks:** 3
+**Scaling per Rank:**
+- Rank 1: +2 block pickup range
+- Rank 2: +4 block pickup range
+- Rank 3: +6 block pickup range
+**Activation:** Passive (always active)
+**Requirements:** None
+**Upgrade Cost:** 1 / 2 / 3
+**Config Keys:**
+- `magnetic_pull_range_per_level` (default 2.0)
+**Notes:** Needs to modify item entity pickup radius. May need to hook into item collection events or modify player pickup hitbox.
+
+### Gourmand
+**Status:** TODO
+**Effect Type:** Stat Modifier (food effects)
+**Description:** Food provides enhanced benefits
+**Max Ranks:** 3
+**Scaling per Rank:**
+- Rank 1: +25% food effect strength/duration
+- Rank 2: +50% food effect strength/duration
+- Rank 3: +100% food effect strength/duration
+**Activation:** On Event (when consuming food)
+**Requirements:** None
+**Upgrade Cost:** 1 / 2 / 3
+**Config Keys:**
+- `gourmand_effect_per_level_pct` (default 25.0)
+**Notes:** Needs to hook into food consumption events. Could affect hunger restoration, buff duration, or both.
+
+### Fire Resistance
+**Status:** TODO
+**Effect Type:** Damage Reduction (fire)
+**Description:** Take reduced damage from fire and lava
+**Max Ranks:** 3
+**Scaling per Rank:**
+- Rank 1: 25% fire damage reduction
+- Rank 2: 50% fire damage reduction
+- Rank 3: 75% fire damage reduction
+**Activation:** Passive (when taking fire damage)
+**Requirements:** None
+**Upgrade Cost:** 1 / 2 / 3
+**Config Keys:**
+- `fire_resistance_per_level_pct` (default 25.0)
+**Notes:** Needs to hook into damage events and filter for fire damage type. Could also reduce burning duration at higher ranks.

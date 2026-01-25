@@ -21,6 +21,8 @@ import com.bsnacks.rpgstats.systems.LuckyShotSystem;
 import com.bsnacks.rpgstats.systems.CriticalStrikeSystem;
 import com.bsnacks.rpgstats.systems.LifestealSystem;
 import com.bsnacks.rpgstats.systems.ThornsSystem;
+import com.bsnacks.rpgstats.systems.ToolProficiencySystem;
+import com.bsnacks.rpgstats.systems.LuckyMinerSystem;
 
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.Ref;
@@ -76,6 +78,8 @@ public final class RpgStatsPlugin extends JavaPlugin {
         getEntityStoreRegistry().registerSystem(new CriticalStrikeSystem(rpgStatsType, config));
         getEntityStoreRegistry().registerSystem(new LifestealSystem(rpgStatsType, config));
         getEntityStoreRegistry().registerSystem(new ThornsSystem(rpgStatsType, config));
+        getEntityStoreRegistry().registerSystem(new ToolProficiencySystem(rpgStatsType, config, this));
+        getEntityStoreRegistry().registerSystem(new LuckyMinerSystem(rpgStatsType, config, this));
 
         // Lucky Shot utility - ability tracking works, effect trigger needs proper Hytale API hook
         // The tryLuckyShot() method is ready to be called when the correct event is identified

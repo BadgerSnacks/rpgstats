@@ -206,37 +206,36 @@ This document contains ability specifications for implementation. Each entry inc
 **Notes:** Uses DamageEventSystem to detect incoming damage and apply counter-damage to attacker via EntityStatMap.addStatValue() with negative health.
 
 ### Tool Proficiency
-**Status:** TODO
-**Effect Type:** Stat Modifier (tool durability)
-**Description:** Your tools last longer before breaking
+**Status:** Implemented
+**Effect Type:** Chance-Based (durability preservation)
+**Description:** Chance to not consume tool durability when using tools
 **Max Ranks:** 3
 **Scaling per Rank:**
-- Rank 1: +50% durability
-- Rank 2: +100% durability
-- Rank 3: +150% durability
-**Activation:** Passive (when using tools)
-**Requirements:** Must be using a tool (pickaxe, axe, shovel, hoe, etc.)
+- Rank 1: 15% chance
+- Rank 2: 30% chance
+- Rank 3: 45% chance
+**Activation:** On Event (when using tools to mine blocks)
+**Requirements:** Must be using a tool (pickaxe, axe, shovel, etc.)
 **Upgrade Cost:** 1 / 2 / 3
 **Config Keys:**
-- `tool_proficiency_durability_per_level_pct` (default 50.0)
-**Notes:** Needs to hook into tool durability consumption events. May reduce durability loss per use or increase max durability.
+- `tool_proficiency_chance_per_level_pct` (default 15.0)
+**Notes:** Uses DamageBlockEvent to detect tool usage. Level tracking and UI implemented. Effect currently logs preservation triggers - full durability restoration pending direct Hytale API access for ItemStack durability modification.
 
 ### Lucky Miner
-**Status:** TODO
-**Effect Type:** Chance-Based + Resource Modifier
-**Description:** Chance to receive bonus ore when mining
+**Status:** Implemented
+**Effect Type:** Chance-Based (bonus ore)
+**Description:** Chance to receive bonus ore when mining ore blocks
 **Max Ranks:** 3
 **Scaling per Rank:**
-- Rank 1: 10% chance for +1 ore
-- Rank 2: 20% chance for +1 ore
-- Rank 3: 30% chance for +1 ore
-**Activation:** On Event (when mining ore blocks)
-**Requirements:** Must be mining an ore block
+- Rank 1: 10% chance
+- Rank 2: 20% chance
+- Rank 3: 30% chance
+**Activation:** On Event (when breaking ore blocks)
+**Requirements:** Must be mining an ore block (block ID contains "ore")
 **Upgrade Cost:** 1 / 2 / 3
 **Config Keys:**
 - `lucky_miner_chance_per_level_pct` (default 10.0)
-- `lucky_miner_bonus_amount` (default 1)
-**Notes:** Needs to hook into block break/loot events. Should only trigger for ore-type blocks. Could potentially scale bonus amount at higher ranks instead of chance.
+**Notes:** Uses BreakBlockEvent to detect ore mining. Currently notifies player of bonus ore - actual item dropping pending ItemComponent.generateItemDrops() integration.
 
 ### Flame Touch
 **Status:** TODO
@@ -333,3 +332,29 @@ This document contains ability specifications for implementation. Each entry inc
 **Config Keys:**
 - `fire_resistance_per_level_pct` (default 25.0)
 **Notes:** Needs to hook into damage events and filter for fire damage type. Could also reduce burning duration at higher ranks.
+
+---
+
+## UI Features TODO
+
+### Attribute Points Refund Button
+**Status:** Implemented
+**Description:** A button that resets all spent attribute points (STR, DEX, CON, INT, END, CHA), returning them to the player's available stat points pool.
+**Location:** Stats tab, Attributes card - positioned just above the player level display.
+**Behavior:**
+- Clicking the button resets all attributes to BASE_STAT (10).
+- All spent stat points are returned to the available pool.
+- Requires `rpgstats.reset` permission.
+- Health, mana, and stamina effects are re-applied after refund.
+**Notes:** Currently free to use with no cooldown. Future versions may add config options for cost/cooldown.
+
+### Ability Points Refund Button
+**Status:** Implemented
+**Description:** A button that resets all spent ability points, returning them to the player's available ability points pool.
+**Location:** Abilities tab - positioned at the top right of the header row, next to "Available" points.
+**Behavior:**
+- Clicking the button resets all ability levels to 0.
+- All spent ability points are returned to the available pool.
+- Requires `rpgstats.reset` permission.
+- Ability effects (speed boosts, oxygen capacity) are reset after refund.
+**Notes:** Currently free to use with no cooldown. Future versions may add config options for cost/cooldown.

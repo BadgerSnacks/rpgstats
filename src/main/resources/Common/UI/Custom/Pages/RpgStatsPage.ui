@@ -42,6 +42,14 @@ $C = "../Common.ui";
   Wrap: true
 );
 
+@AbilityNameStyle = LabelStyle(
+  ...$C.@DefaultLabelStyle,
+  RenderBold: true,
+  RenderUppercase: true,
+  FontSize: 14,
+  TextColor: #f1cb71
+);
+
 $C.@PageOverlay {
   LayoutMode: Middle;
 
@@ -268,6 +276,16 @@ $C.@PageOverlay {
 
           Group { FlexWeight: 1; }
 
+          Group #RefundAttributesSection {
+            LayoutMode: Center;
+            Anchor: (Bottom: 8);
+
+            $C.@SecondaryTextButton #RefundAttributesButton {
+              Anchor: (Width: 180, Height: 28);
+              Text: "Reset";
+            }
+          }
+
           Group #ProgressSection {
             LayoutMode: Top;
             Anchor: (Top: 10);
@@ -447,6 +465,13 @@ $C.@PageOverlay {
               Style: @SectionTitleStyle;
               Text: "0";
             }
+
+            Group { FlexWeight: 1; }
+
+            $C.@SecondaryTextButton #RefundAbilitiesButton {
+              Anchor: (Width: 140, Height: 26);
+              Text: "Reset";
+            }
           }
 
           Group #AbilitiesList {
@@ -466,15 +491,15 @@ $C.@PageOverlay {
                 Group #LightFootCard {
                   LayoutMode: Left;
                   FlexWeight: 1;
-                  Background: (TexturePath: "../Common/stone_bg_dark01.png", Border: 4);
-                  Padding: (Full: 10);
+                  Background: (TexturePath: "../Common/ability_bg.png", Border: 48);
+                  Padding: (Left: 26, Right: 24, Bottom: 10, Top: 14);
 
                   Group {
                     LayoutMode: Top;
                     FlexWeight: 1;
 
                     Label #LightFootName {
-                      Style: @SectionTitleStyle;
+                      Style: @AbilityNameStyle;
                       Text: "Light Foot";
                       Anchor: (Bottom: 2);
                     }
@@ -503,7 +528,7 @@ $C.@PageOverlay {
                     Group { FlexWeight: 1; }
 
                     $C.@SmallSecondaryTextButton #LightFootUpgrade {
-                      Anchor: (Width: 80, Height: 26);
+                      Anchor: (Width: 75, Height: 26, Right: 10);
                       Text: "Upgrade";
                     }
                   }
@@ -514,15 +539,15 @@ $C.@PageOverlay {
                 Group #ArmorProficiencyCard {
                   LayoutMode: Left;
                   FlexWeight: 1;
-                  Background: (TexturePath: "../Common/stone_bg_dark02.png", Border: 4);
-                  Padding: (Full: 10);
+                  Background: (TexturePath: "../Common/ability_bg.png", Border: 48);
+                  Padding: (Left: 26, Right: 24, Bottom: 10, Top: 14);
 
                   Group {
                     LayoutMode: Top;
                     FlexWeight: 1;
 
                     Label #ArmorProficiencyName {
-                      Style: @SectionTitleStyle;
+                      Style: @AbilityNameStyle;
                       Text: "Armor Proficiency";
                       Anchor: (Bottom: 2);
                     }
@@ -551,7 +576,7 @@ $C.@PageOverlay {
                     Group { FlexWeight: 1; }
 
                     $C.@SmallSecondaryTextButton #ArmorProficiencyUpgrade {
-                      Anchor: (Width: 80, Height: 26);
+                      Anchor: (Width: 75, Height: 26, Right: 10);
                       Text: "Upgrade";
                     }
                   }
@@ -565,15 +590,15 @@ $C.@PageOverlay {
                 Group #GlancingBlowCard {
                   LayoutMode: Left;
                   FlexWeight: 1;
-                  Background: (TexturePath: "../Common/stone_bg_dark03.png", Border: 4);
-                  Padding: (Full: 10);
+                  Background: (TexturePath: "../Common/ability_bg.png", Border: 48);
+                  Padding: (Left: 26, Right: 24, Bottom: 10, Top: 14);
 
                   Group {
                     LayoutMode: Top;
                     FlexWeight: 1;
 
                     Label #GlancingBlowName {
-                      Style: @SectionTitleStyle;
+                      Style: @AbilityNameStyle;
                       Text: "Glancing Blow";
                       Anchor: (Bottom: 2);
                     }
@@ -602,7 +627,7 @@ $C.@PageOverlay {
                     Group { FlexWeight: 1; }
 
                     $C.@SmallSecondaryTextButton #GlancingBlowUpgrade {
-                      Anchor: (Width: 80, Height: 26);
+                      Anchor: (Width: 75, Height: 26, Right: 10);
                       Text: "Upgrade";
                     }
                   }
@@ -613,15 +638,15 @@ $C.@PageOverlay {
                 Group #HealthRegenCard {
                   LayoutMode: Left;
                   FlexWeight: 1;
-                  Background: (TexturePath: "../Common/stone_bg_dark04.png", Border: 4);
-                  Padding: (Full: 10);
+                  Background: (TexturePath: "../Common/ability_bg.png", Border: 48);
+                  Padding: (Left: 26, Right: 24, Bottom: 10, Top: 14);
 
                   Group {
                     LayoutMode: Top;
                     FlexWeight: 1;
 
                     Label #HealthRegenName {
-                      Style: @SectionTitleStyle;
+                      Style: @AbilityNameStyle;
                       Text: "Health Regeneration";
                       Anchor: (Bottom: 2);
                     }
@@ -650,7 +675,7 @@ $C.@PageOverlay {
                     Group { FlexWeight: 1; }
 
                     $C.@SmallSecondaryTextButton #HealthRegenUpgrade {
-                      Anchor: (Width: 80, Height: 26);
+                      Anchor: (Width: 75, Height: 26, Right: 10);
                       Text: "Upgrade";
                     }
                   }
@@ -664,15 +689,15 @@ $C.@PageOverlay {
                 Group #StaminaRegenCard {
                   LayoutMode: Left;
                   FlexWeight: 1;
-                  Background: (TexturePath: "../Common/stone_bg_dark01.png", Border: 4);
-                  Padding: (Full: 10);
+                  Background: (TexturePath: "../Common/ability_bg.png", Border: 48);
+                  Padding: (Left: 26, Right: 24, Bottom: 10, Top: 14);
 
                   Group {
                     LayoutMode: Top;
                     FlexWeight: 1;
 
                     Label #StaminaRegenName {
-                      Style: @SectionTitleStyle;
+                      Style: @AbilityNameStyle;
                       Text: "Stamina Regeneration";
                       Anchor: (Bottom: 2);
                     }
@@ -701,7 +726,7 @@ $C.@PageOverlay {
                     Group { FlexWeight: 1; }
 
                     $C.@SmallSecondaryTextButton #StaminaRegenUpgrade {
-                      Anchor: (Width: 80, Height: 26);
+                      Anchor: (Width: 75, Height: 26, Right: 10);
                       Text: "Upgrade";
                     }
                   }
@@ -712,15 +737,15 @@ $C.@PageOverlay {
                 Group #StrongLungsCard {
                   LayoutMode: Left;
                   FlexWeight: 1;
-                  Background: (TexturePath: "../Common/stone_bg_dark02.png", Border: 4);
-                  Padding: (Full: 10);
+                  Background: (TexturePath: "../Common/ability_bg.png", Border: 48);
+                  Padding: (Left: 26, Right: 24, Bottom: 10, Top: 14);
 
                   Group {
                     LayoutMode: Top;
                     FlexWeight: 1;
 
                     Label #StrongLungsName {
-                      Style: @SectionTitleStyle;
+                      Style: @AbilityNameStyle;
                       Text: "Strong Lungs";
                       Anchor: (Bottom: 2);
                     }
@@ -749,7 +774,7 @@ $C.@PageOverlay {
                     Group { FlexWeight: 1; }
 
                     $C.@SmallSecondaryTextButton #StrongLungsUpgrade {
-                      Anchor: (Width: 80, Height: 26);
+                      Anchor: (Width: 75, Height: 26, Right: 10);
                       Text: "Upgrade";
                     }
                   }
@@ -763,15 +788,15 @@ $C.@PageOverlay {
                 Group #LuckyShotCard {
                   LayoutMode: Left;
                   FlexWeight: 1;
-                  Background: (TexturePath: "../Common/stone_bg_dark03.png", Border: 4);
-                  Padding: (Full: 10);
+                  Background: (TexturePath: "../Common/ability_bg.png", Border: 48);
+                  Padding: (Left: 26, Right: 24, Bottom: 10, Top: 14);
 
                   Group {
                     LayoutMode: Top;
                     FlexWeight: 1;
 
                     Label #LuckyShotName {
-                      Style: @SectionTitleStyle;
+                      Style: @AbilityNameStyle;
                       Text: "Lucky Shot (WIP)";
                       Anchor: (Bottom: 2);
                     }
@@ -800,7 +825,7 @@ $C.@PageOverlay {
                     Group { FlexWeight: 1; }
 
                     $C.@SmallSecondaryTextButton #LuckyShotUpgrade {
-                      Anchor: (Width: 80, Height: 26);
+                      Anchor: (Width: 75, Height: 26, Right: 10);
                       Text: "Upgrade";
                     }
                   }
@@ -811,15 +836,15 @@ $C.@PageOverlay {
                 Group #CriticalStrikeCard {
                   LayoutMode: Left;
                   FlexWeight: 1;
-                  Background: (TexturePath: "../Common/stone_bg_dark04.png", Border: 4);
-                  Padding: (Full: 10);
+                  Background: (TexturePath: "../Common/ability_bg.png", Border: 48);
+                  Padding: (Left: 26, Right: 24, Bottom: 10, Top: 14);
 
                   Group {
                     LayoutMode: Top;
                     FlexWeight: 1;
 
                     Label #CriticalStrikeName {
-                      Style: @SectionTitleStyle;
+                      Style: @AbilityNameStyle;
                       Text: "Critical Strike";
                       Anchor: (Bottom: 2);
                     }
@@ -848,7 +873,7 @@ $C.@PageOverlay {
                     Group { FlexWeight: 1; }
 
                     $C.@SmallSecondaryTextButton #CriticalStrikeUpgrade {
-                      Anchor: (Width: 80, Height: 26);
+                      Anchor: (Width: 75, Height: 26, Right: 10);
                       Text: "Upgrade";
                     }
                   }
@@ -862,15 +887,15 @@ $C.@PageOverlay {
                 Group #LifestealCard {
                   LayoutMode: Left;
                   FlexWeight: 1;
-                  Background: (TexturePath: "../Common/stone_bg_dark01.png", Border: 4);
-                  Padding: (Full: 10);
+                  Background: (TexturePath: "../Common/ability_bg.png", Border: 48);
+                  Padding: (Left: 26, Right: 24, Bottom: 10, Top: 14);
 
                   Group {
                     LayoutMode: Top;
                     FlexWeight: 1;
 
                     Label #LifestealName {
-                      Style: @SectionTitleStyle;
+                      Style: @AbilityNameStyle;
                       Text: "Lifesteal";
                       Anchor: (Bottom: 2);
                     }
@@ -899,7 +924,7 @@ $C.@PageOverlay {
                     Group { FlexWeight: 1; }
 
                     $C.@SmallSecondaryTextButton #LifestealUpgrade {
-                      Anchor: (Width: 80, Height: 26);
+                      Anchor: (Width: 75, Height: 26, Right: 10);
                       Text: "Upgrade";
                     }
                   }
@@ -910,15 +935,15 @@ $C.@PageOverlay {
                 Group #ThornsCard {
                   LayoutMode: Left;
                   FlexWeight: 1;
-                  Background: (TexturePath: "../Common/stone_bg_dark02.png", Border: 4);
-                  Padding: (Full: 10);
+                  Background: (TexturePath: "../Common/ability_bg.png", Border: 48);
+                  Padding: (Left: 26, Right: 24, Bottom: 10, Top: 14);
 
                   Group {
                     LayoutMode: Top;
                     FlexWeight: 1;
 
                     Label #ThornsName {
-                      Style: @SectionTitleStyle;
+                      Style: @AbilityNameStyle;
                       Text: "Thorns";
                       Anchor: (Bottom: 2);
                     }
@@ -947,7 +972,106 @@ $C.@PageOverlay {
                     Group { FlexWeight: 1; }
 
                     $C.@SmallSecondaryTextButton #ThornsUpgrade {
-                      Anchor: (Width: 80, Height: 26);
+                      Anchor: (Width: 75, Height: 26, Right: 10);
+                      Text: "Upgrade";
+                    }
+                  }
+                }
+              }
+
+              Group #Row6 {
+                LayoutMode: Left;
+                Anchor: (Left: 0, Right: 0, Height: 120, Bottom: 8);
+
+                Group #ToolProficiencyCard {
+                  LayoutMode: Left;
+                  FlexWeight: 1;
+                  Background: (TexturePath: "../Common/ability_bg.png", Border: 48);
+                  Padding: (Left: 26, Right: 24, Bottom: 10, Top: 14);
+
+                  Group {
+                    LayoutMode: Top;
+                    FlexWeight: 1;
+
+                    Label #ToolProficiencyName {
+                      Style: @AbilityNameStyle;
+                      Text: "Tool Proficiency";
+                      Anchor: (Bottom: 2);
+                    }
+
+                    Label #ToolProficiencyLevel {
+                      Style: (...$C.@DefaultLabelStyle, TextColor: #9fb3c8);
+                      Text: "Level 0/3 (0%)";
+                      Anchor: (Bottom: 4);
+                    }
+
+                    Label #ToolProficiencyDescription {
+                      Style: @AbilityDescriptionStyle;
+                      Text: "Chance to preserve durability: 15%, 30%, 45%.";
+                    }
+                  }
+
+                  Group {
+                    Anchor: (Width: 80);
+                    LayoutMode: Top;
+
+                    Group #ToolProficiencyIcon {
+                      Anchor: (Width: 48, Height: 48, Bottom: 4);
+                      Background: (TexturePath: "../Common/tool_proficiency_icon.png");
+                    }
+
+                    Group { FlexWeight: 1; }
+
+                    $C.@SmallSecondaryTextButton #ToolProficiencyUpgrade {
+                      Anchor: (Width: 75, Height: 26, Right: 10);
+                      Text: "Upgrade";
+                    }
+                  }
+                }
+
+                Group { Anchor: (Width: 8); }
+
+                Group #LuckyMinerCard {
+                  LayoutMode: Left;
+                  FlexWeight: 1;
+                  Background: (TexturePath: "../Common/ability_bg.png", Border: 48);
+                  Padding: (Left: 26, Right: 24, Bottom: 10, Top: 14);
+
+                  Group {
+                    LayoutMode: Top;
+                    FlexWeight: 1;
+
+                    Label #LuckyMinerName {
+                      Style: @AbilityNameStyle;
+                      Text: "Lucky Miner";
+                      Anchor: (Bottom: 2);
+                    }
+
+                    Label #LuckyMinerLevel {
+                      Style: (...$C.@DefaultLabelStyle, TextColor: #9fb3c8);
+                      Text: "Level 0/3 (0%)";
+                      Anchor: (Bottom: 4);
+                    }
+
+                    Label #LuckyMinerDescription {
+                      Style: @AbilityDescriptionStyle;
+                      Text: "Chance for bonus ore: 10%, 20%, 30%.";
+                    }
+                  }
+
+                  Group {
+                    Anchor: (Width: 80);
+                    LayoutMode: Top;
+
+                    Group #LuckyMinerIcon {
+                      Anchor: (Width: 48, Height: 48, Bottom: 4);
+                      Background: (TexturePath: "../Common/lucky_miner_icon.png");
+                    }
+
+                    Group { FlexWeight: 1; }
+
+                    $C.@SmallSecondaryTextButton #LuckyMinerUpgrade {
+                      Anchor: (Width: 75, Height: 26, Right: 10);
                       Text: "Upgrade";
                     }
                   }

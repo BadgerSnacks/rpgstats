@@ -22,7 +22,7 @@ public final class RpgStatsConfig {
     private static final DateTimeFormatter BACKUP_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss");
     private static final String FILE_NAME = "config.toml";
     private static final String XP_BLACKLIST_FILE_NAME = "xp_blacklist.toml";
-    private static final int CURRENT_CONFIG_VERSION = 5;
+    private static final int CURRENT_CONFIG_VERSION = 7;
     private static final double DEFAULT_XP_MULTIPLIER = 0.35;
     private static final int DEFAULT_MAX_LEVEL = 25;
     private static final int DEFAULT_ABILITY_POINTS_PER_LEVEL = 2;
@@ -48,6 +48,8 @@ public final class RpgStatsConfig {
     private static final double DEFAULT_CRITICAL_STRIKE_DAMAGE_MULTIPLIER = 1.5;
     private static final double DEFAULT_LIFESTEAL_PER_LEVEL_PCT = 3.0;
     private static final double DEFAULT_THORNS_REFLECT_PER_LEVEL_PCT = 25.0;
+    private static final double DEFAULT_TOOL_PROFICIENCY_CHANCE_PER_LEVEL_PCT = 15.0;
+    private static final double DEFAULT_LUCKY_MINER_CHANCE_PER_LEVEL_PCT = 10.0;
     private static final double DEFAULT_DAMAGE_MULTIPLIER_BASE = 10.0;
     private static final double DEFAULT_MINING_SPEED_BASE = 1.0;
     private static final double DEFAULT_MINING_SPEED_PER_POINT = 0.10;
@@ -87,6 +89,8 @@ public final class RpgStatsConfig {
     private double criticalStrikeDamageMultiplier;
     private double lifestealPerLevelPct;
     private double thornsReflectPerLevelPct;
+    private double toolProficiencyChancePerLevelPct;
+    private double luckyMinerChancePerLevelPct;
     private int abilityRank1Cost;
     private int abilityRank2Cost;
     private int abilityRank3Cost;
@@ -104,7 +108,8 @@ public final class RpgStatsConfig {
                            double strongLungsOxygenPerLevelPct, double luckyShotChancePerLevelPct,
                            double criticalStrikeChancePerLevelPct, double criticalStrikeBaseChancePct,
                            double criticalStrikeDamageMultiplier, double lifestealPerLevelPct,
-                           double thornsReflectPerLevelPct,
+                           double thornsReflectPerLevelPct, double toolProficiencyChancePerLevelPct,
+                           double luckyMinerChancePerLevelPct,
                            int abilityRank1Cost, int abilityRank2Cost, int abilityRank3Cost) {
         this.configVersion = configVersion;
         this.xpMultiplier = xpMultiplier;
@@ -137,6 +142,8 @@ public final class RpgStatsConfig {
         this.criticalStrikeDamageMultiplier = criticalStrikeDamageMultiplier;
         this.lifestealPerLevelPct = lifestealPerLevelPct;
         this.thornsReflectPerLevelPct = thornsReflectPerLevelPct;
+        this.toolProficiencyChancePerLevelPct = toolProficiencyChancePerLevelPct;
+        this.luckyMinerChancePerLevelPct = luckyMinerChancePerLevelPct;
         this.abilityRank1Cost = abilityRank1Cost;
         this.abilityRank2Cost = abilityRank2Cost;
         this.abilityRank3Cost = abilityRank3Cost;
@@ -200,6 +207,14 @@ public final class RpgStatsConfig {
 
     public double getThornsReflectPerLevelPct() {
         return thornsReflectPerLevelPct;
+    }
+
+    public double getToolProficiencyChancePerLevelPct() {
+        return toolProficiencyChancePerLevelPct;
+    }
+
+    public double getLuckyMinerChancePerLevelPct() {
+        return luckyMinerChancePerLevelPct;
     }
 
     public int getAbilityRank1Cost() {
@@ -319,6 +334,8 @@ public final class RpgStatsConfig {
         this.criticalStrikeDamageMultiplier = other.criticalStrikeDamageMultiplier;
         this.lifestealPerLevelPct = other.lifestealPerLevelPct;
         this.thornsReflectPerLevelPct = other.thornsReflectPerLevelPct;
+        this.toolProficiencyChancePerLevelPct = other.toolProficiencyChancePerLevelPct;
+        this.luckyMinerChancePerLevelPct = other.luckyMinerChancePerLevelPct;
         this.abilityRank1Cost = other.abilityRank1Cost;
         this.abilityRank2Cost = other.abilityRank2Cost;
         this.abilityRank3Cost = other.abilityRank3Cost;
@@ -376,6 +393,8 @@ public final class RpgStatsConfig {
                     DEFAULT_CRITICAL_STRIKE_DAMAGE_MULTIPLIER,
                     DEFAULT_LIFESTEAL_PER_LEVEL_PCT,
                     DEFAULT_THORNS_REFLECT_PER_LEVEL_PCT,
+                    DEFAULT_TOOL_PROFICIENCY_CHANCE_PER_LEVEL_PCT,
+                    DEFAULT_LUCKY_MINER_CHANCE_PER_LEVEL_PCT,
                     DEFAULT_ABILITY_RANK1_COST,
                     DEFAULT_ABILITY_RANK2_COST,
                     DEFAULT_ABILITY_RANK3_COST
@@ -479,6 +498,16 @@ public final class RpgStatsConfig {
         thornsReflectPerLevelPct = clampAbilityPct(thornsReflectPerLevelPct, logger,
                 "thorns_reflect_per_level_pct", DEFAULT_THORNS_REFLECT_PER_LEVEL_PCT);
 
+        double toolProficiencyChancePerLevelPct = parseDouble(values.get("tool_proficiency_chance_per_level_pct"),
+                DEFAULT_TOOL_PROFICIENCY_CHANCE_PER_LEVEL_PCT, logger, "tool_proficiency_chance_per_level_pct");
+        toolProficiencyChancePerLevelPct = clampAbilityPct(toolProficiencyChancePerLevelPct, logger,
+                "tool_proficiency_chance_per_level_pct", DEFAULT_TOOL_PROFICIENCY_CHANCE_PER_LEVEL_PCT);
+
+        double luckyMinerChancePerLevelPct = parseDouble(values.get("lucky_miner_chance_per_level_pct"),
+                DEFAULT_LUCKY_MINER_CHANCE_PER_LEVEL_PCT, logger, "lucky_miner_chance_per_level_pct");
+        luckyMinerChancePerLevelPct = clampAbilityPct(luckyMinerChancePerLevelPct, logger,
+                "lucky_miner_chance_per_level_pct", DEFAULT_LUCKY_MINER_CHANCE_PER_LEVEL_PCT);
+
         int abilityRank1Cost = parseInt(values.get("ability_rank1_cost"),
                 DEFAULT_ABILITY_RANK1_COST, logger, "ability_rank1_cost");
         if (abilityRank1Cost < MIN_ABILITY_RANK_COST) {
@@ -562,7 +591,8 @@ public final class RpgStatsConfig {
                 xpBlacklistNpcTypes, xpBlacklistRoles,
                 strongLungsOxygenPerLevelPct, luckyShotChancePerLevelPct,
                 criticalStrikeChancePerLevelPct, criticalStrikeBaseChancePct, criticalStrikeDamageMultiplier,
-                lifestealPerLevelPct, thornsReflectPerLevelPct,
+                lifestealPerLevelPct, thornsReflectPerLevelPct, toolProficiencyChancePerLevelPct,
+                luckyMinerChancePerLevelPct,
                 abilityRank1Cost, abilityRank2Cost, abilityRank3Cost);
     }
 
@@ -831,9 +861,19 @@ public final class RpgStatsConfig {
                 + "lifesteal_per_level_pct = " + DEFAULT_LIFESTEAL_PER_LEVEL_PCT + "\n"
                 + "\n"
                 + "# Thorns reflect percentage per level (default " + DEFAULT_THORNS_REFLECT_PER_LEVEL_PCT + ").\n"
-                + "# Reflects this percentage of damage taken back to attackers. 10%/20%/30% at levels 1-3.\n"
+                + "# Reflects this percentage of damage taken back to attackers. 25%/50%/75% at levels 1-3.\n"
                 + "# Valid range: " + MIN_ABILITY_BONUS_PCT + " to " + MAX_ABILITY_BONUS_PCT + ".\n"
                 + "thorns_reflect_per_level_pct = " + DEFAULT_THORNS_REFLECT_PER_LEVEL_PCT + "\n"
+                + "\n"
+                + "# Tool Proficiency chance per level (default " + DEFAULT_TOOL_PROFICIENCY_CHANCE_PER_LEVEL_PCT + ").\n"
+                + "# Chance to not consume durability when using tools. 15%/30%/45% at levels 1-3.\n"
+                + "# Valid range: " + MIN_ABILITY_BONUS_PCT + " to " + MAX_ABILITY_BONUS_PCT + ".\n"
+                + "tool_proficiency_chance_per_level_pct = " + DEFAULT_TOOL_PROFICIENCY_CHANCE_PER_LEVEL_PCT + "\n"
+                + "\n"
+                + "# Lucky Miner chance per level (default " + DEFAULT_LUCKY_MINER_CHANCE_PER_LEVEL_PCT + ").\n"
+                + "# Chance to receive bonus ore when mining ore blocks. 10%/20%/30% at levels 1-3.\n"
+                + "# Valid range: " + MIN_ABILITY_BONUS_PCT + " to " + MAX_ABILITY_BONUS_PCT + ".\n"
+                + "lucky_miner_chance_per_level_pct = " + DEFAULT_LUCKY_MINER_CHANCE_PER_LEVEL_PCT + "\n"
                 + "\n"
                 + "# Strength damage multiplier: damage *= (STR / damage_multiplier_base) (default " + DEFAULT_DAMAGE_MULTIPLIER_BASE + ").\n"
                 + "# Lower number = more damage. Each point spent into (STR) will add 0.10 to the multiplier.\n"

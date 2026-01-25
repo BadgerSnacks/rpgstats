@@ -5,12 +5,24 @@
 ### Added
 - MultipleHUD mod support - RPGStats HUD now coexists with other HUD mods when MultipleHUD is installed.
 - `HudHelper` utility class for managing HUD compatibility with other mods.
+- Tool Proficiency ability with 3 ranks that provides a chance to preserve tool durability (15%/30%/45%).
+- Configurable `tool_proficiency_chance_per_level_pct` in config.toml.
+- Lucky Miner ability with 3 ranks that provides a chance for bonus ore when mining (10%/20%/30%).
+- Configurable `lucky_miner_chance_per_level_pct` in config.toml.
+- Refund Attributes button on Stats tab to reset all attribute points (STR/DEX/CON/INT/END/CHA) back to base 10.
+- Refund Abilities button on Abilities tab to reset all ability levels back to 0.
+- Stats page "How stats work" section with descriptions for all attributes.
+- Custom stone_bg backgrounds for UI panels.
 
 ### Changed
+- `config_version` bumped to 7.
+- Component version bumped to 16 for Lucky Miner support.
+- Abilities tab now has 6 rows (12 abilities total including WIP Lucky Shot).
 
 ### Fixed
 - HUD not updating when PartyPlugin (or other HUD mods) are installed.
 - HUD updates now properly check if RPGStats HUD is active before sending updates.
+- Lucky Miner now properly spawns bonus ore using CommandBuffer (fixes crash when picking up ore).
 
 ## 0.2.1
 

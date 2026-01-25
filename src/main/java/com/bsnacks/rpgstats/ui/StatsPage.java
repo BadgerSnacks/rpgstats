@@ -15,6 +15,8 @@ import com.bsnacks.rpgstats.systems.LuckyShotSystem;
 import com.bsnacks.rpgstats.systems.CriticalStrikeSystem;
 import com.bsnacks.rpgstats.systems.LifestealSystem;
 import com.bsnacks.rpgstats.systems.ThornsSystem;
+import com.bsnacks.rpgstats.systems.ToolProficiencySystem;
+import com.bsnacks.rpgstats.systems.LuckyMinerSystem;
 
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
@@ -47,6 +49,8 @@ public final class StatsPage extends InteractiveCustomUIPage<StatsPage.StatsPage
     private static final String ACTION_SPEND_STAT = "SpendStat";
     private static final String ACTION_SPEND_ABILITY = "SpendAbility";
     private static final String ACTION_RESET_STATS = "ResetStats";
+    private static final String ACTION_REFUND_ATTRIBUTES = "RefundAttributes";
+    private static final String ACTION_REFUND_ABILITIES = "RefundAbilities";
     private static final String ABILITY_LIGHT_FOOT = "light_foot";
     private static final String ABILITY_ARMOR_PROFICIENCY = "armor_proficiency";
     private static final String ABILITY_GLANCING_BLOW = "glancing_blow";
@@ -57,6 +61,8 @@ public final class StatsPage extends InteractiveCustomUIPage<StatsPage.StatsPage
     private static final String ABILITY_CRITICAL_STRIKE = "critical_strike";
     private static final String ABILITY_LIFESTEAL = "lifesteal";
     private static final String ABILITY_THORNS = "thorns";
+    private static final String ABILITY_TOOL_PROFICIENCY = "tool_proficiency";
+    private static final String ABILITY_LUCKY_MINER = "lucky_miner";
     private static final int DEFAULT_STAT_CAP = 25;
     private static final double BASE_REGEN_PER_SEC = 1.0;
 
@@ -106,6 +112,14 @@ public final class StatsPage extends InteractiveCustomUIPage<StatsPage.StatsPage
         }
         if (ACTION_RESET_STATS.equalsIgnoreCase(type)) {
             handleResetStats(ref, store, player);
+            return;
+        }
+        if (ACTION_REFUND_ATTRIBUTES.equalsIgnoreCase(type)) {
+            handleRefundAttributes(ref, store, player);
+            return;
+        }
+        if (ACTION_REFUND_ABILITIES.equalsIgnoreCase(type)) {
+            handleRefundAbilities(ref, store, player);
         }
     }
 
@@ -139,9 +153,17 @@ public final class StatsPage extends InteractiveCustomUIPage<StatsPage.StatsPage
         bindAbilityButton(uiEventBuilder, "#CriticalStrikeUpgrade", ABILITY_CRITICAL_STRIKE);
         bindAbilityButton(uiEventBuilder, "#LifestealUpgrade", ABILITY_LIFESTEAL);
         bindAbilityButton(uiEventBuilder, "#ThornsUpgrade", ABILITY_THORNS);
+        bindAbilityButton(uiEventBuilder, "#ToolProficiencyUpgrade", ABILITY_TOOL_PROFICIENCY);
+        bindAbilityButton(uiEventBuilder, "#LuckyMinerUpgrade", ABILITY_LUCKY_MINER);
         uiEventBuilder.addEventBinding(CustomUIEventBindingType.Activating, "#ResetStatsButton",
                 new EventData()
                         .append(StatsPageEventData.KEY_TYPE, ACTION_RESET_STATS));
+        uiEventBuilder.addEventBinding(CustomUIEventBindingType.Activating, "#RefundAttributesButton",
+                new EventData()
+                        .append(StatsPageEventData.KEY_TYPE, ACTION_REFUND_ATTRIBUTES));
+        uiEventBuilder.addEventBinding(CustomUIEventBindingType.Activating, "#RefundAbilitiesButton",
+                new EventData()
+                        .append(StatsPageEventData.KEY_TYPE, ACTION_REFUND_ABILITIES));
     }
 
     private void bindStatButton(UIEventBuilder uiEventBuilder, String buttonId, String statKey) {
@@ -561,6 +583,70 @@ public final class StatsPage extends InteractiveCustomUIPage<StatsPage.StatsPage
             return;
         }
 
+        if (ABILITY_TOOL_PROFICIENCY.equalsIgnoreCase(abilityId)) {
+            int currentLevel = stats.getToolProficiencyLevel();
+            int cost = RpgStats.getAbilityUpgradeCost(currentLevel, RpgStats.TOOL_PROFICIENCY_MAX_LEVEL);
+            int available = stats.getAvailableAbilityPoints();
+            if (cost == 0) {
+                player.sendMessage(Message.raw("Tool Proficiency is already at max level."));
+                refreshUI(ref, store, player);
+                return;
+            }
+            if (available < cost) {
+                player.sendMessage(Message.raw("You need " + cost + " ability point"
+                        + (cost == 1 ? "" : "s") + " to upgrade Tool Proficiency."));
+                refreshUI(ref, store, player);
+                return;
+            }
+            if (!stats.upgradeToolProficiency()) {
+                player.sendMessage(Message.raw("Tool Proficiency is already at max level."));
+                refreshUI(ref, store, player);
+                return;
+            }
+            int level = stats.getToolProficiencyLevel();
+            float toolProficiencyPct = ToolProficiencySystem.getPreservationChance(level, config);
+            player.sendMessage(Message.raw("Tool Proficiency upgraded to level " + level
+                    + " (" + formatPercent(toolProficiencyPct) + "% durability preservation chance)."
+                    + " Remaining ability points: " + stats.getAvailableAbilityPoints() + "."));
+            if (plugin != null) {
+                plugin.logInfo("Player upgraded Tool Proficiency to " + level + ": " + player.getDisplayName());
+            }
+            refreshUI(ref, store, player);
+            return;
+        }
+
+        if (ABILITY_LUCKY_MINER.equalsIgnoreCase(abilityId)) {
+            int currentLevel = stats.getLuckyMinerLevel();
+            int cost = RpgStats.getAbilityUpgradeCost(currentLevel, RpgStats.LUCKY_MINER_MAX_LEVEL);
+            int available = stats.getAvailableAbilityPoints();
+            if (cost == 0) {
+                player.sendMessage(Message.raw("Lucky Miner is already at max level."));
+                refreshUI(ref, store, player);
+                return;
+            }
+            if (available < cost) {
+                player.sendMessage(Message.raw("You need " + cost + " ability point"
+                        + (cost == 1 ? "" : "s") + " to upgrade Lucky Miner."));
+                refreshUI(ref, store, player);
+                return;
+            }
+            if (!stats.upgradeLuckyMiner()) {
+                player.sendMessage(Message.raw("Lucky Miner is already at max level."));
+                refreshUI(ref, store, player);
+                return;
+            }
+            int level = stats.getLuckyMinerLevel();
+            float luckyMinerPct = LuckyMinerSystem.getBonusOreChance(level, config);
+            player.sendMessage(Message.raw("Lucky Miner upgraded to level " + level
+                    + " (" + formatPercent(luckyMinerPct) + "% bonus ore chance)."
+                    + " Remaining ability points: " + stats.getAvailableAbilityPoints() + "."));
+            if (plugin != null) {
+                plugin.logInfo("Player upgraded Lucky Miner to " + level + ": " + player.getDisplayName());
+            }
+            refreshUI(ref, store, player);
+            return;
+        }
+
         player.sendMessage(Message.raw("Unknown ability '" + abilityId + "'."));
         refreshUI(ref, store, player);
     }
@@ -587,6 +673,75 @@ public final class StatsPage extends InteractiveCustomUIPage<StatsPage.StatsPage
         player.sendMessage(Message.raw("Your stats have been reset."));
         if (plugin != null) {
             plugin.logInfo("Player reset stats: " + player.getDisplayName());
+        }
+        refreshUI(ref, store, player);
+    }
+
+    private void handleRefundAttributes(Ref<EntityStore> ref, Store<EntityStore> store, Player player) {
+        if (player == null) {
+            return;
+        }
+
+        if (!player.hasPermission(RpgStatsPermissions.STATS_RESET)) {
+            player.sendMessage(Message.raw("You do not have permission to refund attribute points."));
+            refreshUI(ref, store, player);
+            return;
+        }
+
+        RpgStats stats = store.ensureAndGetComponent(ref, rpgStatsType);
+        stats.migrateIfNeeded();
+
+        int refunded = stats.refundAttributes();
+        if (refunded == 0) {
+            player.sendMessage(Message.raw("You have no attribute points to refund."));
+            refreshUI(ref, store, player);
+            return;
+        }
+
+        // Re-apply stat effects after refund
+        EntityStatMap statMap = store.ensureAndGetComponent(ref, EntityStatMap.getComponentType());
+        ConstitutionHealthEffect.apply(statMap, stats, config);
+        IntellectManaEffect.apply(statMap, stats, config);
+        EnduranceStaminaEffect.apply(statMap, stats, config);
+
+        player.sendMessage(Message.raw("Refunded " + refunded + " attribute point" + (refunded == 1 ? "" : "s")
+                + ". Available points: " + stats.getAvailableStatPoints() + "."));
+        if (plugin != null) {
+            plugin.logInfo("Player refunded " + refunded + " attribute points: " + player.getDisplayName());
+        }
+        refreshUI(ref, store, player);
+    }
+
+    private void handleRefundAbilities(Ref<EntityStore> ref, Store<EntityStore> store, Player player) {
+        if (player == null) {
+            return;
+        }
+
+        if (!player.hasPermission(RpgStatsPermissions.STATS_RESET)) {
+            player.sendMessage(Message.raw("You do not have permission to refund ability points."));
+            refreshUI(ref, store, player);
+            return;
+        }
+
+        RpgStats stats = store.ensureAndGetComponent(ref, rpgStatsType);
+        stats.migrateIfNeeded();
+
+        int refunded = stats.refundAbilities();
+        if (refunded == 0) {
+            player.sendMessage(Message.raw("You have no ability points to refund."));
+            refreshUI(ref, store, player);
+            return;
+        }
+
+        // Re-apply ability effects after refund (resets speed boost, etc.)
+        EntityStatMap statMap = store.ensureAndGetComponent(ref, EntityStatMap.getComponentType());
+        LightFootSpeedEffect.apply(ref, store, player, stats, config, plugin);
+        StrongLungsOxygenEffect.apply(statMap, stats, config);
+
+        player.sendMessage(Message.raw("Refunded " + refunded + " ability point" + (refunded == 1 ? "" : "s")
+                + ". Available points: " + stats.getAvailableAbilityPoints() + "."));
+        if (plugin != null) {
+            plugin.logInfo("Player refunded " + refunded + " ability points: " + player.getDisplayName());
         }
         refreshUI(ref, store, player);
     }
@@ -801,6 +956,34 @@ public final class StatsPage extends InteractiveCustomUIPage<StatsPage.StatsPage
         boolean canUpgradeThorns = canSpend && thornsCost > 0 && points >= thornsCost;
         uiCommandBuilder.set("#ThornsUpgrade.HitTestVisible", canUpgradeThorns);
         uiCommandBuilder.set("#ThornsUpgrade.Text", thornsCost == 0 ? "Maxed" : String.valueOf(thornsCost));
+
+        int toolProficiencyLevel = stats.getToolProficiencyLevel();
+        float toolProficiencyPct = ToolProficiencySystem.getPreservationChance(toolProficiencyLevel, config);
+        double toolProficiencyPerLevel = config == null ? 15.0 : config.getToolProficiencyChancePerLevelPct();
+        uiCommandBuilder.set("#ToolProficiencyLevel.Text", "Level " + toolProficiencyLevel + "/" + RpgStats.TOOL_PROFICIENCY_MAX_LEVEL
+                + " (" + formatPercent(toolProficiencyPct) + "%)");
+        uiCommandBuilder.set("#ToolProficiencyDescription.Text", "Chance to not consume tool durability: "
+                + formatPercent(toolProficiencyPerLevel) + "%, "
+                + formatPercent(toolProficiencyPerLevel * 2.0) + "%, and "
+                + formatPercent(toolProficiencyPerLevel * 3.0) + "% at levels 1-3.");
+        int toolProficiencyCost = RpgStats.getAbilityUpgradeCost(toolProficiencyLevel, RpgStats.TOOL_PROFICIENCY_MAX_LEVEL);
+        boolean canUpgradeToolProficiency = canSpend && toolProficiencyCost > 0 && points >= toolProficiencyCost;
+        uiCommandBuilder.set("#ToolProficiencyUpgrade.HitTestVisible", canUpgradeToolProficiency);
+        uiCommandBuilder.set("#ToolProficiencyUpgrade.Text", toolProficiencyCost == 0 ? "Maxed" : String.valueOf(toolProficiencyCost));
+
+        int luckyMinerLevel = stats.getLuckyMinerLevel();
+        float luckyMinerPct = LuckyMinerSystem.getBonusOreChance(luckyMinerLevel, config);
+        double luckyMinerPerLevel = config == null ? 10.0 : config.getLuckyMinerChancePerLevelPct();
+        uiCommandBuilder.set("#LuckyMinerLevel.Text", "Level " + luckyMinerLevel + "/" + RpgStats.LUCKY_MINER_MAX_LEVEL
+                + " (" + formatPercent(luckyMinerPct) + "%)");
+        uiCommandBuilder.set("#LuckyMinerDescription.Text", "Chance for bonus ore when mining: "
+                + formatPercent(luckyMinerPerLevel) + "%, "
+                + formatPercent(luckyMinerPerLevel * 2.0) + "%, and "
+                + formatPercent(luckyMinerPerLevel * 3.0) + "% at levels 1-3.");
+        int luckyMinerCost = RpgStats.getAbilityUpgradeCost(luckyMinerLevel, RpgStats.LUCKY_MINER_MAX_LEVEL);
+        boolean canUpgradeLuckyMiner = canSpend && luckyMinerCost > 0 && points >= luckyMinerCost;
+        uiCommandBuilder.set("#LuckyMinerUpgrade.HitTestVisible", canUpgradeLuckyMiner);
+        uiCommandBuilder.set("#LuckyMinerUpgrade.Text", luckyMinerCost == 0 ? "Maxed" : String.valueOf(luckyMinerCost));
     }
 
     private void setAddButtonState(UICommandBuilder uiCommandBuilder, String buttonId, boolean enabled) {

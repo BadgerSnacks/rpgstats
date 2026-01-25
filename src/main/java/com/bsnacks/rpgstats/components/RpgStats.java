@@ -11,7 +11,7 @@ import java.util.Arrays;
 public final class RpgStats implements Component<EntityStore> {
 
     public static final String COMPONENT_ID = "rpgstats";
-    public static final int CURRENT_VERSION = 14;
+    public static final int CURRENT_VERSION = 16;
     public static final int DEFAULT_MAX_LEVEL = 25;
     public static final int BASE_XP = 100;
     public static final int LINEAR_XP = 50;
@@ -28,6 +28,8 @@ public final class RpgStats implements Component<EntityStore> {
     public static final int CRITICAL_STRIKE_MAX_LEVEL = 3;
     public static final int LIFESTEAL_MAX_LEVEL = 3;
     public static final int THORNS_MAX_LEVEL = 3;
+    public static final int TOOL_PROFICIENCY_MAX_LEVEL = 3;
+    public static final int LUCKY_MINER_MAX_LEVEL = 3;
 
     public static final BuilderCodec<RpgStats> CODEC =
             BuilderCodec.builder(RpgStats.class, RpgStats::new)
@@ -57,6 +59,10 @@ public final class RpgStats implements Component<EntityStore> {
                             (d, v) -> d.lifestealLevel = v, d -> d.lifestealLevel).add()
                     .append(new KeyedCodec<>("ThornsLevel", Codec.INTEGER),
                             (d, v) -> d.thornsLevel = v, d -> d.thornsLevel).add()
+                    .append(new KeyedCodec<>("ToolProficiencyLevel", Codec.INTEGER),
+                            (d, v) -> d.toolProficiencyLevel = v, d -> d.toolProficiencyLevel).add()
+                    .append(new KeyedCodec<>("LuckyMinerLevel", Codec.INTEGER),
+                            (d, v) -> d.luckyMinerLevel = v, d -> d.luckyMinerLevel).add()
 
                     .append(new KeyedCodec<>("Str", Codec.INTEGER), (d, v) -> d.str = v, d -> d.str).add()
                     .append(new KeyedCodec<>("Dex", Codec.INTEGER), (d, v) -> d.dex = v, d -> d.dex).add()
@@ -88,6 +94,8 @@ public final class RpgStats implements Component<EntityStore> {
     private int criticalStrikeLevel = 0;
     private int lifestealLevel = 0;
     private int thornsLevel = 0;
+    private int toolProficiencyLevel = 0;
+    private int luckyMinerLevel = 0;
     private boolean syncingLevel = false;
 
     private int str = BASE_STAT, dex = BASE_STAT, con = BASE_STAT, intl = BASE_STAT, end = BASE_STAT, cha = BASE_STAT;
@@ -151,6 +159,14 @@ public final class RpgStats implements Component<EntityStore> {
             thornsLevel = 0;
             version = 14;
         }
+        if (version < 15) {
+            toolProficiencyLevel = 0;
+            version = 15;
+        }
+        if (version < 16) {
+            luckyMinerLevel = 0;
+            version = 16;
+        }
     }
 
     public int modifier(int score) {
@@ -173,12 +189,53 @@ public final class RpgStats implements Component<EntityStore> {
         criticalStrikeLevel = 0;
         lifestealLevel = 0;
         thornsLevel = 0;
+        toolProficiencyLevel = 0;
+        luckyMinerLevel = 0;
         str = BASE_STAT;
         dex = BASE_STAT;
         con = BASE_STAT;
         intl = BASE_STAT;
         end = BASE_STAT;
         cha = BASE_STAT;
+    }
+
+    /**
+     * Refunds all spent attribute points, resetting STR/DEX/CON/INT/END/CHA to BASE_STAT (10).
+     * The points are returned to the available pool.
+     * @return the number of attribute points refunded
+     */
+    public int refundAttributes() {
+        int refunded = getStatHistorySize();
+        statHistory = new String[0];
+        str = BASE_STAT;
+        dex = BASE_STAT;
+        con = BASE_STAT;
+        intl = BASE_STAT;
+        end = BASE_STAT;
+        cha = BASE_STAT;
+        return refunded;
+    }
+
+    /**
+     * Refunds all spent ability points, resetting all ability levels to 0.
+     * The points are returned to the available pool.
+     * @return the number of ability points refunded
+     */
+    public int refundAbilities() {
+        int refunded = getAbilityPointsSpent();
+        lightFootLevel = 0;
+        armorProficiencyLevel = 0;
+        healthRegenLevel = 0;
+        staminaRegenLevel = 0;
+        glancingBlowLevel = 0;
+        strongLungsLevel = 0;
+        luckyShotLevel = 0;
+        criticalStrikeLevel = 0;
+        lifestealLevel = 0;
+        thornsLevel = 0;
+        toolProficiencyLevel = 0;
+        luckyMinerLevel = 0;
+        return refunded;
     }
 
     public void setLevel(int level) {
@@ -416,6 +473,42 @@ public final class RpgStats implements Component<EntityStore> {
         return true;
     }
 
+    public int getToolProficiencyLevel() {
+        syncLevelToXp();
+        return toolProficiencyLevel;
+    }
+
+    public boolean upgradeToolProficiency() {
+        syncLevelToXp();
+        if (toolProficiencyLevel >= TOOL_PROFICIENCY_MAX_LEVEL) {
+            return false;
+        }
+        int cost = getAbilityUpgradeCost(toolProficiencyLevel, TOOL_PROFICIENCY_MAX_LEVEL);
+        if (getAvailableAbilityPoints() < cost) {
+            return false;
+        }
+        toolProficiencyLevel++;
+        return true;
+    }
+
+    public int getLuckyMinerLevel() {
+        syncLevelToXp();
+        return luckyMinerLevel;
+    }
+
+    public boolean upgradeLuckyMiner() {
+        syncLevelToXp();
+        if (luckyMinerLevel >= LUCKY_MINER_MAX_LEVEL) {
+            return false;
+        }
+        int cost = getAbilityUpgradeCost(luckyMinerLevel, LUCKY_MINER_MAX_LEVEL);
+        if (getAvailableAbilityPoints() < cost) {
+            return false;
+        }
+        luckyMinerLevel++;
+        return true;
+    }
+
     public boolean spendStatPoint(String attributeRaw) {
         if (getAvailableStatPoints() <= 0) {
             return false;
@@ -447,6 +540,8 @@ public final class RpgStats implements Component<EntityStore> {
         copy.criticalStrikeLevel = this.criticalStrikeLevel;
         copy.lifestealLevel = this.lifestealLevel;
         copy.thornsLevel = this.thornsLevel;
+        copy.toolProficiencyLevel = this.toolProficiencyLevel;
+        copy.luckyMinerLevel = this.luckyMinerLevel;
         copy.str = this.str;
         copy.dex = this.dex;
         copy.con = this.con;
@@ -542,6 +637,12 @@ public final class RpgStats implements Component<EntityStore> {
         if (thornsLevel > 0) {
             spent += totalCostForLevels(thornsLevel);
         }
+        if (toolProficiencyLevel > 0) {
+            spent += totalCostForLevels(toolProficiencyLevel);
+        }
+        if (luckyMinerLevel > 0) {
+            spent += totalCostForLevels(luckyMinerLevel);
+        }
         return Math.max(0, spent);
     }
 
@@ -583,6 +684,8 @@ public final class RpgStats implements Component<EntityStore> {
         criticalStrikeLevel = clamp(criticalStrikeLevel, 0, CRITICAL_STRIKE_MAX_LEVEL);
         lifestealLevel = clamp(lifestealLevel, 0, LIFESTEAL_MAX_LEVEL);
         thornsLevel = clamp(thornsLevel, 0, THORNS_MAX_LEVEL);
+        toolProficiencyLevel = clamp(toolProficiencyLevel, 0, TOOL_PROFICIENCY_MAX_LEVEL);
+        luckyMinerLevel = clamp(luckyMinerLevel, 0, LUCKY_MINER_MAX_LEVEL);
 
         if (getAbilityPointsSpent() > maxAllowed) {
             trimAbilityLevelsToPoints(maxAllowed);
@@ -633,10 +736,20 @@ public final class RpgStats implements Component<EntityStore> {
             criticalStrikeLevel = 0;
             lifestealLevel = 0;
             thornsLevel = 0;
+            toolProficiencyLevel = 0;
+            luckyMinerLevel = 0;
             return;
         }
-        int guard = LIGHT_FOOT_MAX_LEVEL + ARMOR_PROFICIENCY_MAX_LEVEL + HEALTH_REGEN_MAX_LEVEL + STAMINA_REGEN_MAX_LEVEL + GLANCING_BLOW_MAX_LEVEL + STRONG_LUNGS_MAX_LEVEL + LUCKY_SHOT_MAX_LEVEL + CRITICAL_STRIKE_MAX_LEVEL + LIFESTEAL_MAX_LEVEL + THORNS_MAX_LEVEL + 2;
+        int guard = LIGHT_FOOT_MAX_LEVEL + ARMOR_PROFICIENCY_MAX_LEVEL + HEALTH_REGEN_MAX_LEVEL + STAMINA_REGEN_MAX_LEVEL + GLANCING_BLOW_MAX_LEVEL + STRONG_LUNGS_MAX_LEVEL + LUCKY_SHOT_MAX_LEVEL + CRITICAL_STRIKE_MAX_LEVEL + LIFESTEAL_MAX_LEVEL + THORNS_MAX_LEVEL + TOOL_PROFICIENCY_MAX_LEVEL + LUCKY_MINER_MAX_LEVEL + 2;
         while (getAbilityPointsSpent() > maxAllowed && guard-- > 0) {
+            if (luckyMinerLevel > 0) {
+                luckyMinerLevel--;
+                continue;
+            }
+            if (toolProficiencyLevel > 0) {
+                toolProficiencyLevel--;
+                continue;
+            }
             if (thornsLevel > 0) {
                 thornsLevel--;
                 continue;

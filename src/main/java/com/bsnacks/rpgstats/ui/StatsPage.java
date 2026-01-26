@@ -14,6 +14,8 @@ import com.bsnacks.rpgstats.systems.StrongLungsOxygenEffect;
 import com.bsnacks.rpgstats.systems.LuckyShotSystem;
 import com.bsnacks.rpgstats.systems.CriticalStrikeSystem;
 import com.bsnacks.rpgstats.systems.LifestealSystem;
+import com.bsnacks.rpgstats.systems.FlameTouchSystem;
+import com.bsnacks.rpgstats.systems.GourmandSystem;
 import com.bsnacks.rpgstats.systems.ThornsSystem;
 import com.bsnacks.rpgstats.systems.ToolProficiencySystem;
 import com.bsnacks.rpgstats.systems.LuckyMinerSystem;
@@ -63,6 +65,8 @@ public final class StatsPage extends InteractiveCustomUIPage<StatsPage.StatsPage
     private static final String ABILITY_THORNS = "thorns";
     private static final String ABILITY_TOOL_PROFICIENCY = "tool_proficiency";
     private static final String ABILITY_LUCKY_MINER = "lucky_miner";
+    private static final String ABILITY_FLAME_TOUCH = "flame_touch";
+    private static final String ABILITY_GOURMAND = "gourmand";
     private static final int DEFAULT_STAT_CAP = 25;
     private static final double BASE_REGEN_PER_SEC = 1.0;
 
@@ -155,6 +159,8 @@ public final class StatsPage extends InteractiveCustomUIPage<StatsPage.StatsPage
         bindAbilityButton(uiEventBuilder, "#ThornsUpgrade", ABILITY_THORNS);
         bindAbilityButton(uiEventBuilder, "#ToolProficiencyUpgrade", ABILITY_TOOL_PROFICIENCY);
         bindAbilityButton(uiEventBuilder, "#LuckyMinerUpgrade", ABILITY_LUCKY_MINER);
+        bindAbilityButton(uiEventBuilder, "#FlameTouchUpgrade", ABILITY_FLAME_TOUCH);
+        bindAbilityButton(uiEventBuilder, "#GourmandUpgrade", ABILITY_GOURMAND);
         uiEventBuilder.addEventBinding(CustomUIEventBindingType.Activating, "#ResetStatsButton",
                 new EventData()
                         .append(StatsPageEventData.KEY_TYPE, ACTION_RESET_STATS));
@@ -647,6 +653,70 @@ public final class StatsPage extends InteractiveCustomUIPage<StatsPage.StatsPage
             return;
         }
 
+        if (ABILITY_FLAME_TOUCH.equalsIgnoreCase(abilityId)) {
+            int currentLevel = stats.getFlameTouchLevel();
+            int cost = RpgStats.getAbilityUpgradeCost(currentLevel, RpgStats.FLAME_TOUCH_MAX_LEVEL);
+            int available = stats.getAvailableAbilityPoints();
+            if (cost == 0) {
+                player.sendMessage(Message.raw("Flame Touch is already at max level."));
+                refreshUI(ref, store, player);
+                return;
+            }
+            if (available < cost) {
+                player.sendMessage(Message.raw("You need " + cost + " ability point"
+                        + (cost == 1 ? "" : "s") + " to upgrade Flame Touch."));
+                refreshUI(ref, store, player);
+                return;
+            }
+            if (!stats.upgradeFlameTouch()) {
+                player.sendMessage(Message.raw("Flame Touch is already at max level."));
+                refreshUI(ref, store, player);
+                return;
+            }
+            int level = stats.getFlameTouchLevel();
+            float fireDamage = FlameTouchSystem.getBonusFireDamage(level, config);
+            player.sendMessage(Message.raw("Flame Touch upgraded to level " + level
+                    + " (+" + formatRate(fireDamage) + " fire damage)."
+                    + " Remaining ability points: " + stats.getAvailableAbilityPoints() + "."));
+            if (plugin != null) {
+                plugin.logInfo("Player upgraded Flame Touch to " + level + ": " + player.getDisplayName());
+            }
+            refreshUI(ref, store, player);
+            return;
+        }
+
+        if (ABILITY_GOURMAND.equalsIgnoreCase(abilityId)) {
+            int currentLevel = stats.getGourmandLevel();
+            int cost = RpgStats.getAbilityUpgradeCost(currentLevel, RpgStats.GOURMAND_MAX_LEVEL);
+            int available = stats.getAvailableAbilityPoints();
+            if (cost == 0) {
+                player.sendMessage(Message.raw("Gourmand is already at max level."));
+                refreshUI(ref, store, player);
+                return;
+            }
+            if (available < cost) {
+                player.sendMessage(Message.raw("You need " + cost + " ability point"
+                        + (cost == 1 ? "" : "s") + " to upgrade Gourmand."));
+                refreshUI(ref, store, player);
+                return;
+            }
+            if (!stats.upgradeGourmand()) {
+                player.sendMessage(Message.raw("Gourmand is already at max level."));
+                refreshUI(ref, store, player);
+                return;
+            }
+            int level = stats.getGourmandLevel();
+            float bonusPct = GourmandSystem.getFoodBonusPercent(level, config);
+            player.sendMessage(Message.raw("Gourmand upgraded to level " + level
+                    + " (+" + formatPercent(bonusPct) + "% food bonuses)."
+                    + " Remaining ability points: " + stats.getAvailableAbilityPoints() + "."));
+            if (plugin != null) {
+                plugin.logInfo("Player upgraded Gourmand to " + level + ": " + player.getDisplayName());
+            }
+            refreshUI(ref, store, player);
+            return;
+        }
+
         player.sendMessage(Message.raw("Unknown ability '" + abilityId + "'."));
         refreshUI(ref, store, player);
     }
@@ -984,6 +1054,33 @@ public final class StatsPage extends InteractiveCustomUIPage<StatsPage.StatsPage
         boolean canUpgradeLuckyMiner = canSpend && luckyMinerCost > 0 && points >= luckyMinerCost;
         uiCommandBuilder.set("#LuckyMinerUpgrade.HitTestVisible", canUpgradeLuckyMiner);
         uiCommandBuilder.set("#LuckyMinerUpgrade.Text", luckyMinerCost == 0 ? "Maxed" : String.valueOf(luckyMinerCost));
+
+        int flameTouchLevel = stats.getFlameTouchLevel();
+        float flameTouchDamage = FlameTouchSystem.getBonusFireDamage(flameTouchLevel, config);
+        double flameTouchPerLevel = config == null ? 2.0 : config.getFlameTouchDamagePerLevel();
+        uiCommandBuilder.set("#FlameTouchLevel.Text", "Level " + flameTouchLevel + "/" + RpgStats.FLAME_TOUCH_MAX_LEVEL
+                + " (+" + formatRate(flameTouchDamage) + ")");
+        uiCommandBuilder.set("#FlameTouchDescription.Text", "Bonus fire damage on hit: +"
+                + formatRate(flameTouchPerLevel) + ", +" + formatRate(flameTouchPerLevel * 2.0)
+                + ", and +" + formatRate(flameTouchPerLevel * 3.0) + " at levels 1-3.");
+        int flameTouchCost = RpgStats.getAbilityUpgradeCost(flameTouchLevel, RpgStats.FLAME_TOUCH_MAX_LEVEL);
+        boolean canUpgradeFlameTouch = canSpend && flameTouchCost > 0 && points >= flameTouchCost;
+        uiCommandBuilder.set("#FlameTouchUpgrade.HitTestVisible", canUpgradeFlameTouch);
+        uiCommandBuilder.set("#FlameTouchUpgrade.Text", flameTouchCost == 0 ? "Maxed" : String.valueOf(flameTouchCost));
+
+        int gourmandLevel = stats.getGourmandLevel();
+        float gourmandPct = GourmandSystem.getFoodBonusPercent(gourmandLevel, config);
+        double gourmandPerLevel = config == null ? 10.0 : config.getGourmandFoodBonusPerLevelPct();
+        uiCommandBuilder.set("#GourmandLevel.Text", "Level " + gourmandLevel + "/" + RpgStats.GOURMAND_MAX_LEVEL
+                + " (+" + formatPercent(gourmandPct) + "%)");
+        uiCommandBuilder.set("#GourmandDescription.Text", "Increase consumable stat gains by "
+                + formatPercent(gourmandPerLevel) + "%, "
+                + formatPercent(gourmandPerLevel * 2.0) + "%, and "
+                + formatPercent(gourmandPerLevel * 3.0) + "% at levels 1-3.");
+        int gourmandCost = RpgStats.getAbilityUpgradeCost(gourmandLevel, RpgStats.GOURMAND_MAX_LEVEL);
+        boolean canUpgradeGourmand = canSpend && gourmandCost > 0 && points >= gourmandCost;
+        uiCommandBuilder.set("#GourmandUpgrade.HitTestVisible", canUpgradeGourmand);
+        uiCommandBuilder.set("#GourmandUpgrade.Text", gourmandCost == 0 ? "Maxed" : String.valueOf(gourmandCost));
     }
 
     private void setAddButtonState(UICommandBuilder uiCommandBuilder, String buttonId, boolean enabled) {

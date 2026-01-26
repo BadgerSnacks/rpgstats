@@ -367,8 +367,8 @@ $C.@PageOverlay {
 
             Label {
               Style: (...$C.@DefaultLabelStyle, TextColor: #c7d1d8, Wrap: true);
-              Text: "Hit harder and put more power into your bow! Every point you spend in this stat will make you one step closer to a pwoerhouse.";
-              Anchor: (Bottom: 6, Left: 12);
+              Text: "Hit harder and put more power into every blow! Every point you spend in this stat will make you one step closer to a powerhouse.";
+              Anchor: (Bottom: 6, Left: 12, Right: 6);
             }
 
             Label {
@@ -380,7 +380,7 @@ $C.@PageOverlay {
             Label {
               Style: (...$C.@DefaultLabelStyle, TextColor: #c7d1d8, Wrap: true);
               Text: "Dig faster and bring down trees more effecentyly. With each point into dexterity you get more comfortable with your work as it beomces easier to find the weak spots in the stone walls, packed earth, and tree trunks.";
-              Anchor: (Bottom: 6, Left: 12);
+              Anchor: (Bottom: 6, Left: 12, Right: 6);
             }
 
             Label {
@@ -392,7 +392,7 @@ $C.@PageOverlay {
             Label {
               Style: (...$C.@DefaultLabelStyle, TextColor: #c7d1d8, Wrap: true);
               Text: "Spend some time training your body, as you improve your constitution you become a little harder to kill. You can take a few more hits before you succumb to your wounds.";
-              Anchor: (Bottom: 12, Left: 12);
+              Anchor: (Bottom: 12, Left: 12, Right: 6);
             }
 
             Label {
@@ -404,7 +404,7 @@ $C.@PageOverlay {
             Label {
               Style: (...$C.@DefaultLabelStyle, TextColor: #c7d1d8, Wrap: true);
               Text: "You spend more time with your studys commiting the anchient texts to memory, as you spead points into intelligence you gain a litte more magical power.";
-              Anchor: (Bottom: 6, Left: 12);
+              Anchor: (Bottom: 6, Left: 12, Right: 6);
             }
 
             Label {
@@ -416,7 +416,7 @@ $C.@PageOverlay {
             Label {
               Style: (...$C.@DefaultLabelStyle, TextColor: #c7d1d8, Wrap: true);
               Text: "The feel of wind on your face brings a sence of freedom to your soul, endurance give you more stamina to keep running.";
-              Anchor: (Bottom: 6, Left: 12);
+              Anchor: (Bottom: 6, Left: 12, Right: 6);
             }
 
             Label {
@@ -428,7 +428,7 @@ $C.@PageOverlay {
             Label {
               Style: (...$C.@DefaultLabelStyle, TextColor: #c7d1d8, Wrap: true);
               Text: "Everyone seems to like you! as you spend points into charisma you find that people are a little kinder to you and more likely to do favors for you. (CHA is currently a WIP and is not implemented into the mod.)";
-              Anchor: (Bottom: 6, Left: 12);
+              Anchor: (Bottom: 6, Left: 12, Right: 6);
             }
           }
         }
@@ -501,7 +501,7 @@ $C.@PageOverlay {
                     Label #LightFootName {
                       Style: @AbilityNameStyle;
                       Text: "Light Foot";
-                      Anchor: (Bottom: 2);
+                      Anchor: (Bottom: 2, Left: 8);
                     }
 
                     Label #LightFootLevel {
@@ -528,7 +528,7 @@ $C.@PageOverlay {
                     Group { FlexWeight: 1; }
 
                     $C.@SmallSecondaryTextButton #LightFootUpgrade {
-                      Anchor: (Width: 75, Height: 26, Right: 10);
+                      Anchor: (Width: 75, Height: 26, Right: 10, Bottom: 6);
                       Text: "Upgrade";
                     }
                   }
@@ -549,7 +549,7 @@ $C.@PageOverlay {
                     Label #ArmorProficiencyName {
                       Style: @AbilityNameStyle;
                       Text: "Armor Proficiency";
-                      Anchor: (Bottom: 2);
+                      Anchor: (Bottom: 2, Left: 8);
                     }
 
                     Label #ArmorProficiencyLevel {
@@ -576,7 +576,7 @@ $C.@PageOverlay {
                     Group { FlexWeight: 1; }
 
                     $C.@SmallSecondaryTextButton #ArmorProficiencyUpgrade {
-                      Anchor: (Width: 75, Height: 26, Right: 10);
+                      Anchor: (Width: 75, Height: 26, Right: 10, Bottom: 6);
                       Text: "Upgrade";
                     }
                   }
@@ -600,7 +600,7 @@ $C.@PageOverlay {
                     Label #GlancingBlowName {
                       Style: @AbilityNameStyle;
                       Text: "Glancing Blow";
-                      Anchor: (Bottom: 2);
+                      Anchor: (Bottom: 2, Left: 8);
                     }
 
                     Label #GlancingBlowLevel {
@@ -627,7 +627,7 @@ $C.@PageOverlay {
                     Group { FlexWeight: 1; }
 
                     $C.@SmallSecondaryTextButton #GlancingBlowUpgrade {
-                      Anchor: (Width: 75, Height: 26, Right: 10);
+                      Anchor: (Width: 75, Height: 26, Right: 10, Bottom: 6);
                       Text: "Upgrade";
                     }
                   }
@@ -648,7 +648,7 @@ $C.@PageOverlay {
                     Label #HealthRegenName {
                       Style: @AbilityNameStyle;
                       Text: "Health Regeneration";
-                      Anchor: (Bottom: 2);
+                      Anchor: (Bottom: 2, Left: 8);
                     }
 
                     Label #HealthRegenLevel {
@@ -675,7 +675,7 @@ $C.@PageOverlay {
                     Group { FlexWeight: 1; }
 
                     $C.@SmallSecondaryTextButton #HealthRegenUpgrade {
-                      Anchor: (Width: 75, Height: 26, Right: 10);
+                      Anchor: (Width: 75, Height: 26, Right: 10, Bottom: 6);
                       Text: "Upgrade";
                     }
                   }
@@ -699,7 +699,7 @@ $C.@PageOverlay {
                     Label #StaminaRegenName {
                       Style: @AbilityNameStyle;
                       Text: "Stamina Regeneration";
-                      Anchor: (Bottom: 2);
+                      Anchor: (Bottom: 2, Left: 8);
                     }
 
                     Label #StaminaRegenLevel {
@@ -726,7 +726,7 @@ $C.@PageOverlay {
                     Group { FlexWeight: 1; }
 
                     $C.@SmallSecondaryTextButton #StaminaRegenUpgrade {
-                      Anchor: (Width: 75, Height: 26, Right: 10);
+                      Anchor: (Width: 75, Height: 26, Right: 10, Bottom: 6);
                       Text: "Upgrade";
                     }
                   }
@@ -747,7 +747,7 @@ $C.@PageOverlay {
                     Label #StrongLungsName {
                       Style: @AbilityNameStyle;
                       Text: "Strong Lungs";
-                      Anchor: (Bottom: 2);
+                      Anchor: (Bottom: 2, Left: 8);
                     }
 
                     Label #StrongLungsLevel {
@@ -774,7 +774,7 @@ $C.@PageOverlay {
                     Group { FlexWeight: 1; }
 
                     $C.@SmallSecondaryTextButton #StrongLungsUpgrade {
-                      Anchor: (Width: 75, Height: 26, Right: 10);
+                      Anchor: (Width: 75, Height: 26, Right: 10, Bottom: 6);
                       Text: "Upgrade";
                     }
                   }
@@ -798,7 +798,7 @@ $C.@PageOverlay {
                     Label #LuckyShotName {
                       Style: @AbilityNameStyle;
                       Text: "Lucky Shot (WIP)";
-                      Anchor: (Bottom: 2);
+                      Anchor: (Bottom: 2, Left: 8);
                     }
 
                     Label #LuckyShotLevel {
@@ -825,7 +825,7 @@ $C.@PageOverlay {
                     Group { FlexWeight: 1; }
 
                     $C.@SmallSecondaryTextButton #LuckyShotUpgrade {
-                      Anchor: (Width: 75, Height: 26, Right: 10);
+                      Anchor: (Width: 75, Height: 26, Right: 10, Bottom: 6);
                       Text: "Upgrade";
                     }
                   }
@@ -846,7 +846,7 @@ $C.@PageOverlay {
                     Label #CriticalStrikeName {
                       Style: @AbilityNameStyle;
                       Text: "Critical Strike";
-                      Anchor: (Bottom: 2);
+                      Anchor: (Bottom: 2, Left: 8);
                     }
 
                     Label #CriticalStrikeLevel {
@@ -873,7 +873,7 @@ $C.@PageOverlay {
                     Group { FlexWeight: 1; }
 
                     $C.@SmallSecondaryTextButton #CriticalStrikeUpgrade {
-                      Anchor: (Width: 75, Height: 26, Right: 10);
+                      Anchor: (Width: 75, Height: 26, Right: 10, Bottom: 6);
                       Text: "Upgrade";
                     }
                   }
@@ -897,7 +897,7 @@ $C.@PageOverlay {
                     Label #LifestealName {
                       Style: @AbilityNameStyle;
                       Text: "Lifesteal";
-                      Anchor: (Bottom: 2);
+                      Anchor: (Bottom: 2, Left: 8);
                     }
 
                     Label #LifestealLevel {
@@ -924,7 +924,7 @@ $C.@PageOverlay {
                     Group { FlexWeight: 1; }
 
                     $C.@SmallSecondaryTextButton #LifestealUpgrade {
-                      Anchor: (Width: 75, Height: 26, Right: 10);
+                      Anchor: (Width: 75, Height: 26, Right: 10, Bottom: 6);
                       Text: "Upgrade";
                     }
                   }
@@ -945,7 +945,7 @@ $C.@PageOverlay {
                     Label #ThornsName {
                       Style: @AbilityNameStyle;
                       Text: "Thorns";
-                      Anchor: (Bottom: 2);
+                      Anchor: (Bottom: 2, Left: 8);
                     }
 
                     Label #ThornsLevel {
@@ -972,7 +972,7 @@ $C.@PageOverlay {
                     Group { FlexWeight: 1; }
 
                     $C.@SmallSecondaryTextButton #ThornsUpgrade {
-                      Anchor: (Width: 75, Height: 26, Right: 10);
+                      Anchor: (Width: 75, Height: 26, Right: 10, Bottom: 6);
                       Text: "Upgrade";
                     }
                   }
@@ -996,7 +996,7 @@ $C.@PageOverlay {
                     Label #ToolProficiencyName {
                       Style: @AbilityNameStyle;
                       Text: "Tool Proficiency";
-                      Anchor: (Bottom: 2);
+                      Anchor: (Bottom: 2, Left: 8);
                     }
 
                     Label #ToolProficiencyLevel {
@@ -1023,7 +1023,7 @@ $C.@PageOverlay {
                     Group { FlexWeight: 1; }
 
                     $C.@SmallSecondaryTextButton #ToolProficiencyUpgrade {
-                      Anchor: (Width: 75, Height: 26, Right: 10);
+                      Anchor: (Width: 75, Height: 26, Right: 10, Bottom: 6);
                       Text: "Upgrade";
                     }
                   }
@@ -1044,7 +1044,7 @@ $C.@PageOverlay {
                     Label #LuckyMinerName {
                       Style: @AbilityNameStyle;
                       Text: "Lucky Miner";
-                      Anchor: (Bottom: 2);
+                      Anchor: (Bottom: 2, Left: 8);
                     }
 
                     Label #LuckyMinerLevel {
@@ -1071,7 +1071,106 @@ $C.@PageOverlay {
                     Group { FlexWeight: 1; }
 
                     $C.@SmallSecondaryTextButton #LuckyMinerUpgrade {
-                      Anchor: (Width: 75, Height: 26, Right: 10);
+                      Anchor: (Width: 75, Height: 26, Right: 10, Bottom: 6);
+                      Text: "Upgrade";
+                    }
+                  }
+                }
+              }
+
+              Group #Row7 {
+                LayoutMode: Left;
+                Anchor: (Left: 0, Right: 0, Height: 120, Bottom: 8);
+
+                Group #FlameTouchCard {
+                  LayoutMode: Left;
+                  FlexWeight: 1;
+                  Background: (TexturePath: "../Common/ability_bg.png", Border: 48);
+                  Padding: (Left: 26, Right: 24, Bottom: 10, Top: 14);
+
+                  Group {
+                    LayoutMode: Top;
+                    FlexWeight: 1;
+
+                    Label #FlameTouchName {
+                      Style: @AbilityNameStyle;
+                      Text: "Flame Touch";
+                      Anchor: (Bottom: 2, Left: 8);
+                    }
+
+                    Label #FlameTouchLevel {
+                      Style: (...$C.@DefaultLabelStyle, TextColor: #9fb3c8);
+                      Text: "Level 0/3 (+0)";
+                      Anchor: (Bottom: 4);
+                    }
+
+                    Label #FlameTouchDescription {
+                      Style: @AbilityDescriptionStyle;
+                      Text: "Bonus fire damage on hit: +2, +4, +6.";
+                    }
+                  }
+
+                  Group {
+                    Anchor: (Width: 80);
+                    LayoutMode: Top;
+
+                    Group #FlameTouchIcon {
+                      Anchor: (Width: 48, Height: 48, Bottom: 4);
+                      Background: (TexturePath: "../Common/flame_touch_icon.png");
+                    }
+
+                    Group { FlexWeight: 1; }
+
+                    $C.@SmallSecondaryTextButton #FlameTouchUpgrade {
+                      Anchor: (Width: 75, Height: 26, Right: 10, Bottom: 6);
+                      Text: "Upgrade";
+                    }
+                  }
+                }
+
+                Group { Anchor: (Width: 8); }
+
+                Group #GourmandCard {
+                  LayoutMode: Left;
+                  FlexWeight: 1;
+                  Background: (TexturePath: "../Common/ability_bg.png", Border: 48);
+                  Padding: (Left: 26, Right: 24, Bottom: 10, Top: 14);
+
+                  Group {
+                    LayoutMode: Top;
+                    FlexWeight: 1;
+
+                    Label #GourmandName {
+                      Style: @AbilityNameStyle;
+                      Text: "Gourmand";
+                      Anchor: (Bottom: 2, Left: 8);
+                    }
+
+                    Label #GourmandLevel {
+                      Style: (...$C.@DefaultLabelStyle, TextColor: #9fb3c8);
+                      Text: "Level 0/3 (+0%)";
+                      Anchor: (Bottom: 4);
+                    }
+
+                    Label #GourmandDescription {
+                      Style: @AbilityDescriptionStyle;
+                      Text: "Increase food stat gains: 10%, 20%, 30%.";
+                    }
+                  }
+
+                  Group {
+                    Anchor: (Width: 80);
+                    LayoutMode: Top;
+
+                    Group #GourmandIcon {
+                      Anchor: (Width: 48, Height: 48, Bottom: 4);
+                      Background: (TexturePath: "../Common/gourmand_icon.png");
+                    }
+
+                    Group { FlexWeight: 1; }
+
+                    $C.@SmallSecondaryTextButton #GourmandUpgrade {
+                      Anchor: (Width: 75, Height: 26, Right: 10, Bottom: 6);
                       Text: "Upgrade";
                     }
                   }

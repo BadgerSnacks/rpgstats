@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.4.0
+
+### Added
+- Flame Touch ability with 3 ranks that adds bonus fire damage and applies Burn on hit (+2/+4/+6).
+- Configurable `flame_touch_damage_per_level` in config.toml.
+- Gourmand ability with 3 ranks that increases stat gains from consumable items (+10%/+20%/+30%).
+- Configurable `gourmand_food_bonus_per_level_pct` in config.toml.
+
+### Changed
+- `config_version` bumped to 9.
+- Component version bumped to 18 for Gourmand support.
+
 ## 0.3.0
 
 ### Added

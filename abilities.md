@@ -238,7 +238,7 @@ This document contains ability specifications for implementation. Each entry inc
 **Notes:** Uses BreakBlockEvent to detect ore mining. Currently notifies player of bonus ore - actual item dropping pending ItemComponent.generateItemDrops() integration.
 
 ### Flame Touch
-**Status:** TODO
+**Status:** Implemented
 **Effect Type:** On-Hit Effect + Damage Modifier
 **Description:** Your weapon attacks deal bonus fire damage
 **Max Ranks:** 3
@@ -251,7 +251,7 @@ This document contains ability specifications for implementation. Each entry inc
 **Upgrade Cost:** 1 / 2 / 3
 **Config Keys:**
 - `flame_touch_damage_per_level` (default 2.0)
-**Notes:** Needs to hook into damage events and apply fire damage type. May also apply burning status effect at higher ranks.
+**Notes:** Uses DamageEventSystem to apply a Fire damage cause bonus on hit (configurable) and applies the Burn effect for visible feedback.
 
 ### Night Owl
 **Status:** TODO
@@ -302,20 +302,20 @@ This document contains ability specifications for implementation. Each entry inc
 **Notes:** Needs to modify item entity pickup radius. May need to hook into item collection events or modify player pickup hitbox.
 
 ### Gourmand
-**Status:** TODO
+**Status:** Implemented
 **Effect Type:** Stat Modifier (food effects)
 **Description:** Food provides enhanced benefits
 **Max Ranks:** 3
 **Scaling per Rank:**
-- Rank 1: +25% food effect strength/duration
-- Rank 2: +50% food effect strength/duration
-- Rank 3: +100% food effect strength/duration
-**Activation:** On Event (when consuming food)
-**Requirements:** None
+- Rank 1: +10% stat gains from consumables
+- Rank 2: +20% stat gains from consumables
+- Rank 3: +30% stat gains from consumables
+**Activation:** On Event (when consuming consumable items)
+**Requirements:** Item must be marked consumable
 **Upgrade Cost:** 1 / 2 / 3
 **Config Keys:**
-- `gourmand_effect_per_level_pct` (default 25.0)
-**Notes:** Needs to hook into food consumption events. Could affect hunger restoration, buff duration, or both.
+- `gourmand_food_bonus_per_level_pct` (default 10.0)
+**Notes:** Tracks InteractionType.Use chains for consumables and applies a bonus based on the observed stat gains.
 
 ### Fire Resistance
 **Status:** TODO

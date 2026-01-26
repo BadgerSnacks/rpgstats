@@ -11,7 +11,7 @@ import java.util.Arrays;
 public final class RpgStats implements Component<EntityStore> {
 
     public static final String COMPONENT_ID = "rpgstats";
-    public static final int CURRENT_VERSION = 16;
+    public static final int CURRENT_VERSION = 18;
     public static final int DEFAULT_MAX_LEVEL = 25;
     public static final int BASE_XP = 100;
     public static final int LINEAR_XP = 50;
@@ -30,6 +30,8 @@ public final class RpgStats implements Component<EntityStore> {
     public static final int THORNS_MAX_LEVEL = 3;
     public static final int TOOL_PROFICIENCY_MAX_LEVEL = 3;
     public static final int LUCKY_MINER_MAX_LEVEL = 3;
+    public static final int FLAME_TOUCH_MAX_LEVEL = 3;
+    public static final int GOURMAND_MAX_LEVEL = 3;
 
     public static final BuilderCodec<RpgStats> CODEC =
             BuilderCodec.builder(RpgStats.class, RpgStats::new)
@@ -63,6 +65,10 @@ public final class RpgStats implements Component<EntityStore> {
                             (d, v) -> d.toolProficiencyLevel = v, d -> d.toolProficiencyLevel).add()
                     .append(new KeyedCodec<>("LuckyMinerLevel", Codec.INTEGER),
                             (d, v) -> d.luckyMinerLevel = v, d -> d.luckyMinerLevel).add()
+                    .append(new KeyedCodec<>("FlameTouchLevel", Codec.INTEGER),
+                            (d, v) -> d.flameTouchLevel = v, d -> d.flameTouchLevel).add()
+                    .append(new KeyedCodec<>("GourmandLevel", Codec.INTEGER),
+                            (d, v) -> d.gourmandLevel = v, d -> d.gourmandLevel).add()
 
                     .append(new KeyedCodec<>("Str", Codec.INTEGER), (d, v) -> d.str = v, d -> d.str).add()
                     .append(new KeyedCodec<>("Dex", Codec.INTEGER), (d, v) -> d.dex = v, d -> d.dex).add()
@@ -96,6 +102,8 @@ public final class RpgStats implements Component<EntityStore> {
     private int thornsLevel = 0;
     private int toolProficiencyLevel = 0;
     private int luckyMinerLevel = 0;
+    private int flameTouchLevel = 0;
+    private int gourmandLevel = 0;
     private boolean syncingLevel = false;
 
     private int str = BASE_STAT, dex = BASE_STAT, con = BASE_STAT, intl = BASE_STAT, end = BASE_STAT, cha = BASE_STAT;
@@ -167,6 +175,14 @@ public final class RpgStats implements Component<EntityStore> {
             luckyMinerLevel = 0;
             version = 16;
         }
+        if (version < 17) {
+            flameTouchLevel = 0;
+            version = 17;
+        }
+        if (version < 18) {
+            gourmandLevel = 0;
+            version = 18;
+        }
     }
 
     public int modifier(int score) {
@@ -191,6 +207,8 @@ public final class RpgStats implements Component<EntityStore> {
         thornsLevel = 0;
         toolProficiencyLevel = 0;
         luckyMinerLevel = 0;
+        flameTouchLevel = 0;
+        gourmandLevel = 0;
         str = BASE_STAT;
         dex = BASE_STAT;
         con = BASE_STAT;
@@ -235,6 +253,8 @@ public final class RpgStats implements Component<EntityStore> {
         thornsLevel = 0;
         toolProficiencyLevel = 0;
         luckyMinerLevel = 0;
+        flameTouchLevel = 0;
+        gourmandLevel = 0;
         return refunded;
     }
 
@@ -509,6 +529,42 @@ public final class RpgStats implements Component<EntityStore> {
         return true;
     }
 
+    public int getFlameTouchLevel() {
+        syncLevelToXp();
+        return flameTouchLevel;
+    }
+
+    public boolean upgradeFlameTouch() {
+        syncLevelToXp();
+        if (flameTouchLevel >= FLAME_TOUCH_MAX_LEVEL) {
+            return false;
+        }
+        int cost = getAbilityUpgradeCost(flameTouchLevel, FLAME_TOUCH_MAX_LEVEL);
+        if (getAvailableAbilityPoints() < cost) {
+            return false;
+        }
+        flameTouchLevel++;
+        return true;
+    }
+
+    public int getGourmandLevel() {
+        syncLevelToXp();
+        return gourmandLevel;
+    }
+
+    public boolean upgradeGourmand() {
+        syncLevelToXp();
+        if (gourmandLevel >= GOURMAND_MAX_LEVEL) {
+            return false;
+        }
+        int cost = getAbilityUpgradeCost(gourmandLevel, GOURMAND_MAX_LEVEL);
+        if (getAvailableAbilityPoints() < cost) {
+            return false;
+        }
+        gourmandLevel++;
+        return true;
+    }
+
     public boolean spendStatPoint(String attributeRaw) {
         if (getAvailableStatPoints() <= 0) {
             return false;
@@ -542,6 +598,8 @@ public final class RpgStats implements Component<EntityStore> {
         copy.thornsLevel = this.thornsLevel;
         copy.toolProficiencyLevel = this.toolProficiencyLevel;
         copy.luckyMinerLevel = this.luckyMinerLevel;
+        copy.flameTouchLevel = this.flameTouchLevel;
+        copy.gourmandLevel = this.gourmandLevel;
         copy.str = this.str;
         copy.dex = this.dex;
         copy.con = this.con;
@@ -643,6 +701,12 @@ public final class RpgStats implements Component<EntityStore> {
         if (luckyMinerLevel > 0) {
             spent += totalCostForLevels(luckyMinerLevel);
         }
+        if (flameTouchLevel > 0) {
+            spent += totalCostForLevels(flameTouchLevel);
+        }
+        if (gourmandLevel > 0) {
+            spent += totalCostForLevels(gourmandLevel);
+        }
         return Math.max(0, spent);
     }
 
@@ -686,6 +750,8 @@ public final class RpgStats implements Component<EntityStore> {
         thornsLevel = clamp(thornsLevel, 0, THORNS_MAX_LEVEL);
         toolProficiencyLevel = clamp(toolProficiencyLevel, 0, TOOL_PROFICIENCY_MAX_LEVEL);
         luckyMinerLevel = clamp(luckyMinerLevel, 0, LUCKY_MINER_MAX_LEVEL);
+        flameTouchLevel = clamp(flameTouchLevel, 0, FLAME_TOUCH_MAX_LEVEL);
+        gourmandLevel = clamp(gourmandLevel, 0, GOURMAND_MAX_LEVEL);
 
         if (getAbilityPointsSpent() > maxAllowed) {
             trimAbilityLevelsToPoints(maxAllowed);
@@ -738,10 +804,20 @@ public final class RpgStats implements Component<EntityStore> {
             thornsLevel = 0;
             toolProficiencyLevel = 0;
             luckyMinerLevel = 0;
+            flameTouchLevel = 0;
+            gourmandLevel = 0;
             return;
         }
-        int guard = LIGHT_FOOT_MAX_LEVEL + ARMOR_PROFICIENCY_MAX_LEVEL + HEALTH_REGEN_MAX_LEVEL + STAMINA_REGEN_MAX_LEVEL + GLANCING_BLOW_MAX_LEVEL + STRONG_LUNGS_MAX_LEVEL + LUCKY_SHOT_MAX_LEVEL + CRITICAL_STRIKE_MAX_LEVEL + LIFESTEAL_MAX_LEVEL + THORNS_MAX_LEVEL + TOOL_PROFICIENCY_MAX_LEVEL + LUCKY_MINER_MAX_LEVEL + 2;
+        int guard = LIGHT_FOOT_MAX_LEVEL + ARMOR_PROFICIENCY_MAX_LEVEL + HEALTH_REGEN_MAX_LEVEL + STAMINA_REGEN_MAX_LEVEL + GLANCING_BLOW_MAX_LEVEL + STRONG_LUNGS_MAX_LEVEL + LUCKY_SHOT_MAX_LEVEL + CRITICAL_STRIKE_MAX_LEVEL + LIFESTEAL_MAX_LEVEL + THORNS_MAX_LEVEL + TOOL_PROFICIENCY_MAX_LEVEL + LUCKY_MINER_MAX_LEVEL + FLAME_TOUCH_MAX_LEVEL + GOURMAND_MAX_LEVEL + 2;
         while (getAbilityPointsSpent() > maxAllowed && guard-- > 0) {
+            if (gourmandLevel > 0) {
+                gourmandLevel--;
+                continue;
+            }
+            if (flameTouchLevel > 0) {
+                flameTouchLevel--;
+                continue;
+            }
             if (luckyMinerLevel > 0) {
                 luckyMinerLevel--;
                 continue;

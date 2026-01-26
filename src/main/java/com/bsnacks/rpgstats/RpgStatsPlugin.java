@@ -20,6 +20,8 @@ import com.bsnacks.rpgstats.systems.GlancingBlowSystem;
 import com.bsnacks.rpgstats.systems.LuckyShotSystem;
 import com.bsnacks.rpgstats.systems.CriticalStrikeSystem;
 import com.bsnacks.rpgstats.systems.LifestealSystem;
+import com.bsnacks.rpgstats.systems.FlameTouchSystem;
+import com.bsnacks.rpgstats.systems.GourmandSystem;
 import com.bsnacks.rpgstats.systems.ThornsSystem;
 import com.bsnacks.rpgstats.systems.ToolProficiencySystem;
 import com.bsnacks.rpgstats.systems.LuckyMinerSystem;
@@ -77,6 +79,8 @@ public final class RpgStatsPlugin extends JavaPlugin {
         getEntityStoreRegistry().registerSystem(new AbilityRegenSystem(rpgStatsType, config));
         getEntityStoreRegistry().registerSystem(new CriticalStrikeSystem(rpgStatsType, config));
         getEntityStoreRegistry().registerSystem(new LifestealSystem(rpgStatsType, config));
+        getEntityStoreRegistry().registerSystem(new FlameTouchSystem(rpgStatsType, config, this));
+        getEntityStoreRegistry().registerSystem(new GourmandSystem(rpgStatsType, config, this));
         getEntityStoreRegistry().registerSystem(new ThornsSystem(rpgStatsType, config));
         getEntityStoreRegistry().registerSystem(new ToolProficiencySystem(rpgStatsType, config, this));
         getEntityStoreRegistry().registerSystem(new LuckyMinerSystem(rpgStatsType, config, this));
@@ -105,6 +109,8 @@ public final class RpgStatsPlugin extends JavaPlugin {
                 + " stamina_regen_per_level_per_sec=" + config.getStaminaRegenPerLevelPerSec()
                 + " glancing_blow_chance_per_level_pct=" + config.getGlancingBlowChancePerLevelPct()
                 + " lucky_shot_chance_per_level_pct=" + config.getLuckyShotChancePerLevelPct()
+                + " flame_touch_damage_per_level=" + config.getFlameTouchDamagePerLevel()
+                + " gourmand_food_bonus_per_level_pct=" + config.getGourmandFoodBonusPerLevelPct()
                 + " ability_rank_costs=" + config.getAbilityRank1Cost() + "/" + config.getAbilityRank2Cost() + "/" + config.getAbilityRank3Cost()
                 + " hud_enabled=" + config.isHudEnabled()
                 + " xp_blacklist_npc_types=" + config.getXpBlacklistNpcTypes().size()

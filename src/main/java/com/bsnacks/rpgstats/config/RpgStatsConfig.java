@@ -22,7 +22,7 @@ public final class RpgStatsConfig {
     private static final DateTimeFormatter BACKUP_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss");
     private static final String FILE_NAME = "config.toml";
     private static final String XP_BLACKLIST_FILE_NAME = "xp_blacklist.toml";
-    private static final int CURRENT_CONFIG_VERSION = 7;
+    private static final int CURRENT_CONFIG_VERSION = 9;
     private static final double DEFAULT_XP_MULTIPLIER = 0.35;
     private static final int DEFAULT_MAX_LEVEL = 25;
     private static final int DEFAULT_ABILITY_POINTS_PER_LEVEL = 2;
@@ -50,6 +50,8 @@ public final class RpgStatsConfig {
     private static final double DEFAULT_THORNS_REFLECT_PER_LEVEL_PCT = 25.0;
     private static final double DEFAULT_TOOL_PROFICIENCY_CHANCE_PER_LEVEL_PCT = 15.0;
     private static final double DEFAULT_LUCKY_MINER_CHANCE_PER_LEVEL_PCT = 10.0;
+    private static final double DEFAULT_FLAME_TOUCH_DAMAGE_PER_LEVEL = 2.0;
+    private static final double DEFAULT_GOURMAND_FOOD_BONUS_PER_LEVEL_PCT = 10.0;
     private static final double DEFAULT_DAMAGE_MULTIPLIER_BASE = 10.0;
     private static final double DEFAULT_MINING_SPEED_BASE = 1.0;
     private static final double DEFAULT_MINING_SPEED_PER_POINT = 0.10;
@@ -91,6 +93,8 @@ public final class RpgStatsConfig {
     private double thornsReflectPerLevelPct;
     private double toolProficiencyChancePerLevelPct;
     private double luckyMinerChancePerLevelPct;
+    private double flameTouchDamagePerLevel;
+    private double gourmandFoodBonusPerLevelPct;
     private int abilityRank1Cost;
     private int abilityRank2Cost;
     private int abilityRank3Cost;
@@ -109,7 +113,8 @@ public final class RpgStatsConfig {
                            double criticalStrikeChancePerLevelPct, double criticalStrikeBaseChancePct,
                            double criticalStrikeDamageMultiplier, double lifestealPerLevelPct,
                            double thornsReflectPerLevelPct, double toolProficiencyChancePerLevelPct,
-                           double luckyMinerChancePerLevelPct,
+                           double luckyMinerChancePerLevelPct, double flameTouchDamagePerLevel,
+                           double gourmandFoodBonusPerLevelPct,
                            int abilityRank1Cost, int abilityRank2Cost, int abilityRank3Cost) {
         this.configVersion = configVersion;
         this.xpMultiplier = xpMultiplier;
@@ -144,6 +149,8 @@ public final class RpgStatsConfig {
         this.thornsReflectPerLevelPct = thornsReflectPerLevelPct;
         this.toolProficiencyChancePerLevelPct = toolProficiencyChancePerLevelPct;
         this.luckyMinerChancePerLevelPct = luckyMinerChancePerLevelPct;
+        this.flameTouchDamagePerLevel = flameTouchDamagePerLevel;
+        this.gourmandFoodBonusPerLevelPct = gourmandFoodBonusPerLevelPct;
         this.abilityRank1Cost = abilityRank1Cost;
         this.abilityRank2Cost = abilityRank2Cost;
         this.abilityRank3Cost = abilityRank3Cost;
@@ -215,6 +222,14 @@ public final class RpgStatsConfig {
 
     public double getLuckyMinerChancePerLevelPct() {
         return luckyMinerChancePerLevelPct;
+    }
+
+    public double getFlameTouchDamagePerLevel() {
+        return flameTouchDamagePerLevel;
+    }
+
+    public double getGourmandFoodBonusPerLevelPct() {
+        return gourmandFoodBonusPerLevelPct;
     }
 
     public int getAbilityRank1Cost() {
@@ -336,6 +351,8 @@ public final class RpgStatsConfig {
         this.thornsReflectPerLevelPct = other.thornsReflectPerLevelPct;
         this.toolProficiencyChancePerLevelPct = other.toolProficiencyChancePerLevelPct;
         this.luckyMinerChancePerLevelPct = other.luckyMinerChancePerLevelPct;
+        this.flameTouchDamagePerLevel = other.flameTouchDamagePerLevel;
+        this.gourmandFoodBonusPerLevelPct = other.gourmandFoodBonusPerLevelPct;
         this.abilityRank1Cost = other.abilityRank1Cost;
         this.abilityRank2Cost = other.abilityRank2Cost;
         this.abilityRank3Cost = other.abilityRank3Cost;
@@ -395,6 +412,8 @@ public final class RpgStatsConfig {
                     DEFAULT_THORNS_REFLECT_PER_LEVEL_PCT,
                     DEFAULT_TOOL_PROFICIENCY_CHANCE_PER_LEVEL_PCT,
                     DEFAULT_LUCKY_MINER_CHANCE_PER_LEVEL_PCT,
+                    DEFAULT_FLAME_TOUCH_DAMAGE_PER_LEVEL,
+                    DEFAULT_GOURMAND_FOOD_BONUS_PER_LEVEL_PCT,
                     DEFAULT_ABILITY_RANK1_COST,
                     DEFAULT_ABILITY_RANK2_COST,
                     DEFAULT_ABILITY_RANK3_COST
@@ -508,6 +527,18 @@ public final class RpgStatsConfig {
         luckyMinerChancePerLevelPct = clampAbilityPct(luckyMinerChancePerLevelPct, logger,
                 "lucky_miner_chance_per_level_pct", DEFAULT_LUCKY_MINER_CHANCE_PER_LEVEL_PCT);
 
+        double flameTouchDamagePerLevel = parseDouble(values.get("flame_touch_damage_per_level"),
+                DEFAULT_FLAME_TOUCH_DAMAGE_PER_LEVEL, logger, "flame_touch_damage_per_level");
+        if (flameTouchDamagePerLevel < 0.0) {
+            logger.at(Level.WARNING).log("[RPGStats] flame_touch_damage_per_level must be >= 0. Using default " + DEFAULT_FLAME_TOUCH_DAMAGE_PER_LEVEL);
+            flameTouchDamagePerLevel = DEFAULT_FLAME_TOUCH_DAMAGE_PER_LEVEL;
+        }
+
+        double gourmandFoodBonusPerLevelPct = parseDouble(values.get("gourmand_food_bonus_per_level_pct"),
+                DEFAULT_GOURMAND_FOOD_BONUS_PER_LEVEL_PCT, logger, "gourmand_food_bonus_per_level_pct");
+        gourmandFoodBonusPerLevelPct = clampAbilityPct(gourmandFoodBonusPerLevelPct, logger,
+                "gourmand_food_bonus_per_level_pct", DEFAULT_GOURMAND_FOOD_BONUS_PER_LEVEL_PCT);
+
         int abilityRank1Cost = parseInt(values.get("ability_rank1_cost"),
                 DEFAULT_ABILITY_RANK1_COST, logger, "ability_rank1_cost");
         if (abilityRank1Cost < MIN_ABILITY_RANK_COST) {
@@ -592,7 +623,7 @@ public final class RpgStatsConfig {
                 strongLungsOxygenPerLevelPct, luckyShotChancePerLevelPct,
                 criticalStrikeChancePerLevelPct, criticalStrikeBaseChancePct, criticalStrikeDamageMultiplier,
                 lifestealPerLevelPct, thornsReflectPerLevelPct, toolProficiencyChancePerLevelPct,
-                luckyMinerChancePerLevelPct,
+                luckyMinerChancePerLevelPct, flameTouchDamagePerLevel, gourmandFoodBonusPerLevelPct,
                 abilityRank1Cost, abilityRank2Cost, abilityRank3Cost);
     }
 
@@ -874,6 +905,15 @@ public final class RpgStatsConfig {
                 + "# Chance to receive bonus ore when mining ore blocks. 10%/20%/30% at levels 1-3.\n"
                 + "# Valid range: " + MIN_ABILITY_BONUS_PCT + " to " + MAX_ABILITY_BONUS_PCT + ".\n"
                 + "lucky_miner_chance_per_level_pct = " + DEFAULT_LUCKY_MINER_CHANCE_PER_LEVEL_PCT + "\n"
+                + "\n"
+                + "# Flame Touch bonus fire damage per level (default " + DEFAULT_FLAME_TOUCH_DAMAGE_PER_LEVEL + ").\n"
+                + "# Adds flat fire damage on hit. 2/4/6 at levels 1-3.\n"
+                + "flame_touch_damage_per_level = " + DEFAULT_FLAME_TOUCH_DAMAGE_PER_LEVEL + "\n"
+                + "\n"
+                + "# Gourmand bonus to food stat gains per level, in percent (default " + DEFAULT_GOURMAND_FOOD_BONUS_PER_LEVEL_PCT + ").\n"
+                + "# Increases positive stat changes from consumable items. 10%/20%/30% at levels 1-3.\n"
+                + "# Valid range: " + MIN_ABILITY_BONUS_PCT + " to " + MAX_ABILITY_BONUS_PCT + ".\n"
+                + "gourmand_food_bonus_per_level_pct = " + DEFAULT_GOURMAND_FOOD_BONUS_PER_LEVEL_PCT + "\n"
                 + "\n"
                 + "# Strength damage multiplier: damage *= (STR / damage_multiplier_base) (default " + DEFAULT_DAMAGE_MULTIPLIER_BASE + ").\n"
                 + "# Lower number = more damage. Each point spent into (STR) will add 0.10 to the multiplier.\n"

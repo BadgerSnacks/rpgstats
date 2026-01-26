@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.5.0
+
+### Added
+- Mining XP config file `mining_xp.toml` with wildcard support for ore variants.
+- Mining XP debug logging to trace block/tool matching and awarded XP.
+- HUD refresh on player load to show current XP immediately (GUI fix).
+
+### Changed
+
 ## 0.4.0
 
 ### Added
@@ -7,6 +16,8 @@
 - Configurable `flame_touch_damage_per_level` in config.toml.
 - Gourmand ability with 3 ranks that increases stat gains from consumable items (+10%/+20%/+30%).
 - Configurable `gourmand_food_bonus_per_level_pct` in config.toml.
+- Tool-gated mining XP system with configurable block rewards in `mining_xp.toml`.
+- Mining XP wildcards like `Ore_Iron_*` to match all ore variants and auto-normalization for old item-style IDs.
 
 ### Changed
 - `config_version` bumped to 9.

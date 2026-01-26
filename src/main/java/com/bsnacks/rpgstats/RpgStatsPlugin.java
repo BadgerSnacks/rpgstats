@@ -25,6 +25,8 @@ import com.bsnacks.rpgstats.systems.GourmandSystem;
 import com.bsnacks.rpgstats.systems.ThornsSystem;
 import com.bsnacks.rpgstats.systems.ToolProficiencySystem;
 import com.bsnacks.rpgstats.systems.LuckyMinerSystem;
+import com.bsnacks.rpgstats.systems.MiningExperienceSystem;
+import com.bsnacks.rpgstats.systems.HudRefreshSystem;
 
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.Ref;
@@ -49,6 +51,7 @@ public final class RpgStatsPlugin extends JavaPlugin {
     private RpgStatsFileLogger fileLogger;
     private RpgStatsConfig config;
     private Path configPath;
+    private HudRefreshSystem hudRefreshSystem;
 
     public RpgStatsPlugin(@Nonnull JavaPluginInit init) {
         super(init);
@@ -84,6 +87,9 @@ public final class RpgStatsPlugin extends JavaPlugin {
         getEntityStoreRegistry().registerSystem(new ThornsSystem(rpgStatsType, config));
         getEntityStoreRegistry().registerSystem(new ToolProficiencySystem(rpgStatsType, config, this));
         getEntityStoreRegistry().registerSystem(new LuckyMinerSystem(rpgStatsType, config, this));
+        getEntityStoreRegistry().registerSystem(new MiningExperienceSystem(rpgStatsType, config, this));
+        hudRefreshSystem = new HudRefreshSystem(rpgStatsType, this);
+        getEntityStoreRegistry().registerSystem(hudRefreshSystem);
 
         // Lucky Shot utility - ability tracking works, effect trigger needs proper Hytale API hook
         // The tryLuckyShot() method is ready to be called when the correct event is identified
@@ -114,7 +120,8 @@ public final class RpgStatsPlugin extends JavaPlugin {
                 + " ability_rank_costs=" + config.getAbilityRank1Cost() + "/" + config.getAbilityRank2Cost() + "/" + config.getAbilityRank3Cost()
                 + " hud_enabled=" + config.isHudEnabled()
                 + " xp_blacklist_npc_types=" + config.getXpBlacklistNpcTypes().size()
-                + " xp_blacklist_roles=" + config.getXpBlacklistRoles().size());
+                + " xp_blacklist_roles=" + config.getXpBlacklistRoles().size()
+                + " mining_xp_entries=" + config.getMiningXpEntryCount());
         logDebug("XP blacklist loaded: npc_types=" + config.getXpBlacklistNpcTypes().size()
                 + " roles=" + config.getXpBlacklistRoles().size());
         if (rpgStatsType != null) {
@@ -184,6 +191,12 @@ public final class RpgStatsPlugin extends JavaPlugin {
     public void logDebug(String msg) {
         if (fileLogger != null) {
             fileLogger.log(msg);
+        }
+    }
+
+    public void scheduleHudRefresh(Player player, String reason) {
+        if (hudRefreshSystem != null && player != null) {
+            hudRefreshSystem.schedule(player, reason);
         }
     }
 

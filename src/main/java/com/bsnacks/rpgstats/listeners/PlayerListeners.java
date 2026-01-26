@@ -51,10 +51,11 @@ public final class PlayerListeners {
 
         plugin.logInfo((created ? "Created" : "Loaded") + " stats for player: "
                 + player.getDisplayName() + " | Level=" + stats.getLevel() + " XP=" + stats.getXp());
-        initializeHud(player);
+        initializeHud(player, stats);
+        plugin.scheduleHudRefresh(player, "player_ready");
     }
 
-    private void initializeHud(Player player) {
+    private void initializeHud(Player player, RpgStats stats) {
         if (player == null) {
             return;
         }
@@ -75,6 +76,9 @@ public final class PlayerListeners {
             }
             HudHelper.setCustomHud(player, playerRef, new RpgStatsHud(playerRef, rpgStatsType));
             plugin.logDebug("RPG stats HUD enabled for player: " + player.getDisplayName());
+        }
+        if (stats != null) {
+            RpgStatsHud.refreshIfActive(player, stats);
         }
         Ref<EntityStore> ref = playerRef.getReference();
         if (ref == null || !ref.isValid()) {

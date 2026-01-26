@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +23,7 @@ public final class RpgStatsConfig {
     private static final DateTimeFormatter BACKUP_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss");
     private static final String FILE_NAME = "config.toml";
     private static final String XP_BLACKLIST_FILE_NAME = "xp_blacklist.toml";
+    private static final String MINING_XP_FILE_NAME = "mining_xp.toml";
     private static final int CURRENT_CONFIG_VERSION = 9;
     private static final double DEFAULT_XP_MULTIPLIER = 0.35;
     private static final int DEFAULT_MAX_LEVEL = 25;
@@ -84,6 +86,7 @@ public final class RpgStatsConfig {
     private int chaCap;
     private Set<String> xpBlacklistNpcTypes;
     private Set<String> xpBlacklistRoles;
+    private Map<String, Integer> miningXpByBlockId;
     private double strongLungsOxygenPerLevelPct;
     private double luckyShotChancePerLevelPct;
     private double criticalStrikeChancePerLevelPct;
@@ -109,6 +112,7 @@ public final class RpgStatsConfig {
                            boolean hudEnabled,
                            int strCap, int dexCap, int conCap, int intCap, int endCap, int chaCap,
                            Set<String> xpBlacklistNpcTypes, Set<String> xpBlacklistRoles,
+                           Map<String, Integer> miningXpByBlockId,
                            double strongLungsOxygenPerLevelPct, double luckyShotChancePerLevelPct,
                            double criticalStrikeChancePerLevelPct, double criticalStrikeBaseChancePct,
                            double criticalStrikeDamageMultiplier, double lifestealPerLevelPct,
@@ -140,6 +144,7 @@ public final class RpgStatsConfig {
         this.chaCap = chaCap;
         this.xpBlacklistNpcTypes = xpBlacklistNpcTypes;
         this.xpBlacklistRoles = xpBlacklistRoles;
+        this.miningXpByBlockId = miningXpByBlockId;
         this.strongLungsOxygenPerLevelPct = strongLungsOxygenPerLevelPct;
         this.luckyShotChancePerLevelPct = luckyShotChancePerLevelPct;
         this.criticalStrikeChancePerLevelPct = criticalStrikeChancePerLevelPct;
@@ -302,6 +307,31 @@ public final class RpgStatsConfig {
         return xpBlacklistRoles;
     }
 
+    public int getMiningXpForBlock(String blockId) {
+        if (blockId == null || miningXpByBlockId == null || miningXpByBlockId.isEmpty()) {
+            return 0;
+        }
+        String key = blockId.toLowerCase();
+        Integer xp = miningXpByBlockId.get(key);
+        if (xp != null) {
+            return xp;
+        }
+        for (Map.Entry<String, Integer> entry : miningXpByBlockId.entrySet()) {
+            String configured = entry.getKey();
+            if (configured.endsWith("*")) {
+                String prefix = configured.substring(0, configured.length() - 1);
+                if (!prefix.isEmpty() && key.startsWith(prefix)) {
+                    return entry.getValue();
+                }
+            }
+        }
+        return xp == null ? 0 : xp;
+    }
+
+    public int getMiningXpEntryCount() {
+        return miningXpByBlockId == null ? 0 : miningXpByBlockId.size();
+    }
+
     public boolean isXpBlacklisted(String npcTypeId, String roleName) {
         if (npcTypeId != null && xpBlacklistNpcTypes != null
                 && xpBlacklistNpcTypes.contains(npcTypeId.toLowerCase())) {
@@ -344,6 +374,7 @@ public final class RpgStatsConfig {
         this.chaCap = other.chaCap;
         this.xpBlacklistNpcTypes = other.xpBlacklistNpcTypes;
         this.xpBlacklistRoles = other.xpBlacklistRoles;
+        this.miningXpByBlockId = other.miningXpByBlockId;
         this.criticalStrikeChancePerLevelPct = other.criticalStrikeChancePerLevelPct;
         this.criticalStrikeBaseChancePct = other.criticalStrikeBaseChancePct;
         this.criticalStrikeDamageMultiplier = other.criticalStrikeDamageMultiplier;
@@ -366,6 +397,10 @@ public final class RpgStatsConfig {
         return dataDirectory.resolve(XP_BLACKLIST_FILE_NAME);
     }
 
+    public static Path resolveMiningXpPath(Path dataDirectory) {
+        return dataDirectory.resolve(MINING_XP_FILE_NAME);
+    }
+
     public static RpgStatsConfig load(Path dataDirectory, HytaleLogger logger) {
         try {
             Files.createDirectories(dataDirectory);
@@ -374,6 +409,7 @@ public final class RpgStatsConfig {
         }
 
         XpBlacklist xpBlacklist = readXpBlacklist(dataDirectory, logger);
+        MiningXp miningXp = readMiningXp(dataDirectory, logger);
 
         Path configPath = resolveConfigPath(dataDirectory);
         if (!Files.exists(configPath)) {
@@ -403,6 +439,7 @@ public final class RpgStatsConfig {
                     DEFAULT_STAT_CAP,
                     xpBlacklist.npcTypes,
                     xpBlacklist.roles,
+                    miningXp.blockXp,
                     DEFAULT_STRONG_LUNGS_OXYGEN_PER_LEVEL_PCT,
                     DEFAULT_LUCKY_SHOT_CHANCE_PER_LEVEL_PCT,
                     DEFAULT_CRITICAL_STRIKE_CHANCE_PER_LEVEL_PCT,
@@ -619,7 +656,7 @@ public final class RpgStatsConfig {
                 damageBase, miningBase, miningPerPoint, healthPerPoint, manaPerPoint, staminaPerPoint,
                 hudEnabled,
                 strCap, dexCap, conCap, intCap, endCap, chaCap,
-                xpBlacklistNpcTypes, xpBlacklistRoles,
+                xpBlacklistNpcTypes, xpBlacklistRoles, miningXp.blockXp,
                 strongLungsOxygenPerLevelPct, luckyShotChancePerLevelPct,
                 criticalStrikeChancePerLevelPct, criticalStrikeBaseChancePct, criticalStrikeDamageMultiplier,
                 lifestealPerLevelPct, thornsReflectPerLevelPct, toolProficiencyChancePerLevelPct,
@@ -690,6 +727,20 @@ public final class RpgStatsConfig {
         Set<String> npcTypes = parseStringSet(values.get("npc_types"));
         Set<String> roles = parseStringSet(values.get("roles"));
         return new XpBlacklist(npcTypes, roles);
+    }
+
+    private static MiningXp readMiningXp(Path dataDirectory, HytaleLogger logger) {
+        Path miningXpPath = resolveMiningXpPath(dataDirectory);
+        if (!Files.exists(miningXpPath)) {
+            writeDefaultMiningXp(miningXpPath, logger);
+            if (!Files.exists(miningXpPath)) {
+                return new MiningXp(Collections.emptyMap());
+            }
+        }
+        Map<String, String> values = readKeyValues(miningXpPath, logger);
+        Set<String> blockEntries = parseStringSet(values.get("block_xp"));
+        Map<String, Integer> blockXp = parseMiningXpEntries(blockEntries, logger);
+        return new MiningXp(blockXp);
     }
 
     private static double parseDouble(String raw, double fallback, HytaleLogger logger, String key) {
@@ -795,6 +846,60 @@ public final class RpgStatsConfig {
             return Collections.emptySet();
         }
         return Collections.unmodifiableSet(values);
+    }
+
+    private static Map<String, Integer> parseMiningXpEntries(Set<String> entries, HytaleLogger logger) {
+        if (entries == null || entries.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        LinkedHashMap<String, Integer> results = new LinkedHashMap<>();
+        for (String entry : entries) {
+            if (entry == null) {
+                continue;
+            }
+            String trimmed = entry.trim();
+            if (trimmed.isEmpty()) {
+                continue;
+            }
+            int separator = trimmed.indexOf('=');
+            if (separator < 0) {
+                separator = trimmed.indexOf(':');
+            }
+            if (separator <= 0 || separator >= trimmed.length() - 1) {
+                logger.at(Level.WARNING).log("[RPGStats] Invalid mining XP entry '" + entry
+                        + "'. Expected format: \"block_id=XP\".");
+                continue;
+            }
+            String blockId = trimmed.substring(0, separator).trim().toLowerCase();
+            String xpRaw = trimmed.substring(separator + 1).trim();
+            int xp = parseInt(xpRaw, -1, logger, "mining_xp");
+            if (xp <= 0) {
+                logger.at(Level.WARNING).log("[RPGStats] mining_xp entry '" + entry + "' must be > 0.");
+                continue;
+            }
+            if (blockId.contains("/") && blockId.endsWith("_ore")) {
+                int slash = blockId.lastIndexOf('/');
+                String oreName = slash >= 0 ? blockId.substring(slash + 1, blockId.length() - 4) : "";
+                if (!oreName.isBlank()) {
+                    String normalized = "ore_" + oreName + "_*";
+                    logger.at(Level.WARNING).log("[RPGStats] mining_xp entry '" + entry
+                            + "' looks like an item ID. Using '" + normalized + "' to match ore blocks.");
+                    blockId = normalized;
+                }
+            } else if (blockId.contains(":") || blockId.contains("/")) {
+                logger.at(Level.WARNING).log("[RPGStats] mining_xp entry '" + entry
+                        + "' looks like an item ID. Use block IDs like Ore_Iron_Stone or wildcard Ore_Iron_*.");
+            }
+            if (results.containsKey(blockId)) {
+                logger.at(Level.WARNING).log("[RPGStats] Duplicate mining_xp entry for '" + blockId
+                        + "'. Using last value.");
+            }
+            results.put(blockId, xp);
+        }
+        if (results.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        return Collections.unmodifiableMap(results);
     }
 
     private static String stripQuotes(String value) {
@@ -942,7 +1047,8 @@ public final class RpgStatsConfig {
                 + "end_cap = " + DEFAULT_STAT_CAP + "\n"
                 + "cha_cap = " + DEFAULT_STAT_CAP + "\n"
                 + "\n"
-                + "# XP blacklist entries live in xp_blacklist.toml\n";
+                + "# XP blacklist entries live in xp_blacklist.toml\n"
+                + "# Mining XP entries live in mining_xp.toml\n";
         try {
             Files.writeString(configPath, content, StandardCharsets.UTF_8,
                     StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
@@ -1002,6 +1108,35 @@ public final class RpgStatsConfig {
         }
     }
 
+    private static void writeDefaultMiningXp(Path miningXpPath, HytaleLogger logger) {
+        String content = ""
+                + "# RPGStats mining XP\n"
+                + "#\n"
+                + "# Entries here grant XP when the block is broken with the correct tool.\n"
+                + "# Values are case-insensitive.\n"
+                + "#\n"
+                + "# Format: \"block_id=XP\"\n"
+                + "# Use block IDs like Ore_Iron_Stone or wildcards like Ore_Iron_* to match all variants.\n"
+                + "# Example: block_xp = [\"Ore_Copper_*=6\", \"Ore_Iron_*=10\"]\n"
+                + "block_xp = [\n"
+                + "    \"Ore_Copper_*=3\",\n"
+                + "    \"Ore_Iron_*=5\",\n"
+                + "    \"Ore_Silver_*=7\",\n"
+                + "    \"Ore_Gold_*=9\",\n"
+                + "    \"Ore_Cobalt_*=11\",\n"
+                + "    \"Ore_Thorium_*=13\",\n"
+                + "    \"Ore_Mithril_*=15\",\n"
+                + "    \"Ore_Adamantite_*=17\",\n"
+                + "    \"Ore_Onyxium_*=19\"\n"
+                + "]\n";
+        try {
+            Files.writeString(miningXpPath, content, StandardCharsets.UTF_8,
+                    StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
+        } catch (IOException ex) {
+            logger.at(Level.WARNING).log("[RPGStats] Failed to write default mining_xp.toml: " + ex.getMessage());
+        }
+    }
+
     public static void backup(Path dataDirectory, HytaleLogger logger) {
         Path configPath = dataDirectory.resolve(FILE_NAME);
         if (!Files.exists(configPath)) {
@@ -1023,6 +1158,14 @@ public final class RpgStatsConfig {
         private XpBlacklist(Set<String> npcTypes, Set<String> roles) {
             this.npcTypes = npcTypes == null ? Collections.emptySet() : npcTypes;
             this.roles = roles == null ? Collections.emptySet() : roles;
+        }
+    }
+
+    private static final class MiningXp {
+        private final Map<String, Integer> blockXp;
+
+        private MiningXp(Map<String, Integer> blockXp) {
+            this.blockXp = blockXp == null ? Collections.emptyMap() : blockXp;
         }
     }
 }

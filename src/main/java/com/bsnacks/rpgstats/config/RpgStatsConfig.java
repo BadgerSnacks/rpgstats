@@ -24,7 +24,16 @@ public final class RpgStatsConfig {
     private static final String FILE_NAME = "config.toml";
     private static final String XP_BLACKLIST_FILE_NAME = "xp_blacklist.toml";
     private static final String MINING_XP_FILE_NAME = "mining_xp.toml";
-    private static final int CURRENT_CONFIG_VERSION = 9;
+    private static final String CRAFTING_XP_FILE_NAME = "crafting_xp.toml";
+    private static final int CURRENT_CONFIG_VERSION = 13;
+    // Crafting XP formula defaults
+    private static final int DEFAULT_CRAFTING_BASE_XP = 5;
+    private static final double DEFAULT_CRAFTING_INGREDIENT_XP = 2.0;
+    private static final double DEFAULT_CRAFTING_TIME_XP_PER_SEC = 1.0;
+    private static final double DEFAULT_BENCH_TIER_MULTIPLIER_BASE = 1.0;
+    private static final double DEFAULT_BENCH_TIER_MULTIPLIER_PER_LEVEL = 0.25;
+    private static final int DEFAULT_MAX_CRAFTING_XP = 500;
+    private static final boolean DEFAULT_CRAFTING_FORMULA_ENABLED = true;
     private static final double DEFAULT_XP_MULTIPLIER = 0.35;
     private static final int DEFAULT_MAX_LEVEL = 25;
     private static final int DEFAULT_ABILITY_POINTS_PER_LEVEL = 2;
@@ -33,6 +42,9 @@ public final class RpgStatsConfig {
     private static final int DEFAULT_ABILITY_RANK2_COST = 2;
     private static final int DEFAULT_ABILITY_RANK3_COST = 3;
     private static final int MIN_ABILITY_RANK_COST = 0;
+    private static final int DEFAULT_MAX_ABILITY_LEVEL = 3;
+    private static final int MIN_MAX_ABILITY_LEVEL = 1;
+    private static final int MAX_MAX_ABILITY_LEVEL = 10;
     private static final int DEFAULT_STAT_CAP = 25;
     private static final double DEFAULT_LIGHT_FOOT_SPEED_PER_LEVEL_PCT = 5.0;
     private static final double DEFAULT_ARMOR_PROFICIENCY_RESISTANCE_PER_LEVEL_PCT = 5.0;
@@ -52,8 +64,9 @@ public final class RpgStatsConfig {
     private static final double DEFAULT_THORNS_REFLECT_PER_LEVEL_PCT = 25.0;
     private static final double DEFAULT_TOOL_PROFICIENCY_CHANCE_PER_LEVEL_PCT = 15.0;
     private static final double DEFAULT_LUCKY_MINER_CHANCE_PER_LEVEL_PCT = 10.0;
-    private static final double DEFAULT_FLAME_TOUCH_DAMAGE_PER_LEVEL = 2.0;
     private static final double DEFAULT_GOURMAND_FOOD_BONUS_PER_LEVEL_PCT = 10.0;
+    private static final double DEFAULT_FLAME_TOUCH_BONUS_DAMAGE_PER_LEVEL_PCT = 15.0;
+    private static final String DEFAULT_FLAME_TOUCH_PARTICLE_SYSTEM = "Fire_AoE_Spawn";
     private static final double DEFAULT_DAMAGE_MULTIPLIER_BASE = 10.0;
     private static final double DEFAULT_MINING_SPEED_BASE = 1.0;
     private static final double DEFAULT_MINING_SPEED_PER_POINT = 0.10;
@@ -87,6 +100,14 @@ public final class RpgStatsConfig {
     private Set<String> xpBlacklistNpcTypes;
     private Set<String> xpBlacklistRoles;
     private Map<String, Integer> miningXpByBlockId;
+    private Map<String, Integer> craftingXpByItemId;
+    private int craftingBaseXp;
+    private double craftingIngredientXp;
+    private double craftingTimeXpPerSecond;
+    private double benchTierMultiplierBase;
+    private double benchTierMultiplierPerLevel;
+    private int maxCraftingXp;
+    private boolean craftingFormulaEnabled;
     private double strongLungsOxygenPerLevelPct;
     private double luckyShotChancePerLevelPct;
     private double criticalStrikeChancePerLevelPct;
@@ -96,30 +117,39 @@ public final class RpgStatsConfig {
     private double thornsReflectPerLevelPct;
     private double toolProficiencyChancePerLevelPct;
     private double luckyMinerChancePerLevelPct;
-    private double flameTouchDamagePerLevel;
     private double gourmandFoodBonusPerLevelPct;
+    private double flameTouchBonusDamagePerLevelPct;
+    private String flameTouchParticleSystem;
     private int abilityRank1Cost;
     private int abilityRank2Cost;
     private int abilityRank3Cost;
+    private int maxAbilityLevel;
 
     private RpgStatsConfig(int configVersion, double xpMultiplier, int maxLevel, int abilityPointsPerLevel,
-                           double lightFootSpeedPerLevelPct, double armorProficiencyResistancePerLevelPct,
-                           double healthRegenPerLevelPerSec, double staminaRegenPerLevelPerSec,
-                           double glancingBlowChancePerLevelPct,
-                           double damageMultiplierBase,
-                           double miningSpeedBase, double miningSpeedPerPoint,
-                           double healthPerPoint, double manaPerPoint, double staminaPerPoint,
-                           boolean hudEnabled,
-                           int strCap, int dexCap, int conCap, int intCap, int endCap, int chaCap,
-                           Set<String> xpBlacklistNpcTypes, Set<String> xpBlacklistRoles,
-                           Map<String, Integer> miningXpByBlockId,
-                           double strongLungsOxygenPerLevelPct, double luckyShotChancePerLevelPct,
-                           double criticalStrikeChancePerLevelPct, double criticalStrikeBaseChancePct,
-                           double criticalStrikeDamageMultiplier, double lifestealPerLevelPct,
-                           double thornsReflectPerLevelPct, double toolProficiencyChancePerLevelPct,
-                           double luckyMinerChancePerLevelPct, double flameTouchDamagePerLevel,
-                           double gourmandFoodBonusPerLevelPct,
-                           int abilityRank1Cost, int abilityRank2Cost, int abilityRank3Cost) {
+                            double lightFootSpeedPerLevelPct, double armorProficiencyResistancePerLevelPct,
+                            double healthRegenPerLevelPerSec, double staminaRegenPerLevelPerSec,
+                            double glancingBlowChancePerLevelPct,
+                            double damageMultiplierBase,
+                            double miningSpeedBase, double miningSpeedPerPoint,
+                            double healthPerPoint, double manaPerPoint, double staminaPerPoint,
+                            boolean hudEnabled,
+                            int strCap, int dexCap, int conCap, int intCap, int endCap, int chaCap,
+                            Set<String> xpBlacklistNpcTypes, Set<String> xpBlacklistRoles,
+                            Map<String, Integer> miningXpByBlockId,
+                            Map<String, Integer> craftingXpByItemId,
+                            int craftingBaseXp, double craftingIngredientXp, double craftingTimeXpPerSecond,
+                            double benchTierMultiplierBase, double benchTierMultiplierPerLevel,
+                            int maxCraftingXp, boolean craftingFormulaEnabled,
+                            double strongLungsOxygenPerLevelPct, double luckyShotChancePerLevelPct,
+                            double criticalStrikeChancePerLevelPct, double criticalStrikeBaseChancePct,
+                            double criticalStrikeDamageMultiplier, double lifestealPerLevelPct,
+                            double thornsReflectPerLevelPct, double toolProficiencyChancePerLevelPct,
+                            double luckyMinerChancePerLevelPct,
+                            double gourmandFoodBonusPerLevelPct,
+                            double flameTouchBonusDamagePerLevelPct,
+                            String flameTouchParticleSystem,
+                            int abilityRank1Cost, int abilityRank2Cost, int abilityRank3Cost,
+                            int maxAbilityLevel) {
         this.configVersion = configVersion;
         this.xpMultiplier = xpMultiplier;
         this.maxLevel = maxLevel;
@@ -145,6 +175,14 @@ public final class RpgStatsConfig {
         this.xpBlacklistNpcTypes = xpBlacklistNpcTypes;
         this.xpBlacklistRoles = xpBlacklistRoles;
         this.miningXpByBlockId = miningXpByBlockId;
+        this.craftingXpByItemId = craftingXpByItemId;
+        this.craftingBaseXp = craftingBaseXp;
+        this.craftingIngredientXp = craftingIngredientXp;
+        this.craftingTimeXpPerSecond = craftingTimeXpPerSecond;
+        this.benchTierMultiplierBase = benchTierMultiplierBase;
+        this.benchTierMultiplierPerLevel = benchTierMultiplierPerLevel;
+        this.maxCraftingXp = maxCraftingXp;
+        this.craftingFormulaEnabled = craftingFormulaEnabled;
         this.strongLungsOxygenPerLevelPct = strongLungsOxygenPerLevelPct;
         this.luckyShotChancePerLevelPct = luckyShotChancePerLevelPct;
         this.criticalStrikeChancePerLevelPct = criticalStrikeChancePerLevelPct;
@@ -154,11 +192,13 @@ public final class RpgStatsConfig {
         this.thornsReflectPerLevelPct = thornsReflectPerLevelPct;
         this.toolProficiencyChancePerLevelPct = toolProficiencyChancePerLevelPct;
         this.luckyMinerChancePerLevelPct = luckyMinerChancePerLevelPct;
-        this.flameTouchDamagePerLevel = flameTouchDamagePerLevel;
         this.gourmandFoodBonusPerLevelPct = gourmandFoodBonusPerLevelPct;
+        this.flameTouchBonusDamagePerLevelPct = flameTouchBonusDamagePerLevelPct;
+        this.flameTouchParticleSystem = flameTouchParticleSystem;
         this.abilityRank1Cost = abilityRank1Cost;
         this.abilityRank2Cost = abilityRank2Cost;
         this.abilityRank3Cost = abilityRank3Cost;
+        this.maxAbilityLevel = maxAbilityLevel;
     }
 
     public double getXpMultiplier() {
@@ -229,12 +269,16 @@ public final class RpgStatsConfig {
         return luckyMinerChancePerLevelPct;
     }
 
-    public double getFlameTouchDamagePerLevel() {
-        return flameTouchDamagePerLevel;
-    }
-
     public double getGourmandFoodBonusPerLevelPct() {
         return gourmandFoodBonusPerLevelPct;
+    }
+
+    public double getFlameTouchBonusDamagePerLevelPct() {
+        return flameTouchBonusDamagePerLevelPct;
+    }
+
+    public String getFlameTouchParticleSystem() {
+        return flameTouchParticleSystem == null ? DEFAULT_FLAME_TOUCH_PARTICLE_SYSTEM : flameTouchParticleSystem;
     }
 
     public int getAbilityRank1Cost() {
@@ -247,6 +291,10 @@ public final class RpgStatsConfig {
 
     public int getAbilityRank3Cost() {
         return abilityRank3Cost;
+    }
+
+    public int getMaxAbilityLevel() {
+        return maxAbilityLevel;
     }
 
     public double getDamageMultiplierBase() {
@@ -332,6 +380,59 @@ public final class RpgStatsConfig {
         return miningXpByBlockId == null ? 0 : miningXpByBlockId.size();
     }
 
+    public int getCraftingXpForItem(String itemId) {
+        if (itemId == null || craftingXpByItemId == null || craftingXpByItemId.isEmpty()) {
+            return -1;
+        }
+        String key = itemId.toLowerCase();
+        Integer xp = craftingXpByItemId.get(key);
+        if (xp != null) {
+            return xp;
+        }
+        for (Map.Entry<String, Integer> entry : craftingXpByItemId.entrySet()) {
+            String configured = entry.getKey();
+            if (configured.endsWith("*")) {
+                String prefix = configured.substring(0, configured.length() - 1);
+                if (!prefix.isEmpty() && key.startsWith(prefix)) {
+                    return entry.getValue();
+                }
+            }
+        }
+        return -1;
+    }
+
+    public int getCraftingXpEntryCount() {
+        return craftingXpByItemId == null ? 0 : craftingXpByItemId.size();
+    }
+
+    public int getCraftingBaseXp() {
+        return craftingBaseXp;
+    }
+
+    public double getCraftingIngredientXp() {
+        return craftingIngredientXp;
+    }
+
+    public double getCraftingTimeXpPerSecond() {
+        return craftingTimeXpPerSecond;
+    }
+
+    public double getBenchTierMultiplierBase() {
+        return benchTierMultiplierBase;
+    }
+
+    public double getBenchTierMultiplierPerLevel() {
+        return benchTierMultiplierPerLevel;
+    }
+
+    public int getMaxCraftingXp() {
+        return maxCraftingXp;
+    }
+
+    public boolean isCraftingFormulaEnabled() {
+        return craftingFormulaEnabled;
+    }
+
     public boolean isXpBlacklisted(String npcTypeId, String roleName) {
         if (npcTypeId != null && xpBlacklistNpcTypes != null
                 && xpBlacklistNpcTypes.contains(npcTypeId.toLowerCase())) {
@@ -375,6 +476,14 @@ public final class RpgStatsConfig {
         this.xpBlacklistNpcTypes = other.xpBlacklistNpcTypes;
         this.xpBlacklistRoles = other.xpBlacklistRoles;
         this.miningXpByBlockId = other.miningXpByBlockId;
+        this.craftingXpByItemId = other.craftingXpByItemId;
+        this.craftingBaseXp = other.craftingBaseXp;
+        this.craftingIngredientXp = other.craftingIngredientXp;
+        this.craftingTimeXpPerSecond = other.craftingTimeXpPerSecond;
+        this.benchTierMultiplierBase = other.benchTierMultiplierBase;
+        this.benchTierMultiplierPerLevel = other.benchTierMultiplierPerLevel;
+        this.maxCraftingXp = other.maxCraftingXp;
+        this.craftingFormulaEnabled = other.craftingFormulaEnabled;
         this.criticalStrikeChancePerLevelPct = other.criticalStrikeChancePerLevelPct;
         this.criticalStrikeBaseChancePct = other.criticalStrikeBaseChancePct;
         this.criticalStrikeDamageMultiplier = other.criticalStrikeDamageMultiplier;
@@ -382,11 +491,13 @@ public final class RpgStatsConfig {
         this.thornsReflectPerLevelPct = other.thornsReflectPerLevelPct;
         this.toolProficiencyChancePerLevelPct = other.toolProficiencyChancePerLevelPct;
         this.luckyMinerChancePerLevelPct = other.luckyMinerChancePerLevelPct;
-        this.flameTouchDamagePerLevel = other.flameTouchDamagePerLevel;
         this.gourmandFoodBonusPerLevelPct = other.gourmandFoodBonusPerLevelPct;
+        this.flameTouchBonusDamagePerLevelPct = other.flameTouchBonusDamagePerLevelPct;
+        this.flameTouchParticleSystem = other.flameTouchParticleSystem;
         this.abilityRank1Cost = other.abilityRank1Cost;
         this.abilityRank2Cost = other.abilityRank2Cost;
         this.abilityRank3Cost = other.abilityRank3Cost;
+        this.maxAbilityLevel = other.maxAbilityLevel;
     }
 
     public static Path resolveConfigPath(Path dataDirectory) {
@@ -401,6 +512,10 @@ public final class RpgStatsConfig {
         return dataDirectory.resolve(MINING_XP_FILE_NAME);
     }
 
+    public static Path resolveCraftingXpPath(Path dataDirectory) {
+        return dataDirectory.resolve(CRAFTING_XP_FILE_NAME);
+    }
+
     public static RpgStatsConfig load(Path dataDirectory, HytaleLogger logger) {
         try {
             Files.createDirectories(dataDirectory);
@@ -410,6 +525,7 @@ public final class RpgStatsConfig {
 
         XpBlacklist xpBlacklist = readXpBlacklist(dataDirectory, logger);
         MiningXp miningXp = readMiningXp(dataDirectory, logger);
+        CraftingXp craftingXp = readCraftingXp(dataDirectory, logger);
 
         Path configPath = resolveConfigPath(dataDirectory);
         if (!Files.exists(configPath)) {
@@ -440,6 +556,14 @@ public final class RpgStatsConfig {
                     xpBlacklist.npcTypes,
                     xpBlacklist.roles,
                     miningXp.blockXp,
+                    craftingXp.itemXp,
+                    craftingXp.baseXp,
+                    craftingXp.ingredientXp,
+                    craftingXp.timeXpPerSecond,
+                    craftingXp.benchTierMultiplierBase,
+                    craftingXp.benchTierMultiplierPerLevel,
+                    craftingXp.maxXp,
+                    craftingXp.formulaEnabled,
                     DEFAULT_STRONG_LUNGS_OXYGEN_PER_LEVEL_PCT,
                     DEFAULT_LUCKY_SHOT_CHANCE_PER_LEVEL_PCT,
                     DEFAULT_CRITICAL_STRIKE_CHANCE_PER_LEVEL_PCT,
@@ -449,11 +573,13 @@ public final class RpgStatsConfig {
                     DEFAULT_THORNS_REFLECT_PER_LEVEL_PCT,
                     DEFAULT_TOOL_PROFICIENCY_CHANCE_PER_LEVEL_PCT,
                     DEFAULT_LUCKY_MINER_CHANCE_PER_LEVEL_PCT,
-                    DEFAULT_FLAME_TOUCH_DAMAGE_PER_LEVEL,
                     DEFAULT_GOURMAND_FOOD_BONUS_PER_LEVEL_PCT,
+                    DEFAULT_FLAME_TOUCH_BONUS_DAMAGE_PER_LEVEL_PCT,
+                    DEFAULT_FLAME_TOUCH_PARTICLE_SYSTEM,
                     DEFAULT_ABILITY_RANK1_COST,
                     DEFAULT_ABILITY_RANK2_COST,
-                    DEFAULT_ABILITY_RANK3_COST
+                    DEFAULT_ABILITY_RANK3_COST,
+                    DEFAULT_MAX_ABILITY_LEVEL
             );
         }
 
@@ -564,17 +690,22 @@ public final class RpgStatsConfig {
         luckyMinerChancePerLevelPct = clampAbilityPct(luckyMinerChancePerLevelPct, logger,
                 "lucky_miner_chance_per_level_pct", DEFAULT_LUCKY_MINER_CHANCE_PER_LEVEL_PCT);
 
-        double flameTouchDamagePerLevel = parseDouble(values.get("flame_touch_damage_per_level"),
-                DEFAULT_FLAME_TOUCH_DAMAGE_PER_LEVEL, logger, "flame_touch_damage_per_level");
-        if (flameTouchDamagePerLevel < 0.0) {
-            logger.at(Level.WARNING).log("[RPGStats] flame_touch_damage_per_level must be >= 0. Using default " + DEFAULT_FLAME_TOUCH_DAMAGE_PER_LEVEL);
-            flameTouchDamagePerLevel = DEFAULT_FLAME_TOUCH_DAMAGE_PER_LEVEL;
-        }
-
         double gourmandFoodBonusPerLevelPct = parseDouble(values.get("gourmand_food_bonus_per_level_pct"),
                 DEFAULT_GOURMAND_FOOD_BONUS_PER_LEVEL_PCT, logger, "gourmand_food_bonus_per_level_pct");
         gourmandFoodBonusPerLevelPct = clampAbilityPct(gourmandFoodBonusPerLevelPct, logger,
                 "gourmand_food_bonus_per_level_pct", DEFAULT_GOURMAND_FOOD_BONUS_PER_LEVEL_PCT);
+
+        double flameTouchBonusDamagePerLevelPct = parseDouble(values.get("flame_touch_bonus_damage_per_level_pct"),
+                DEFAULT_FLAME_TOUCH_BONUS_DAMAGE_PER_LEVEL_PCT, logger, "flame_touch_bonus_damage_per_level_pct");
+        flameTouchBonusDamagePerLevelPct = clampAbilityPct(flameTouchBonusDamagePerLevelPct, logger,
+                "flame_touch_bonus_damage_per_level_pct", DEFAULT_FLAME_TOUCH_BONUS_DAMAGE_PER_LEVEL_PCT);
+
+        String flameTouchParticleSystem = stripQuotes(values.get("flame_touch_particle_system"));
+        if (flameTouchParticleSystem == null || flameTouchParticleSystem.isBlank()) {
+            flameTouchParticleSystem = DEFAULT_FLAME_TOUCH_PARTICLE_SYSTEM;
+        } else if ("none".equalsIgnoreCase(flameTouchParticleSystem) || "off".equalsIgnoreCase(flameTouchParticleSystem)) {
+            flameTouchParticleSystem = "";
+        }
 
         int abilityRank1Cost = parseInt(values.get("ability_rank1_cost"),
                 DEFAULT_ABILITY_RANK1_COST, logger, "ability_rank1_cost");
@@ -598,6 +729,18 @@ public final class RpgStatsConfig {
             logger.at(Level.WARNING).log("[RPGStats] ability_rank3_cost must be >= "
                     + MIN_ABILITY_RANK_COST + ". Using default " + DEFAULT_ABILITY_RANK3_COST);
             abilityRank3Cost = DEFAULT_ABILITY_RANK3_COST;
+        }
+
+        int maxAbilityLevel = parseInt(values.get("max_ability_level"),
+                DEFAULT_MAX_ABILITY_LEVEL, logger, "max_ability_level");
+        if (maxAbilityLevel < MIN_MAX_ABILITY_LEVEL) {
+            logger.at(Level.WARNING).log("[RPGStats] max_ability_level must be >= "
+                    + MIN_MAX_ABILITY_LEVEL + ". Using default " + DEFAULT_MAX_ABILITY_LEVEL);
+            maxAbilityLevel = DEFAULT_MAX_ABILITY_LEVEL;
+        } else if (maxAbilityLevel > MAX_MAX_ABILITY_LEVEL) {
+            logger.at(Level.WARNING).log("[RPGStats] max_ability_level must be <= "
+                    + MAX_MAX_ABILITY_LEVEL + ". Using default " + DEFAULT_MAX_ABILITY_LEVEL);
+            maxAbilityLevel = DEFAULT_MAX_ABILITY_LEVEL;
         }
 
         double damageBase = parseDouble(values.get("damage_multiplier_base"), DEFAULT_DAMAGE_MULTIPLIER_BASE,
@@ -650,18 +793,31 @@ public final class RpgStatsConfig {
         Set<String> xpBlacklistNpcTypes = mergeSets(xpBlacklist.npcTypes, legacyNpcTypes);
         Set<String> xpBlacklistRoles = mergeSets(xpBlacklist.roles, legacyRoles);
 
-        return new RpgStatsConfig(configVersion, multiplier, maxLevel, abilityPointsPerLevel,
+        RpgStatsConfig config = new RpgStatsConfig(configVersion, multiplier, maxLevel, abilityPointsPerLevel,
                 lightFootSpeedPerLevelPct, armorProficiencyResistancePerLevelPct,
                 healthRegenPerLevelPerSec, staminaRegenPerLevelPerSec, glancingBlowChancePerLevelPct,
                 damageBase, miningBase, miningPerPoint, healthPerPoint, manaPerPoint, staminaPerPoint,
                 hudEnabled,
                 strCap, dexCap, conCap, intCap, endCap, chaCap,
                 xpBlacklistNpcTypes, xpBlacklistRoles, miningXp.blockXp,
+                craftingXp.itemXp,
+                craftingXp.baseXp,
+                craftingXp.ingredientXp,
+                craftingXp.timeXpPerSecond,
+                craftingXp.benchTierMultiplierBase,
+                craftingXp.benchTierMultiplierPerLevel,
+                craftingXp.maxXp,
+                craftingXp.formulaEnabled,
                 strongLungsOxygenPerLevelPct, luckyShotChancePerLevelPct,
                 criticalStrikeChancePerLevelPct, criticalStrikeBaseChancePct, criticalStrikeDamageMultiplier,
                 lifestealPerLevelPct, thornsReflectPerLevelPct, toolProficiencyChancePerLevelPct,
-                luckyMinerChancePerLevelPct, flameTouchDamagePerLevel, gourmandFoodBonusPerLevelPct,
-                abilityRank1Cost, abilityRank2Cost, abilityRank3Cost);
+                luckyMinerChancePerLevelPct,
+                gourmandFoodBonusPerLevelPct,
+                flameTouchBonusDamagePerLevelPct,
+                flameTouchParticleSystem,
+                abilityRank1Cost, abilityRank2Cost, abilityRank3Cost,
+                maxAbilityLevel);
+        return config;
     }
 
     private static Map<String, String> readKeyValues(Path configPath, HytaleLogger logger) {
@@ -741,6 +897,77 @@ public final class RpgStatsConfig {
         Set<String> blockEntries = parseStringSet(values.get("block_xp"));
         Map<String, Integer> blockXp = parseMiningXpEntries(blockEntries, logger);
         return new MiningXp(blockXp);
+    }
+
+    private static CraftingXp readCraftingXp(Path dataDirectory, HytaleLogger logger) {
+        Path craftingXpPath = resolveCraftingXpPath(dataDirectory);
+        if (!Files.exists(craftingXpPath)) {
+            writeDefaultCraftingXp(craftingXpPath, logger);
+            if (!Files.exists(craftingXpPath)) {
+                return new CraftingXp(Collections.emptyMap(),
+                        DEFAULT_CRAFTING_BASE_XP,
+                        DEFAULT_CRAFTING_INGREDIENT_XP,
+                        DEFAULT_CRAFTING_TIME_XP_PER_SEC,
+                        DEFAULT_BENCH_TIER_MULTIPLIER_BASE,
+                        DEFAULT_BENCH_TIER_MULTIPLIER_PER_LEVEL,
+                        DEFAULT_MAX_CRAFTING_XP,
+                        DEFAULT_CRAFTING_FORMULA_ENABLED);
+            }
+        }
+        Map<String, String> values = readKeyValues(craftingXpPath, logger);
+        Set<String> itemEntries = parseStringSet(values.get("item_xp"));
+        Map<String, Integer> itemXp = parseCraftingXpEntries(itemEntries, logger);
+
+        int baseXp = parseInt(values.get("base_xp"), DEFAULT_CRAFTING_BASE_XP, logger, "base_xp");
+        double ingredientXp = parseDouble(values.get("ingredient_xp_per_item"), DEFAULT_CRAFTING_INGREDIENT_XP, logger, "ingredient_xp_per_item");
+        double timeXpPerSec = parseDouble(values.get("time_xp_per_second"), DEFAULT_CRAFTING_TIME_XP_PER_SEC, logger, "time_xp_per_second");
+        double benchBase = parseDouble(values.get("bench_tier_multiplier_base"), DEFAULT_BENCH_TIER_MULTIPLIER_BASE, logger, "bench_tier_multiplier_base");
+        double benchPerLevel = parseDouble(values.get("bench_tier_multiplier_per_level"), DEFAULT_BENCH_TIER_MULTIPLIER_PER_LEVEL, logger, "bench_tier_multiplier_per_level");
+        int maxXp = parseInt(values.get("max_xp_per_craft"), DEFAULT_MAX_CRAFTING_XP, logger, "max_xp_per_craft");
+        boolean formulaEnabled = parseBoolean(values.get("formula_enabled"), DEFAULT_CRAFTING_FORMULA_ENABLED, logger, "formula_enabled");
+
+        return new CraftingXp(itemXp, baseXp, ingredientXp, timeXpPerSec, benchBase, benchPerLevel, maxXp, formulaEnabled);
+    }
+
+    private static Map<String, Integer> parseCraftingXpEntries(Set<String> entries, HytaleLogger logger) {
+        if (entries == null || entries.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        LinkedHashMap<String, Integer> results = new LinkedHashMap<>();
+        for (String entry : entries) {
+            if (entry == null) {
+                continue;
+            }
+            String trimmed = entry.trim();
+            if (trimmed.isEmpty()) {
+                continue;
+            }
+            int separator = trimmed.indexOf('=');
+            if (separator < 0) {
+                separator = trimmed.indexOf(':');
+            }
+            if (separator <= 0 || separator >= trimmed.length() - 1) {
+                logger.at(Level.WARNING).log("[RPGStats] Invalid crafting XP entry '" + entry
+                        + "'. Expected format: \"item_id=XP\".");
+                continue;
+            }
+            String itemId = trimmed.substring(0, separator).trim().toLowerCase();
+            String xpRaw = trimmed.substring(separator + 1).trim();
+            int xp = parseInt(xpRaw, -1, logger, "crafting_xp");
+            if (xp <= 0) {
+                logger.at(Level.WARNING).log("[RPGStats] crafting_xp entry '" + entry + "' must be > 0.");
+                continue;
+            }
+            if (results.containsKey(itemId)) {
+                logger.at(Level.WARNING).log("[RPGStats] Duplicate crafting_xp entry for '" + itemId
+                        + "'. Using last value.");
+            }
+            results.put(itemId, xp);
+        }
+        if (results.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        return Collections.unmodifiableMap(results);
     }
 
     private static double parseDouble(String raw, double fallback, HytaleLogger logger, String key) {
@@ -848,6 +1075,119 @@ public final class RpgStatsConfig {
         return Collections.unmodifiableSet(values);
     }
 
+    private static Map<String, Double> parseDoubleEntries(Set<String> entries, Map<String, Double> defaults,
+                                                          HytaleLogger logger, String key) {
+        if (entries == null || entries.isEmpty()) {
+            return defaults == null ? Collections.emptyMap() : defaults;
+        }
+        LinkedHashMap<String, Double> results = new LinkedHashMap<>();
+        for (String entry : entries) {
+            if (entry == null) {
+                continue;
+            }
+            String trimmed = entry.trim();
+            if (trimmed.isEmpty()) {
+                continue;
+            }
+            int separator = trimmed.indexOf('=');
+            if (separator < 0) {
+                separator = trimmed.indexOf(':');
+            }
+            if (separator < 0) {
+                logger.at(Level.WARNING).log("[RPGStats] Invalid " + key + " entry '" + entry + "'. Expected format: \"stat=value\".");
+                continue;
+            }
+            String id = stripQuotes(trimmed.substring(0, separator).trim()).toLowerCase();
+            String valueRaw = trimmed.substring(separator + 1).trim();
+            if (id.isEmpty()) {
+                continue;
+            }
+            double value;
+            try {
+                value = Double.parseDouble(valueRaw);
+            } catch (NumberFormatException ex) {
+                logger.at(Level.WARNING).log("[RPGStats] Invalid " + key + " entry '" + entry + "'.");
+                continue;
+            }
+            if (value < 0.0) {
+                logger.at(Level.WARNING).log("[RPGStats] " + key + " entry '" + entry + "' must be >= 0.");
+                continue;
+            }
+            results.put(id, value);
+        }
+        if (results.isEmpty()) {
+            return defaults == null ? Collections.emptyMap() : defaults;
+        }
+        return Collections.unmodifiableMap(results);
+    }
+
+    private static Map<String, LevelRange> parseLevelRanges(Set<String> entries, int defaultMin,
+                                                            int defaultMax, HytaleLogger logger) {
+        if (entries == null || entries.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        LinkedHashMap<String, LevelRange> results = new LinkedHashMap<>();
+        for (String entry : entries) {
+            if (entry == null) {
+                continue;
+            }
+            String trimmed = entry.trim();
+            if (trimmed.isEmpty()) {
+                continue;
+            }
+            int separator = trimmed.indexOf('=');
+            if (separator < 0) {
+                separator = trimmed.indexOf(':');
+            }
+            if (separator < 0) {
+                logger.at(Level.WARNING).log("[RPGStats] Invalid npc_level_spawn_ranges entry '" + entry
+                        + "'. Expected format: \"spawn_id=min-max\".");
+                continue;
+            }
+            String id = stripQuotes(trimmed.substring(0, separator).trim()).toLowerCase();
+            String rangeRaw = trimmed.substring(separator + 1).trim();
+            if (id.isEmpty()) {
+                continue;
+            }
+            int min = defaultMin;
+            int max = defaultMax;
+            String[] parts;
+            if (rangeRaw.contains("..")) {
+                parts = rangeRaw.split("\\.\\.");
+            } else if (rangeRaw.contains("-")) {
+                parts = rangeRaw.split("-");
+            } else if (rangeRaw.contains(",")) {
+                parts = rangeRaw.split(",");
+            } else {
+                parts = new String[]{rangeRaw};
+            }
+            try {
+                if (parts.length >= 1) {
+                    min = Integer.parseInt(parts[0].trim());
+                }
+                if (parts.length >= 2) {
+                    max = Integer.parseInt(parts[1].trim());
+                } else {
+                    max = min;
+                }
+            } catch (NumberFormatException ex) {
+                logger.at(Level.WARNING).log("[RPGStats] Invalid npc_level_spawn_ranges entry '" + entry + "'.");
+                continue;
+            }
+            if (min < 1) {
+                min = 1;
+            }
+            if (max < min) {
+                max = min;
+            }
+            results.put(id, new LevelRange(min, max));
+        }
+        if (results.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        return Collections.unmodifiableMap(results);
+    }
+
     private static Map<String, Integer> parseMiningXpEntries(Set<String> entries, HytaleLogger logger) {
         if (entries == null || entries.isEmpty()) {
             return Collections.emptyMap();
@@ -903,6 +1243,9 @@ public final class RpgStatsConfig {
     }
 
     private static String stripQuotes(String value) {
+        if (value == null) {
+            return null;
+        }
         String trimmed = value.trim();
         if (trimmed.length() >= 2) {
             char first = trimmed.charAt(0);
@@ -953,6 +1296,12 @@ public final class RpgStatsConfig {
                 + "ability_rank1_cost = " + DEFAULT_ABILITY_RANK1_COST + "\n"
                 + "ability_rank2_cost = " + DEFAULT_ABILITY_RANK2_COST + "\n"
                 + "ability_rank3_cost = " + DEFAULT_ABILITY_RANK3_COST + "\n"
+                + "\n"
+                + "# Maximum level for all abilities (default " + DEFAULT_MAX_ABILITY_LEVEL + ").\n"
+                + "# Valid range: " + MIN_MAX_ABILITY_LEVEL + " to " + MAX_MAX_ABILITY_LEVEL + ".\n"
+                + "# Increasing this allows abilities to be upgraded beyond rank 3.\n"
+                + "# Note: Rank costs beyond rank 3 equal the rank number (rank 4 costs 4 points, etc.).\n"
+                + "max_ability_level = " + DEFAULT_MAX_ABILITY_LEVEL + "\n"
                 + "\n"
                 + "# Light Foot bonus per level, in percent (default " + DEFAULT_LIGHT_FOOT_SPEED_PER_LEVEL_PCT + ").\n"
                 + "light_foot_speed_per_level_pct = " + DEFAULT_LIGHT_FOOT_SPEED_PER_LEVEL_PCT + "\n"
@@ -1011,14 +1360,18 @@ public final class RpgStatsConfig {
                 + "# Valid range: " + MIN_ABILITY_BONUS_PCT + " to " + MAX_ABILITY_BONUS_PCT + ".\n"
                 + "lucky_miner_chance_per_level_pct = " + DEFAULT_LUCKY_MINER_CHANCE_PER_LEVEL_PCT + "\n"
                 + "\n"
-                + "# Flame Touch bonus fire damage per level (default " + DEFAULT_FLAME_TOUCH_DAMAGE_PER_LEVEL + ").\n"
-                + "# Adds flat fire damage on hit. 2/4/6 at levels 1-3.\n"
-                + "flame_touch_damage_per_level = " + DEFAULT_FLAME_TOUCH_DAMAGE_PER_LEVEL + "\n"
-                + "\n"
                 + "# Gourmand bonus to food stat gains per level, in percent (default " + DEFAULT_GOURMAND_FOOD_BONUS_PER_LEVEL_PCT + ").\n"
                 + "# Increases positive stat changes from consumable items. 10%/20%/30% at levels 1-3.\n"
                 + "# Valid range: " + MIN_ABILITY_BONUS_PCT + " to " + MAX_ABILITY_BONUS_PCT + ".\n"
                 + "gourmand_food_bonus_per_level_pct = " + DEFAULT_GOURMAND_FOOD_BONUS_PER_LEVEL_PCT + "\n"
+                + "\n"
+                + "# Flame Touch bonus fire damage per level, in percent (default " + DEFAULT_FLAME_TOUCH_BONUS_DAMAGE_PER_LEVEL_PCT + ").\n"
+                + "# Adds bonus fire damage when attacking. 15%/30%/45% at levels 1-3.\n"
+                + "# Valid range: " + MIN_ABILITY_BONUS_PCT + " to " + MAX_ABILITY_BONUS_PCT + ".\n"
+                + "flame_touch_bonus_damage_per_level_pct = " + DEFAULT_FLAME_TOUCH_BONUS_DAMAGE_PER_LEVEL_PCT + "\n"
+                + "# Particle system for Flame Touch visuals.\n"
+                + "# Set to \"none\" or \"off\" to disable particles.\n"
+                + "flame_touch_particle_system = \"" + DEFAULT_FLAME_TOUCH_PARTICLE_SYSTEM + "\"\n"
                 + "\n"
                 + "# Strength damage multiplier: damage *= (STR / damage_multiplier_base) (default " + DEFAULT_DAMAGE_MULTIPLIER_BASE + ").\n"
                 + "# Lower number = more damage. Each point spent into (STR) will add 0.10 to the multiplier.\n"
@@ -1137,6 +1490,54 @@ public final class RpgStatsConfig {
         }
     }
 
+    private static void writeDefaultCraftingXp(Path craftingXpPath, HytaleLogger logger) {
+        String content = ""
+                + "# RPGStats crafting XP\n"
+                + "#\n"
+                + "# Entries here grant XP when items are crafted.\n"
+                + "# Values are case-insensitive.\n"
+                + "#\n"
+                + "# Format: \"item_id=XP\"\n"
+                + "# Use item IDs or wildcards like Armor_Iron_* to match all iron armor variants.\n"
+                + "# Items not listed will use the formula-based fallback calculation.\n"
+                + "#\n"
+                + "# Example: item_xp = [\"Armor_Iron_*=25\", \"Sword_Mithril=50\", \"Tool_Pickaxe_*=15\"]\n"
+                + "item_xp = [\n"
+                + "    \"Armor_*=15\",\n"
+                + "    \"Weapon_*=20\",\n"
+                + "    \"Tool_*=10\"\n"
+                + "]\n"
+                + "\n"
+                + "# Formula settings for items not in the list above\n"
+                + "# XP = (base_xp + ingredient_bonus + time_bonus) * bench_multiplier * batch_size\n"
+                + "#\n"
+                + "# Base XP awarded for any crafted item\n"
+                + "base_xp = " + DEFAULT_CRAFTING_BASE_XP + "\n"
+                + "\n"
+                + "# Additional XP per ingredient in the recipe\n"
+                + "ingredient_xp_per_item = " + DEFAULT_CRAFTING_INGREDIENT_XP + "\n"
+                + "\n"
+                + "# Additional XP per second of crafting time\n"
+                + "time_xp_per_second = " + DEFAULT_CRAFTING_TIME_XP_PER_SEC + "\n"
+                + "\n"
+                + "# Multiplier applied based on bench tier requirement\n"
+                + "# tier 0 = 1.0x, tier 1 = 1.25x, tier 2 = 1.5x, tier 3 = 2.0x\n"
+                + "bench_tier_multiplier_base = " + DEFAULT_BENCH_TIER_MULTIPLIER_BASE + "\n"
+                + "bench_tier_multiplier_per_level = " + DEFAULT_BENCH_TIER_MULTIPLIER_PER_LEVEL + "\n"
+                + "\n"
+                + "# Maximum XP that can be awarded for a single craft (0 = unlimited)\n"
+                + "max_xp_per_craft = " + DEFAULT_MAX_CRAFTING_XP + "\n"
+                + "\n"
+                + "# Enable/disable formula fallback (if false, only configured items award XP)\n"
+                + "formula_enabled = " + DEFAULT_CRAFTING_FORMULA_ENABLED + "\n";
+        try {
+            Files.writeString(craftingXpPath, content, StandardCharsets.UTF_8,
+                    StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
+        } catch (IOException ex) {
+            logger.at(Level.WARNING).log("[RPGStats] Failed to write default crafting_xp.toml: " + ex.getMessage());
+        }
+    }
+
     public static void backup(Path dataDirectory, HytaleLogger logger) {
         Path configPath = dataDirectory.resolve(FILE_NAME);
         if (!Files.exists(configPath)) {
@@ -1148,6 +1549,24 @@ public final class RpgStatsConfig {
             Files.copy(configPath, backupPath);
         } catch (IOException ex) {
             logger.at(Level.WARNING).log("[RPGStats] Failed to back up config.toml: " + ex.getMessage());
+        }
+    }
+
+    public static final class LevelRange {
+        private final int min;
+        private final int max;
+
+        public LevelRange(int min, int max) {
+            this.min = Math.max(1, min);
+            this.max = Math.max(this.min, max);
+        }
+
+        public int min() {
+            return min;
+        }
+
+        public int max() {
+            return max;
         }
     }
 
@@ -1166,6 +1585,30 @@ public final class RpgStatsConfig {
 
         private MiningXp(Map<String, Integer> blockXp) {
             this.blockXp = blockXp == null ? Collections.emptyMap() : blockXp;
+        }
+    }
+
+    private static final class CraftingXp {
+        private final Map<String, Integer> itemXp;
+        private final int baseXp;
+        private final double ingredientXp;
+        private final double timeXpPerSecond;
+        private final double benchTierMultiplierBase;
+        private final double benchTierMultiplierPerLevel;
+        private final int maxXp;
+        private final boolean formulaEnabled;
+
+        private CraftingXp(Map<String, Integer> itemXp, int baseXp, double ingredientXp,
+                           double timeXpPerSecond, double benchTierMultiplierBase,
+                           double benchTierMultiplierPerLevel, int maxXp, boolean formulaEnabled) {
+            this.itemXp = itemXp == null ? Collections.emptyMap() : itemXp;
+            this.baseXp = baseXp;
+            this.ingredientXp = ingredientXp;
+            this.timeXpPerSecond = timeXpPerSecond;
+            this.benchTierMultiplierBase = benchTierMultiplierBase;
+            this.benchTierMultiplierPerLevel = benchTierMultiplierPerLevel;
+            this.maxXp = maxXp;
+            this.formulaEnabled = formulaEnabled;
         }
     }
 }

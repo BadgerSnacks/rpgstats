@@ -1,13 +1,45 @@
 # Changelog
 
-## 0.5.0
+## 0.6.0
 
 ### Added
-- Mining XP config file `mining_xp.toml` with wildcard support for ore variants.
-- Mining XP debug logging to trace block/tool matching and awarded XP.
-- HUD refresh on player load to show current XP immediately (GUI fix).
+- Log rotation on version updates: existing logs are renamed with `-old-{version}` suffix when plugin version changes.
+- Configurable max ability level via `max_ability_level` in `config.toml` (default 3, range 1-10).
+  - Allows server admins to let players upgrade abilities beyond rank 3.
+  - Rank costs beyond rank 3 equal the rank number (rank 4 costs 4 points, rank 5 costs 5 points, etc.).
 
 ### Changed
+- `config_version` bumped to 13.
+
+### Fixed
+- Config loading crash when upgrading from older versions missing new config keys (null pointer in `stripQuotes`).
+
+### Deferred
+- Crafting XP system - postponed until Hytale provides proper events for bench crafting.
+  - Current Hytale API only fires crafting events for instant crafts, not bench crafting with time.
+  - Config file structure (`crafting_xp.toml`) is designed and ready for when the API supports it.
+
+## 0.5.x
+
+### Added
+- Mining XP system with configurable rewards per block type (`mining_xp.toml`).
+- Wildcard support for mining XP (e.g., `Ore_Iron_*` matches all iron ore variants).
+- HUD refresh on player load to fix level display on first join.
+- Flame Touch XP attribution - players now receive XP when NPCs die from burn damage.
+- Configurable `flame_touch_finisher_threshold` for low-health NPC kills.
+
+### Changed
+- Flame Touch only activates when holding a weapon (not tools or empty hand).
+- Flame Touch uses damage modification instead of nested damage events.
+- Flame Touch finisher ticks every 0.25 seconds for faster death resolution.
+
+### Fixed
+- NPCs no longer become invulnerable during combat (NpcLevelAssignSystem rewrite).
+- Flame Touch burn kills now properly credit XP.
+- Flame Touch finisher catches NPCs stuck in "broken death state".
+
+### Removed
+- NPC Leveling System completely removed (caused entity state corruption issues).
 
 ## 0.4.0
 

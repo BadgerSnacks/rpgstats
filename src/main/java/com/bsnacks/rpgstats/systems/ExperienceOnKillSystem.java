@@ -1,5 +1,6 @@
 package com.bsnacks.rpgstats.systems;
 
+import com.bsnacks.rpgstats.components.FlameTouchAttribution;
 import com.bsnacks.rpgstats.components.RpgStats;
 import com.bsnacks.rpgstats.config.RpgStatsConfig;
 import com.bsnacks.rpgstats.logging.RpgStatsFileLogger;
@@ -18,7 +19,6 @@ import com.hypixel.hytale.server.core.modules.entity.damage.Damage;
 import com.hypixel.hytale.server.core.modules.entity.damage.DeathComponent;
 import com.hypixel.hytale.server.core.modules.entity.damage.DeathSystems;
 import com.hypixel.hytale.server.core.modules.entitystats.EntityStatMap;
-import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.NPCPlugin;
 import com.hypixel.hytale.server.npc.entities.NPCEntity;
@@ -27,6 +27,7 @@ import com.hypixel.hytale.server.npc.role.Role;
 public final class ExperienceOnKillSystem extends DeathSystems.OnDeathSystem {
 
     private final ComponentType<EntityStore, RpgStats> rpgStatsType;
+    private final ComponentType<EntityStore, FlameTouchAttribution> attributionType;
     private final ComponentType<EntityStore, NPCEntity> npcType;
     private final ComponentType<EntityStore, Player> playerType;
     private final ComponentType<EntityStore, EntityStatMap> statMapType;
@@ -34,9 +35,11 @@ public final class ExperienceOnKillSystem extends DeathSystems.OnDeathSystem {
     private final RpgStatsConfig config;
 
     public ExperienceOnKillSystem(ComponentType<EntityStore, RpgStats> rpgStatsType,
+                                  ComponentType<EntityStore, FlameTouchAttribution> attributionType,
                                   RpgStatsFileLogger fileLogger,
                                   RpgStatsConfig config) {
         this.rpgStatsType = rpgStatsType;
+        this.attributionType = attributionType;
         this.fileLogger = fileLogger;
         this.config = config;
         npcType = NPCEntity.getComponentType();
@@ -67,7 +70,7 @@ public final class ExperienceOnKillSystem extends DeathSystems.OnDeathSystem {
             return;
         }
 
-        Ref<EntityStore> attackerRef = resolveAttackerRef(npc, death);
+        Ref<EntityStore> attackerRef = resolveAttackerRef(npc, death, ref, commandBuffer);
         if (attackerRef == null || !attackerRef.isValid()) {
             logDebug("No valid attacker ref for NPC death: ref=" + ref.getIndex());
             return;
@@ -98,6 +101,7 @@ public final class ExperienceOnKillSystem extends DeathSystems.OnDeathSystem {
 
         int oldLevel = stats.getLevel();
         long oldXp = stats.getXp();
+
         stats.setXp(oldXp + xpGained);
 
         sendXpMessage(killer, stats, xpGained, oldLevel);
@@ -127,13 +131,14 @@ public final class ExperienceOnKillSystem extends DeathSystems.OnDeathSystem {
         return attitude == Attitude.HOSTILE;
     }
 
-    private Ref<EntityStore> resolveAttackerRef(NPCEntity npc, DeathComponent death) {
+    private Ref<EntityStore> resolveAttackerRef(NPCEntity npc, DeathComponent death,
+                                                Ref<EntityStore> npcRef, CommandBuffer<EntityStore> commandBuffer) {
         Damage damage = death.getDeathInfo();
         if (damage != null) {
             Damage.Source source = damage.getSource();
             if (source instanceof Damage.EntitySource) {
                 Ref<EntityStore> ref = ((Damage.EntitySource) source).getRef();
-                if (ref != null) {
+                if (ref != null && ref.isValid()) {
                     logDebug("Attacker resolved from death info: ref=" + ref.getIndex());
                     return ref;
                 }
@@ -143,15 +148,30 @@ public final class ExperienceOnKillSystem extends DeathSystems.OnDeathSystem {
         var damageData = npc.getDamageData();
         if (damageData != null) {
             Ref<EntityStore> ref = damageData.getMostDamagingAttacker();
-            if (ref != null) {
+            if (ref != null && ref.isValid()) {
                 logDebug("Attacker resolved from damage data: ref=" + ref.getIndex());
                 return ref;
             }
             Ref<EntityStore> any = damageData.getAnyAttacker();
-            if (any != null) {
+            if (any != null && any.isValid()) {
                 logDebug("Fallback attacker resolved from damage data: ref=" + any.getIndex());
+                return any;
             }
-            return any;
+        }
+
+        // Check for Flame Touch attribution (for burn kills)
+        if (attributionType != null && npcRef != null) {
+            FlameTouchAttribution attribution = commandBuffer.getComponent(npcRef, attributionType);
+            if (attribution != null) {
+                Ref<EntityStore> flameTouchAttacker = attribution.getAttackerIfValid();
+                if (flameTouchAttacker != null && flameTouchAttacker.isValid()) {
+                    logDebug("Attacker resolved from Flame Touch attribution: ref=" + flameTouchAttacker.getIndex()
+                            + " remaining=" + String.format("%.1f", attribution.getRemainingSeconds()) + "s");
+                    return flameTouchAttacker;
+                } else {
+                    logDebug("Flame Touch attribution expired or invalid");
+                }
+            }
         }
 
         return null;

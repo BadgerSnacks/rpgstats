@@ -20,8 +20,9 @@ import com.bsnacks.rpgstats.systems.GlancingBlowSystem;
 import com.bsnacks.rpgstats.systems.LuckyShotSystem;
 import com.bsnacks.rpgstats.systems.CriticalStrikeSystem;
 import com.bsnacks.rpgstats.systems.LifestealSystem;
-import com.bsnacks.rpgstats.systems.FlameTouchSystem;
 import com.bsnacks.rpgstats.systems.GourmandSystem;
+import com.bsnacks.rpgstats.systems.FlameTouchSystem;
+import com.bsnacks.rpgstats.systems.DamageDebugSystem;
 import com.bsnacks.rpgstats.systems.ThornsSystem;
 import com.bsnacks.rpgstats.systems.ToolProficiencySystem;
 import com.bsnacks.rpgstats.systems.LuckyMinerSystem;
@@ -48,6 +49,7 @@ import java.util.List;
 public final class RpgStatsPlugin extends JavaPlugin {
 
     private ComponentType<EntityStore, RpgStats> rpgStatsType;
+    private ComponentType<EntityStore, com.bsnacks.rpgstats.components.FlameTouchAttribution> flameTouchAttributionType;
     private RpgStatsFileLogger fileLogger;
     private RpgStatsConfig config;
     private Path configPath;
@@ -59,7 +61,9 @@ public final class RpgStatsPlugin extends JavaPlugin {
 
     @Override
     protected void setup() {
-        fileLogger = new RpgStatsFileLogger(getDataDirectory(), getLogger());
+        String pluginVersion = getManifest().getVersion() != null
+                ? getManifest().getVersion().toString() : "unknown";
+        fileLogger = new RpgStatsFileLogger(getDataDirectory(), getLogger(), pluginVersion);
         logInfo("Diagnostics log: " + fileLogger.getLogFile());
         logInfo("Permission root: " + RpgStatsPermissions.ROOT);
         configPath = RpgStatsConfig.resolveConfigPath(getDataDirectory());
@@ -69,25 +73,34 @@ public final class RpgStatsPlugin extends JavaPlugin {
         // Register the component so it can be stored on players and persisted between sessions.
         rpgStatsType = getEntityStoreRegistry().registerComponent(RpgStats.class, RpgStats.COMPONENT_ID, RpgStats.CODEC);
         logInfo("Registered RPG stats component id: " + RpgStats.COMPONENT_ID);
+        flameTouchAttributionType = getEntityStoreRegistry().registerComponent(
+                com.bsnacks.rpgstats.components.FlameTouchAttribution.class,
+                "rpgstats:flame_touch_attribution",
+                com.bsnacks.rpgstats.components.FlameTouchAttribution.CODEC);
+        logInfo("Registered Flame Touch attribution component");
 
         //Register listeners + commands
         PlayerListeners listeners = new PlayerListeners(this, rpgStatsType, config);
         getEventRegistry().registerGlobal(PlayerReadyEvent.class, listeners::onPlayerReady);
         getCommandRegistry().registerCommand(new StatsCommand(this, rpgStatsType, config));
+        // Core systems
         getEntityStoreRegistry().registerSystem(new StrengthDamageSystem(rpgStatsType, config));
         getEntityStoreRegistry().registerSystem(new DexterityMiningSpeedSystem(rpgStatsType, config));
-        getEntityStoreRegistry().registerSystem(new ExperienceOnKillSystem(rpgStatsType, fileLogger, config));
+        getEntityStoreRegistry().registerSystem(new ExperienceOnKillSystem(rpgStatsType, flameTouchAttributionType, fileLogger, config));
         getEntityStoreRegistry().registerSystem(new ArmorProficiencySystem(rpgStatsType, config));
         getEntityStoreRegistry().registerSystem(new GlancingBlowSystem(rpgStatsType, config));
         getEntityStoreRegistry().registerSystem(new AbilityRegenSystem(rpgStatsType, config));
         getEntityStoreRegistry().registerSystem(new CriticalStrikeSystem(rpgStatsType, config));
         getEntityStoreRegistry().registerSystem(new LifestealSystem(rpgStatsType, config));
-        getEntityStoreRegistry().registerSystem(new FlameTouchSystem(rpgStatsType, config, this));
         getEntityStoreRegistry().registerSystem(new GourmandSystem(rpgStatsType, config, this));
+        // FlameTouchSystem - uses Filter group damage modification + Burn effect
+        getEntityStoreRegistry().registerSystem(new FlameTouchSystem(rpgStatsType, flameTouchAttributionType, config, this));
         getEntityStoreRegistry().registerSystem(new ThornsSystem(rpgStatsType, config));
         getEntityStoreRegistry().registerSystem(new ToolProficiencySystem(rpgStatsType, config, this));
         getEntityStoreRegistry().registerSystem(new LuckyMinerSystem(rpgStatsType, config, this));
         getEntityStoreRegistry().registerSystem(new MiningExperienceSystem(rpgStatsType, config, this));
+        // Crafting XP - disabled until Hytale provides proper crafting events for bench crafting
+        // The current API only fires events for instant crafts, not bench crafting with time
         hudRefreshSystem = new HudRefreshSystem(rpgStatsType, this);
         getEntityStoreRegistry().registerSystem(hudRefreshSystem);
 
@@ -106,22 +119,24 @@ public final class RpgStatsPlugin extends JavaPlugin {
         RpgStats.setMaxLevel(config.getMaxLevel());
         RpgStats.setAbilityPointsPerLevel(config.getAbilityPointsPerLevel());
         RpgStats.setAbilityRankCosts(config.getAbilityRank1Cost(), config.getAbilityRank2Cost(), config.getAbilityRank3Cost());
+        RpgStats.setMaxAbilityLevel(config.getMaxAbilityLevel());
         logInfo("Config reloaded (" + reason + "): xp_multiplier=" + config.getXpMultiplier()
                 + " max_level=" + config.getMaxLevel()
                 + " ability_points_per_level=" + config.getAbilityPointsPerLevel()
+                + " max_ability_level=" + config.getMaxAbilityLevel()
                 + " light_foot_speed_per_level_pct=" + config.getLightFootSpeedPerLevelPct()
                 + " armor_proficiency_resistance_per_level_pct=" + config.getArmorProficiencyResistancePerLevelPct()
                 + " health_regen_per_level_per_sec=" + config.getHealthRegenPerLevelPerSec()
                 + " stamina_regen_per_level_per_sec=" + config.getStaminaRegenPerLevelPerSec()
                 + " glancing_blow_chance_per_level_pct=" + config.getGlancingBlowChancePerLevelPct()
                 + " lucky_shot_chance_per_level_pct=" + config.getLuckyShotChancePerLevelPct()
-                + " flame_touch_damage_per_level=" + config.getFlameTouchDamagePerLevel()
                 + " gourmand_food_bonus_per_level_pct=" + config.getGourmandFoodBonusPerLevelPct()
                 + " ability_rank_costs=" + config.getAbilityRank1Cost() + "/" + config.getAbilityRank2Cost() + "/" + config.getAbilityRank3Cost()
                 + " hud_enabled=" + config.isHudEnabled()
                 + " xp_blacklist_npc_types=" + config.getXpBlacklistNpcTypes().size()
                 + " xp_blacklist_roles=" + config.getXpBlacklistRoles().size()
-                + " mining_xp_entries=" + config.getMiningXpEntryCount());
+                + " mining_xp_entries=" + config.getMiningXpEntryCount()
+                + " crafting_xp_entries=" + config.getCraftingXpEntryCount());
         logDebug("XP blacklist loaded: npc_types=" + config.getXpBlacklistNpcTypes().size()
                 + " roles=" + config.getXpBlacklistRoles().size());
         if (rpgStatsType != null) {

@@ -14,7 +14,6 @@ import com.bsnacks.rpgstats.systems.StrongLungsOxygenEffect;
 import com.bsnacks.rpgstats.systems.LuckyShotSystem;
 import com.bsnacks.rpgstats.systems.CriticalStrikeSystem;
 import com.bsnacks.rpgstats.systems.LifestealSystem;
-import com.bsnacks.rpgstats.systems.FlameTouchSystem;
 import com.bsnacks.rpgstats.systems.GourmandSystem;
 import com.bsnacks.rpgstats.systems.ThornsSystem;
 import com.bsnacks.rpgstats.systems.ToolProficiencySystem;
@@ -65,8 +64,8 @@ public final class StatsPage extends InteractiveCustomUIPage<StatsPage.StatsPage
     private static final String ABILITY_THORNS = "thorns";
     private static final String ABILITY_TOOL_PROFICIENCY = "tool_proficiency";
     private static final String ABILITY_LUCKY_MINER = "lucky_miner";
-    private static final String ABILITY_FLAME_TOUCH = "flame_touch";
     private static final String ABILITY_GOURMAND = "gourmand";
+    private static final String ABILITY_FLAME_TOUCH = "flame_touch";
     private static final int DEFAULT_STAT_CAP = 25;
     private static final double BASE_REGEN_PER_SEC = 1.0;
 
@@ -159,8 +158,8 @@ public final class StatsPage extends InteractiveCustomUIPage<StatsPage.StatsPage
         bindAbilityButton(uiEventBuilder, "#ThornsUpgrade", ABILITY_THORNS);
         bindAbilityButton(uiEventBuilder, "#ToolProficiencyUpgrade", ABILITY_TOOL_PROFICIENCY);
         bindAbilityButton(uiEventBuilder, "#LuckyMinerUpgrade", ABILITY_LUCKY_MINER);
-        bindAbilityButton(uiEventBuilder, "#FlameTouchUpgrade", ABILITY_FLAME_TOUCH);
         bindAbilityButton(uiEventBuilder, "#GourmandUpgrade", ABILITY_GOURMAND);
+        bindAbilityButton(uiEventBuilder, "#FlameTouchUpgrade", ABILITY_FLAME_TOUCH);
         uiEventBuilder.addEventBinding(CustomUIEventBindingType.Activating, "#ResetStatsButton",
                 new EventData()
                         .append(StatsPageEventData.KEY_TYPE, ACTION_RESET_STATS));
@@ -265,7 +264,7 @@ public final class StatsPage extends InteractiveCustomUIPage<StatsPage.StatsPage
         stats.migrateIfNeeded();
         if (ABILITY_LIGHT_FOOT.equalsIgnoreCase(abilityId)) {
             int currentLevel = stats.getLightFootLevel();
-            int cost = RpgStats.getAbilityUpgradeCost(currentLevel, RpgStats.LIGHT_FOOT_MAX_LEVEL);
+            int cost = RpgStats.getAbilityUpgradeCost(currentLevel, RpgStats.getLightFootMaxLevel());
             int available = stats.getAvailableAbilityPoints();
             if (cost == 0) {
                 player.sendMessage(Message.raw("Light Foot is already at max level."));
@@ -298,7 +297,7 @@ public final class StatsPage extends InteractiveCustomUIPage<StatsPage.StatsPage
 
         if (ABILITY_ARMOR_PROFICIENCY.equalsIgnoreCase(abilityId)) {
             int currentLevel = stats.getArmorProficiencyLevel();
-            int cost = RpgStats.getAbilityUpgradeCost(currentLevel, RpgStats.ARMOR_PROFICIENCY_MAX_LEVEL);
+            int cost = RpgStats.getAbilityUpgradeCost(currentLevel, RpgStats.getArmorProficiencyMaxLevel());
             int available = stats.getAvailableAbilityPoints();
             if (cost == 0) {
                 player.sendMessage(Message.raw("Armor Proficiency is already at max level."));
@@ -330,7 +329,7 @@ public final class StatsPage extends InteractiveCustomUIPage<StatsPage.StatsPage
 
         if (ABILITY_GLANCING_BLOW.equalsIgnoreCase(abilityId)) {
             int currentLevel = stats.getGlancingBlowLevel();
-            int cost = RpgStats.getAbilityUpgradeCost(currentLevel, RpgStats.GLANCING_BLOW_MAX_LEVEL);
+            int cost = RpgStats.getAbilityUpgradeCost(currentLevel, RpgStats.getGlancingBlowMaxLevel());
             int available = stats.getAvailableAbilityPoints();
             if (cost == 0) {
                 player.sendMessage(Message.raw("Glancing Blow is already at max level."));
@@ -362,7 +361,7 @@ public final class StatsPage extends InteractiveCustomUIPage<StatsPage.StatsPage
 
         if (ABILITY_HEALTH_REGEN.equalsIgnoreCase(abilityId)) {
             int currentLevel = stats.getHealthRegenLevel();
-            int cost = RpgStats.getAbilityUpgradeCost(currentLevel, RpgStats.HEALTH_REGEN_MAX_LEVEL);
+            int cost = RpgStats.getAbilityUpgradeCost(currentLevel, RpgStats.getHealthRegenMaxLevel());
             int available = stats.getAvailableAbilityPoints();
             if (cost == 0) {
                 player.sendMessage(Message.raw("Health Regeneration is already at max level."));
@@ -395,7 +394,7 @@ public final class StatsPage extends InteractiveCustomUIPage<StatsPage.StatsPage
 
         if (ABILITY_STAMINA_REGEN.equalsIgnoreCase(abilityId)) {
             int currentLevel = stats.getStaminaRegenLevel();
-            int cost = RpgStats.getAbilityUpgradeCost(currentLevel, RpgStats.STAMINA_REGEN_MAX_LEVEL);
+            int cost = RpgStats.getAbilityUpgradeCost(currentLevel, RpgStats.getStaminaRegenMaxLevel());
             int available = stats.getAvailableAbilityPoints();
             if (cost == 0) {
                 player.sendMessage(Message.raw("Stamina Regeneration is already at max level."));
@@ -428,7 +427,7 @@ public final class StatsPage extends InteractiveCustomUIPage<StatsPage.StatsPage
 
         if (ABILITY_STRONG_LUNGS.equalsIgnoreCase(abilityId)) {
             int currentLevel = stats.getStrongLungsLevel();
-            int cost = RpgStats.getAbilityUpgradeCost(currentLevel, RpgStats.STRONG_LUNGS_MAX_LEVEL);
+            int cost = RpgStats.getAbilityUpgradeCost(currentLevel, RpgStats.getStrongLungsMaxLevel());
             int available = stats.getAvailableAbilityPoints();
             if (cost == 0) {
                 player.sendMessage(Message.raw("Strong Lungs is already at max level."));
@@ -461,7 +460,7 @@ public final class StatsPage extends InteractiveCustomUIPage<StatsPage.StatsPage
 
         if (ABILITY_LUCKY_SHOT.equalsIgnoreCase(abilityId)) {
             int currentLevel = stats.getLuckyShotLevel();
-            int cost = RpgStats.getAbilityUpgradeCost(currentLevel, RpgStats.LUCKY_SHOT_MAX_LEVEL);
+            int cost = RpgStats.getAbilityUpgradeCost(currentLevel, RpgStats.getLuckyShotMaxLevel());
             int available = stats.getAvailableAbilityPoints();
             if (cost == 0) {
                 player.sendMessage(Message.raw("Lucky Shot is already at max level."));
@@ -494,7 +493,7 @@ public final class StatsPage extends InteractiveCustomUIPage<StatsPage.StatsPage
 
         if (ABILITY_CRITICAL_STRIKE.equalsIgnoreCase(abilityId)) {
             int currentLevel = stats.getCriticalStrikeLevel();
-            int cost = RpgStats.getAbilityUpgradeCost(currentLevel, RpgStats.CRITICAL_STRIKE_MAX_LEVEL);
+            int cost = RpgStats.getAbilityUpgradeCost(currentLevel, RpgStats.getCriticalStrikeMaxLevel());
             int available = stats.getAvailableAbilityPoints();
             if (cost == 0) {
                 player.sendMessage(Message.raw("Critical Strike is already at max level."));
@@ -527,7 +526,7 @@ public final class StatsPage extends InteractiveCustomUIPage<StatsPage.StatsPage
 
         if (ABILITY_LIFESTEAL.equalsIgnoreCase(abilityId)) {
             int currentLevel = stats.getLifestealLevel();
-            int cost = RpgStats.getAbilityUpgradeCost(currentLevel, RpgStats.LIFESTEAL_MAX_LEVEL);
+            int cost = RpgStats.getAbilityUpgradeCost(currentLevel, RpgStats.getLifestealMaxLevel());
             int available = stats.getAvailableAbilityPoints();
             if (cost == 0) {
                 player.sendMessage(Message.raw("Lifesteal is already at max level."));
@@ -559,7 +558,7 @@ public final class StatsPage extends InteractiveCustomUIPage<StatsPage.StatsPage
 
         if (ABILITY_THORNS.equalsIgnoreCase(abilityId)) {
             int currentLevel = stats.getThornsLevel();
-            int cost = RpgStats.getAbilityUpgradeCost(currentLevel, RpgStats.THORNS_MAX_LEVEL);
+            int cost = RpgStats.getAbilityUpgradeCost(currentLevel, RpgStats.getThornsMaxLevel());
             int available = stats.getAvailableAbilityPoints();
             if (cost == 0) {
                 player.sendMessage(Message.raw("Thorns is already at max level."));
@@ -591,7 +590,7 @@ public final class StatsPage extends InteractiveCustomUIPage<StatsPage.StatsPage
 
         if (ABILITY_TOOL_PROFICIENCY.equalsIgnoreCase(abilityId)) {
             int currentLevel = stats.getToolProficiencyLevel();
-            int cost = RpgStats.getAbilityUpgradeCost(currentLevel, RpgStats.TOOL_PROFICIENCY_MAX_LEVEL);
+            int cost = RpgStats.getAbilityUpgradeCost(currentLevel, RpgStats.getToolProficiencyMaxLevel());
             int available = stats.getAvailableAbilityPoints();
             if (cost == 0) {
                 player.sendMessage(Message.raw("Tool Proficiency is already at max level."));
@@ -623,7 +622,7 @@ public final class StatsPage extends InteractiveCustomUIPage<StatsPage.StatsPage
 
         if (ABILITY_LUCKY_MINER.equalsIgnoreCase(abilityId)) {
             int currentLevel = stats.getLuckyMinerLevel();
-            int cost = RpgStats.getAbilityUpgradeCost(currentLevel, RpgStats.LUCKY_MINER_MAX_LEVEL);
+            int cost = RpgStats.getAbilityUpgradeCost(currentLevel, RpgStats.getLuckyMinerMaxLevel());
             int available = stats.getAvailableAbilityPoints();
             if (cost == 0) {
                 player.sendMessage(Message.raw("Lucky Miner is already at max level."));
@@ -653,41 +652,9 @@ public final class StatsPage extends InteractiveCustomUIPage<StatsPage.StatsPage
             return;
         }
 
-        if (ABILITY_FLAME_TOUCH.equalsIgnoreCase(abilityId)) {
-            int currentLevel = stats.getFlameTouchLevel();
-            int cost = RpgStats.getAbilityUpgradeCost(currentLevel, RpgStats.FLAME_TOUCH_MAX_LEVEL);
-            int available = stats.getAvailableAbilityPoints();
-            if (cost == 0) {
-                player.sendMessage(Message.raw("Flame Touch is already at max level."));
-                refreshUI(ref, store, player);
-                return;
-            }
-            if (available < cost) {
-                player.sendMessage(Message.raw("You need " + cost + " ability point"
-                        + (cost == 1 ? "" : "s") + " to upgrade Flame Touch."));
-                refreshUI(ref, store, player);
-                return;
-            }
-            if (!stats.upgradeFlameTouch()) {
-                player.sendMessage(Message.raw("Flame Touch is already at max level."));
-                refreshUI(ref, store, player);
-                return;
-            }
-            int level = stats.getFlameTouchLevel();
-            float fireDamage = FlameTouchSystem.getBonusFireDamage(level, config);
-            player.sendMessage(Message.raw("Flame Touch upgraded to level " + level
-                    + " (+" + formatRate(fireDamage) + " fire damage)."
-                    + " Remaining ability points: " + stats.getAvailableAbilityPoints() + "."));
-            if (plugin != null) {
-                plugin.logInfo("Player upgraded Flame Touch to " + level + ": " + player.getDisplayName());
-            }
-            refreshUI(ref, store, player);
-            return;
-        }
-
         if (ABILITY_GOURMAND.equalsIgnoreCase(abilityId)) {
             int currentLevel = stats.getGourmandLevel();
-            int cost = RpgStats.getAbilityUpgradeCost(currentLevel, RpgStats.GOURMAND_MAX_LEVEL);
+            int cost = RpgStats.getAbilityUpgradeCost(currentLevel, RpgStats.getGourmandMaxLevel());
             int available = stats.getAvailableAbilityPoints();
             if (cost == 0) {
                 player.sendMessage(Message.raw("Gourmand is already at max level."));
@@ -712,6 +679,39 @@ public final class StatsPage extends InteractiveCustomUIPage<StatsPage.StatsPage
                     + " Remaining ability points: " + stats.getAvailableAbilityPoints() + "."));
             if (plugin != null) {
                 plugin.logInfo("Player upgraded Gourmand to " + level + ": " + player.getDisplayName());
+            }
+            refreshUI(ref, store, player);
+            return;
+        }
+
+        if (ABILITY_FLAME_TOUCH.equalsIgnoreCase(abilityId)) {
+            int currentLevel = stats.getFlameTouchLevel();
+            int cost = RpgStats.getAbilityUpgradeCost(currentLevel, RpgStats.getFlameTouchMaxLevel());
+            int available = stats.getAvailableAbilityPoints();
+            if (cost == 0) {
+                player.sendMessage(Message.raw("Flame Touch is already at max level."));
+                refreshUI(ref, store, player);
+                return;
+            }
+            if (available < cost) {
+                player.sendMessage(Message.raw("You need " + cost + " ability point"
+                        + (cost == 1 ? "" : "s") + " to upgrade Flame Touch."));
+                refreshUI(ref, store, player);
+                return;
+            }
+            if (!stats.upgradeFlameTouch()) {
+                player.sendMessage(Message.raw("Flame Touch is already at max level."));
+                refreshUI(ref, store, player);
+                return;
+            }
+            int level = stats.getFlameTouchLevel();
+            double bonusPct = config == null ? 15.0 : config.getFlameTouchBonusDamagePerLevelPct();
+            float totalBonus = (float) (bonusPct * level);
+            player.sendMessage(Message.raw("Flame Touch upgraded to level " + level
+                    + " (+" + formatPercent(totalBonus) + "% fire damage)."
+                    + " Remaining ability points: " + stats.getAvailableAbilityPoints() + "."));
+            if (plugin != null) {
+                plugin.logInfo("Player upgraded Flame Touch to " + level + ": " + player.getDisplayName());
             }
             refreshUI(ref, store, player);
             return;
@@ -887,42 +887,42 @@ public final class StatsPage extends InteractiveCustomUIPage<StatsPage.StatsPage
         int points = stats.getAvailableAbilityPoints();
         int level = stats.getLightFootLevel();
         int percent = Math.round(LightFootSpeedEffect.getSpeedBonus(level, config) * 100.0f);
-        uiCommandBuilder.set("#LightFootLevel.Text", "Level " + level + "/" + RpgStats.LIGHT_FOOT_MAX_LEVEL
+        uiCommandBuilder.set("#LightFootLevel.Text", "Level " + level + "/" + RpgStats.getLightFootMaxLevel()
                 + " (+" + percent + "%)");
         double lightFootPerLevel = config == null ? 5.0 : config.getLightFootSpeedPerLevelPct();
         uiCommandBuilder.set("#LightFootDescription.Text", "Move " + formatPercent(lightFootPerLevel) + "%, "
                 + formatPercent(lightFootPerLevel * 2.0) + "%, and " + formatPercent(lightFootPerLevel * 3.0)
                 + "% faster at levels 1-3.");
 
-        int lightFootCost = RpgStats.getAbilityUpgradeCost(level, RpgStats.LIGHT_FOOT_MAX_LEVEL);
+        int lightFootCost = RpgStats.getAbilityUpgradeCost(level, RpgStats.getLightFootMaxLevel());
         boolean canUpgrade = canSpend && lightFootCost > 0 && points >= lightFootCost;
         uiCommandBuilder.set("#LightFootUpgrade.HitTestVisible", canUpgrade);
         uiCommandBuilder.set("#LightFootUpgrade.Text", lightFootCost == 0 ? "Maxed" : String.valueOf(lightFootCost));
 
         int armorProficiencyLevel = stats.getArmorProficiencyLevel();
         int armorProficiencyPercent = Math.round(ArmorProficiencySystem.getResistanceBonus(armorProficiencyLevel, config) * 100.0f);
-        uiCommandBuilder.set("#ArmorProficiencyLevel.Text", "Level " + armorProficiencyLevel + "/" + RpgStats.ARMOR_PROFICIENCY_MAX_LEVEL
+        uiCommandBuilder.set("#ArmorProficiencyLevel.Text", "Level " + armorProficiencyLevel + "/" + RpgStats.getArmorProficiencyMaxLevel()
                 + " (+" + armorProficiencyPercent + "%)");
         double armorProficiencyPerLevel = config == null ? 5.0 : config.getArmorProficiencyResistancePerLevelPct();
         uiCommandBuilder.set("#ArmorProficiencyDescription.Text", "While wearing armor, reduce Physical and Projectile damage by "
                 + formatPercent(armorProficiencyPerLevel) + "%, " + formatPercent(armorProficiencyPerLevel * 2.0) + "%, and "
                 + formatPercent(armorProficiencyPerLevel * 3.0) + "%.");
 
-        int armorProficiencyCost = RpgStats.getAbilityUpgradeCost(armorProficiencyLevel, RpgStats.ARMOR_PROFICIENCY_MAX_LEVEL);
+        int armorProficiencyCost = RpgStats.getAbilityUpgradeCost(armorProficiencyLevel, RpgStats.getArmorProficiencyMaxLevel());
         boolean canUpgradeArmorProficiency = canSpend && armorProficiencyCost > 0 && points >= armorProficiencyCost;
         uiCommandBuilder.set("#ArmorProficiencyUpgrade.HitTestVisible", canUpgradeArmorProficiency);
         uiCommandBuilder.set("#ArmorProficiencyUpgrade.Text", armorProficiencyCost == 0 ? "Maxed" : String.valueOf(armorProficiencyCost));
 
         int glancingBlowLevel = stats.getGlancingBlowLevel();
         int glancingBlowPercent = Math.round(GlancingBlowSystem.getDodgeChance(glancingBlowLevel, config));
-        uiCommandBuilder.set("#GlancingBlowLevel.Text", "Level " + glancingBlowLevel + "/" + RpgStats.GLANCING_BLOW_MAX_LEVEL
+        uiCommandBuilder.set("#GlancingBlowLevel.Text", "Level " + glancingBlowLevel + "/" + RpgStats.getGlancingBlowMaxLevel()
                 + " (" + glancingBlowPercent + "%)");
         double glancingBlowPerLevel = config == null ? 5.0 : config.getGlancingBlowChancePerLevelPct();
         uiCommandBuilder.set("#GlancingBlowDescription.Text", "Chance to dodge hostile NPC damage: "
                 + formatPercent(5.0 + glancingBlowPerLevel) + "%, "
                 + formatPercent(5.0 + glancingBlowPerLevel * 2.0) + "%, and "
                 + formatPercent(5.0 + glancingBlowPerLevel * 3.0) + "%.");
-        int glancingBlowCost = RpgStats.getAbilityUpgradeCost(glancingBlowLevel, RpgStats.GLANCING_BLOW_MAX_LEVEL);
+        int glancingBlowCost = RpgStats.getAbilityUpgradeCost(glancingBlowLevel, RpgStats.getGlancingBlowMaxLevel());
         boolean canUpgradeGlancingBlow = canSpend && glancingBlowCost > 0 && points >= glancingBlowCost;
         uiCommandBuilder.set("#GlancingBlowUpgrade.HitTestVisible", canUpgradeGlancingBlow);
         uiCommandBuilder.set("#GlancingBlowUpgrade.Text", glancingBlowCost == 0 ? "Maxed" : String.valueOf(glancingBlowCost));
@@ -930,13 +930,13 @@ public final class StatsPage extends InteractiveCustomUIPage<StatsPage.StatsPage
         int healthRegenLevel = stats.getHealthRegenLevel();
         double healthRegenPerLevel = config == null ? 1.0 : config.getHealthRegenPerLevelPerSec();
         double healthTotal = BASE_REGEN_PER_SEC + healthRegenPerLevel * healthRegenLevel;
-        uiCommandBuilder.set("#HealthRegenLevel.Text", "Level " + healthRegenLevel + "/" + RpgStats.HEALTH_REGEN_MAX_LEVEL
+        uiCommandBuilder.set("#HealthRegenLevel.Text", "Level " + healthRegenLevel + "/" + RpgStats.getHealthRegenMaxLevel()
                 + " (" + formatRate(healthTotal) + "/s)");
         uiCommandBuilder.set("#HealthRegenDescription.Text", "Regenerate "
                 + formatRate(BASE_REGEN_PER_SEC + healthRegenPerLevel) + ", "
                 + formatRate(BASE_REGEN_PER_SEC + healthRegenPerLevel * 2.0) + ", and "
                 + formatRate(BASE_REGEN_PER_SEC + healthRegenPerLevel * 3.0) + " health per second at levels 1-3.");
-        int healthRegenCost = RpgStats.getAbilityUpgradeCost(healthRegenLevel, RpgStats.HEALTH_REGEN_MAX_LEVEL);
+        int healthRegenCost = RpgStats.getAbilityUpgradeCost(healthRegenLevel, RpgStats.getHealthRegenMaxLevel());
         boolean canUpgradeHealthRegen = canSpend && healthRegenCost > 0 && points >= healthRegenCost;
         uiCommandBuilder.set("#HealthRegenUpgrade.HitTestVisible", canUpgradeHealthRegen);
         uiCommandBuilder.set("#HealthRegenUpgrade.Text", healthRegenCost == 0 ? "Maxed" : String.valueOf(healthRegenCost));
@@ -944,13 +944,13 @@ public final class StatsPage extends InteractiveCustomUIPage<StatsPage.StatsPage
         int staminaRegenLevel = stats.getStaminaRegenLevel();
         double staminaRegenPerLevel = config == null ? 1.0 : config.getStaminaRegenPerLevelPerSec();
         double staminaTotal = BASE_REGEN_PER_SEC + staminaRegenPerLevel * staminaRegenLevel;
-        uiCommandBuilder.set("#StaminaRegenLevel.Text", "Level " + staminaRegenLevel + "/" + RpgStats.STAMINA_REGEN_MAX_LEVEL
+        uiCommandBuilder.set("#StaminaRegenLevel.Text", "Level " + staminaRegenLevel + "/" + RpgStats.getStaminaRegenMaxLevel()
                 + " (" + formatRate(staminaTotal) + "/s)");
         uiCommandBuilder.set("#StaminaRegenDescription.Text", "Regenerate "
                 + formatRate(BASE_REGEN_PER_SEC + staminaRegenPerLevel) + ", "
                 + formatRate(BASE_REGEN_PER_SEC + staminaRegenPerLevel * 2.0) + ", and "
                 + formatRate(BASE_REGEN_PER_SEC + staminaRegenPerLevel * 3.0) + " stamina per second at levels 1-3.");
-        int staminaRegenCost = RpgStats.getAbilityUpgradeCost(staminaRegenLevel, RpgStats.STAMINA_REGEN_MAX_LEVEL);
+        int staminaRegenCost = RpgStats.getAbilityUpgradeCost(staminaRegenLevel, RpgStats.getStaminaRegenMaxLevel());
         boolean canUpgradeStaminaRegen = canSpend && staminaRegenCost > 0 && points >= staminaRegenCost;
         uiCommandBuilder.set("#StaminaRegenUpgrade.HitTestVisible", canUpgradeStaminaRegen);
         uiCommandBuilder.set("#StaminaRegenUpgrade.Text", staminaRegenCost == 0 ? "Maxed" : String.valueOf(staminaRegenCost));
@@ -958,13 +958,13 @@ public final class StatsPage extends InteractiveCustomUIPage<StatsPage.StatsPage
         int strongLungsLevel = stats.getStrongLungsLevel();
         double strongLungsPerLevel = config == null ? 50.0 : config.getStrongLungsOxygenPerLevelPct();
         double strongLungsTotalPct = strongLungsPerLevel * strongLungsLevel;
-        uiCommandBuilder.set("#StrongLungsLevel.Text", "Level " + strongLungsLevel + "/" + RpgStats.STRONG_LUNGS_MAX_LEVEL
+        uiCommandBuilder.set("#StrongLungsLevel.Text", "Level " + strongLungsLevel + "/" + RpgStats.getStrongLungsMaxLevel()
                 + " (+" + formatPercent(strongLungsTotalPct) + "%)");
         uiCommandBuilder.set("#StrongLungsDescription.Text", "Increase max oxygen by "
                 + formatPercent(strongLungsPerLevel) + "%, "
                 + formatPercent(strongLungsPerLevel * 2.0) + "%, and "
                 + formatPercent(strongLungsPerLevel * 3.0) + "% at levels 1-3.");
-        int strongLungsCost = RpgStats.getAbilityUpgradeCost(strongLungsLevel, RpgStats.STRONG_LUNGS_MAX_LEVEL);
+        int strongLungsCost = RpgStats.getAbilityUpgradeCost(strongLungsLevel, RpgStats.getStrongLungsMaxLevel());
         boolean canUpgradeStrongLungs = canSpend && strongLungsCost > 0 && points >= strongLungsCost;
         uiCommandBuilder.set("#StrongLungsUpgrade.HitTestVisible", canUpgradeStrongLungs);
         uiCommandBuilder.set("#StrongLungsUpgrade.Text", strongLungsCost == 0 ? "Maxed" : String.valueOf(strongLungsCost));
@@ -972,13 +972,13 @@ public final class StatsPage extends InteractiveCustomUIPage<StatsPage.StatsPage
         int luckyShotLevel = stats.getLuckyShotLevel();
         double luckyShotPerLevel = config == null ? 10.0 : config.getLuckyShotChancePerLevelPct();
         double luckyShotTotalPct = luckyShotPerLevel * luckyShotLevel;
-        uiCommandBuilder.set("#LuckyShotLevel.Text", "Level " + luckyShotLevel + "/" + RpgStats.LUCKY_SHOT_MAX_LEVEL
+        uiCommandBuilder.set("#LuckyShotLevel.Text", "Level " + luckyShotLevel + "/" + RpgStats.getLuckyShotMaxLevel()
                 + " (" + formatPercent(luckyShotTotalPct) + "%)");
         uiCommandBuilder.set("#LuckyShotDescription.Text", "Chance to not consume ammo with bow/crossbow: "
                 + formatPercent(luckyShotPerLevel) + "%, "
                 + formatPercent(luckyShotPerLevel * 2.0) + "%, and "
                 + formatPercent(luckyShotPerLevel * 3.0) + "% at levels 1-3.");
-        int luckyShotCost = RpgStats.getAbilityUpgradeCost(luckyShotLevel, RpgStats.LUCKY_SHOT_MAX_LEVEL);
+        int luckyShotCost = RpgStats.getAbilityUpgradeCost(luckyShotLevel, RpgStats.getLuckyShotMaxLevel());
         boolean canUpgradeLuckyShot = canSpend && luckyShotCost > 0 && points >= luckyShotCost;
         uiCommandBuilder.set("#LuckyShotUpgrade.HitTestVisible", canUpgradeLuckyShot);
         uiCommandBuilder.set("#LuckyShotUpgrade.Text", luckyShotCost == 0 ? "Maxed" : String.valueOf(luckyShotCost));
@@ -986,7 +986,7 @@ public final class StatsPage extends InteractiveCustomUIPage<StatsPage.StatsPage
         int criticalStrikeLevel = stats.getCriticalStrikeLevel();
         float criticalStrikeTotalChance = CriticalStrikeSystem.getCriticalChance(criticalStrikeLevel, config);
         double criticalStrikeDamageMultiplier = config == null ? 1.5 : config.getCriticalStrikeDamageMultiplier();
-        uiCommandBuilder.set("#CriticalStrikeLevel.Text", "Level " + criticalStrikeLevel + "/" + RpgStats.CRITICAL_STRIKE_MAX_LEVEL
+        uiCommandBuilder.set("#CriticalStrikeLevel.Text", "Level " + criticalStrikeLevel + "/" + RpgStats.getCriticalStrikeMaxLevel()
                 + " (" + formatPercent(criticalStrikeTotalChance) + "%)");
         double criticalStrikeBaseChance = config == null ? 5.0 : config.getCriticalStrikeBaseChancePct();
         double criticalStrikePerLevel = config == null ? 5.0 : config.getCriticalStrikeChancePerLevelPct();
@@ -994,7 +994,7 @@ public final class StatsPage extends InteractiveCustomUIPage<StatsPage.StatsPage
                 + " damage: " + formatPercent(criticalStrikeBaseChance + criticalStrikePerLevel) + "%, "
                 + formatPercent(criticalStrikeBaseChance + criticalStrikePerLevel * 2.0) + "%, and "
                 + formatPercent(criticalStrikeBaseChance + criticalStrikePerLevel * 3.0) + "% at levels 1-3.");
-        int criticalStrikeCost = RpgStats.getAbilityUpgradeCost(criticalStrikeLevel, RpgStats.CRITICAL_STRIKE_MAX_LEVEL);
+        int criticalStrikeCost = RpgStats.getAbilityUpgradeCost(criticalStrikeLevel, RpgStats.getCriticalStrikeMaxLevel());
         boolean canUpgradeCriticalStrike = canSpend && criticalStrikeCost > 0 && points >= criticalStrikeCost;
         uiCommandBuilder.set("#CriticalStrikeUpgrade.HitTestVisible", canUpgradeCriticalStrike);
         uiCommandBuilder.set("#CriticalStrikeUpgrade.Text", criticalStrikeCost == 0 ? "Maxed" : String.valueOf(criticalStrikeCost));
@@ -1002,13 +1002,13 @@ public final class StatsPage extends InteractiveCustomUIPage<StatsPage.StatsPage
         int lifestealLevel = stats.getLifestealLevel();
         float lifestealPct = LifestealSystem.getLifestealPercent(lifestealLevel, config);
         double lifestealPerLevel = config == null ? 3.0 : config.getLifestealPerLevelPct();
-        uiCommandBuilder.set("#LifestealLevel.Text", "Level " + lifestealLevel + "/" + RpgStats.LIFESTEAL_MAX_LEVEL
+        uiCommandBuilder.set("#LifestealLevel.Text", "Level " + lifestealLevel + "/" + RpgStats.getLifestealMaxLevel()
                 + " (" + formatPercent(lifestealPct) + "%)");
         uiCommandBuilder.set("#LifestealDescription.Text", "Heal for percentage of damage dealt: "
                 + formatPercent(lifestealPerLevel) + "%, "
                 + formatPercent(lifestealPerLevel * 2.0) + "%, and "
                 + formatPercent(lifestealPerLevel * 3.0) + "% at levels 1-3.");
-        int lifestealCost = RpgStats.getAbilityUpgradeCost(lifestealLevel, RpgStats.LIFESTEAL_MAX_LEVEL);
+        int lifestealCost = RpgStats.getAbilityUpgradeCost(lifestealLevel, RpgStats.getLifestealMaxLevel());
         boolean canUpgradeLifesteal = canSpend && lifestealCost > 0 && points >= lifestealCost;
         uiCommandBuilder.set("#LifestealUpgrade.HitTestVisible", canUpgradeLifesteal);
         uiCommandBuilder.set("#LifestealUpgrade.Text", lifestealCost == 0 ? "Maxed" : String.valueOf(lifestealCost));
@@ -1016,13 +1016,13 @@ public final class StatsPage extends InteractiveCustomUIPage<StatsPage.StatsPage
         int thornsLevel = stats.getThornsLevel();
         float thornsPct = ThornsSystem.getThornsReflectPercent(thornsLevel, config);
         double thornsPerLevel = config == null ? 25.0 : config.getThornsReflectPerLevelPct();
-        uiCommandBuilder.set("#ThornsLevel.Text", "Level " + thornsLevel + "/" + RpgStats.THORNS_MAX_LEVEL
+        uiCommandBuilder.set("#ThornsLevel.Text", "Level " + thornsLevel + "/" + RpgStats.getThornsMaxLevel()
                 + " (" + formatPercent(thornsPct) + "%)");
         uiCommandBuilder.set("#ThornsDescription.Text", "Reflect damage back to attackers: "
                 + formatPercent(thornsPerLevel) + "%, "
                 + formatPercent(thornsPerLevel * 2.0) + "%, and "
                 + formatPercent(thornsPerLevel * 3.0) + "% at levels 1-3.");
-        int thornsCost = RpgStats.getAbilityUpgradeCost(thornsLevel, RpgStats.THORNS_MAX_LEVEL);
+        int thornsCost = RpgStats.getAbilityUpgradeCost(thornsLevel, RpgStats.getThornsMaxLevel());
         boolean canUpgradeThorns = canSpend && thornsCost > 0 && points >= thornsCost;
         uiCommandBuilder.set("#ThornsUpgrade.HitTestVisible", canUpgradeThorns);
         uiCommandBuilder.set("#ThornsUpgrade.Text", thornsCost == 0 ? "Maxed" : String.valueOf(thornsCost));
@@ -1030,13 +1030,13 @@ public final class StatsPage extends InteractiveCustomUIPage<StatsPage.StatsPage
         int toolProficiencyLevel = stats.getToolProficiencyLevel();
         float toolProficiencyPct = ToolProficiencySystem.getPreservationChance(toolProficiencyLevel, config);
         double toolProficiencyPerLevel = config == null ? 15.0 : config.getToolProficiencyChancePerLevelPct();
-        uiCommandBuilder.set("#ToolProficiencyLevel.Text", "Level " + toolProficiencyLevel + "/" + RpgStats.TOOL_PROFICIENCY_MAX_LEVEL
+        uiCommandBuilder.set("#ToolProficiencyLevel.Text", "Level " + toolProficiencyLevel + "/" + RpgStats.getToolProficiencyMaxLevel()
                 + " (" + formatPercent(toolProficiencyPct) + "%)");
         uiCommandBuilder.set("#ToolProficiencyDescription.Text", "Chance to not consume tool durability: "
                 + formatPercent(toolProficiencyPerLevel) + "%, "
                 + formatPercent(toolProficiencyPerLevel * 2.0) + "%, and "
                 + formatPercent(toolProficiencyPerLevel * 3.0) + "% at levels 1-3.");
-        int toolProficiencyCost = RpgStats.getAbilityUpgradeCost(toolProficiencyLevel, RpgStats.TOOL_PROFICIENCY_MAX_LEVEL);
+        int toolProficiencyCost = RpgStats.getAbilityUpgradeCost(toolProficiencyLevel, RpgStats.getToolProficiencyMaxLevel());
         boolean canUpgradeToolProficiency = canSpend && toolProficiencyCost > 0 && points >= toolProficiencyCost;
         uiCommandBuilder.set("#ToolProficiencyUpgrade.HitTestVisible", canUpgradeToolProficiency);
         uiCommandBuilder.set("#ToolProficiencyUpgrade.Text", toolProficiencyCost == 0 ? "Maxed" : String.valueOf(toolProficiencyCost));
@@ -1044,43 +1044,44 @@ public final class StatsPage extends InteractiveCustomUIPage<StatsPage.StatsPage
         int luckyMinerLevel = stats.getLuckyMinerLevel();
         float luckyMinerPct = LuckyMinerSystem.getBonusOreChance(luckyMinerLevel, config);
         double luckyMinerPerLevel = config == null ? 10.0 : config.getLuckyMinerChancePerLevelPct();
-        uiCommandBuilder.set("#LuckyMinerLevel.Text", "Level " + luckyMinerLevel + "/" + RpgStats.LUCKY_MINER_MAX_LEVEL
+        uiCommandBuilder.set("#LuckyMinerLevel.Text", "Level " + luckyMinerLevel + "/" + RpgStats.getLuckyMinerMaxLevel()
                 + " (" + formatPercent(luckyMinerPct) + "%)");
         uiCommandBuilder.set("#LuckyMinerDescription.Text", "Chance for bonus ore when mining: "
                 + formatPercent(luckyMinerPerLevel) + "%, "
                 + formatPercent(luckyMinerPerLevel * 2.0) + "%, and "
                 + formatPercent(luckyMinerPerLevel * 3.0) + "% at levels 1-3.");
-        int luckyMinerCost = RpgStats.getAbilityUpgradeCost(luckyMinerLevel, RpgStats.LUCKY_MINER_MAX_LEVEL);
+        int luckyMinerCost = RpgStats.getAbilityUpgradeCost(luckyMinerLevel, RpgStats.getLuckyMinerMaxLevel());
         boolean canUpgradeLuckyMiner = canSpend && luckyMinerCost > 0 && points >= luckyMinerCost;
         uiCommandBuilder.set("#LuckyMinerUpgrade.HitTestVisible", canUpgradeLuckyMiner);
         uiCommandBuilder.set("#LuckyMinerUpgrade.Text", luckyMinerCost == 0 ? "Maxed" : String.valueOf(luckyMinerCost));
 
-        int flameTouchLevel = stats.getFlameTouchLevel();
-        float flameTouchDamage = FlameTouchSystem.getBonusFireDamage(flameTouchLevel, config);
-        double flameTouchPerLevel = config == null ? 2.0 : config.getFlameTouchDamagePerLevel();
-        uiCommandBuilder.set("#FlameTouchLevel.Text", "Level " + flameTouchLevel + "/" + RpgStats.FLAME_TOUCH_MAX_LEVEL
-                + " (+" + formatRate(flameTouchDamage) + ")");
-        uiCommandBuilder.set("#FlameTouchDescription.Text", "Bonus fire damage on hit: +"
-                + formatRate(flameTouchPerLevel) + ", +" + formatRate(flameTouchPerLevel * 2.0)
-                + ", and +" + formatRate(flameTouchPerLevel * 3.0) + " at levels 1-3.");
-        int flameTouchCost = RpgStats.getAbilityUpgradeCost(flameTouchLevel, RpgStats.FLAME_TOUCH_MAX_LEVEL);
-        boolean canUpgradeFlameTouch = canSpend && flameTouchCost > 0 && points >= flameTouchCost;
-        uiCommandBuilder.set("#FlameTouchUpgrade.HitTestVisible", canUpgradeFlameTouch);
-        uiCommandBuilder.set("#FlameTouchUpgrade.Text", flameTouchCost == 0 ? "Maxed" : String.valueOf(flameTouchCost));
-
         int gourmandLevel = stats.getGourmandLevel();
         float gourmandPct = GourmandSystem.getFoodBonusPercent(gourmandLevel, config);
         double gourmandPerLevel = config == null ? 10.0 : config.getGourmandFoodBonusPerLevelPct();
-        uiCommandBuilder.set("#GourmandLevel.Text", "Level " + gourmandLevel + "/" + RpgStats.GOURMAND_MAX_LEVEL
+        uiCommandBuilder.set("#GourmandLevel.Text", "Level " + gourmandLevel + "/" + RpgStats.getGourmandMaxLevel()
                 + " (+" + formatPercent(gourmandPct) + "%)");
         uiCommandBuilder.set("#GourmandDescription.Text", "Increase consumable stat gains by "
                 + formatPercent(gourmandPerLevel) + "%, "
                 + formatPercent(gourmandPerLevel * 2.0) + "%, and "
                 + formatPercent(gourmandPerLevel * 3.0) + "% at levels 1-3.");
-        int gourmandCost = RpgStats.getAbilityUpgradeCost(gourmandLevel, RpgStats.GOURMAND_MAX_LEVEL);
+        int gourmandCost = RpgStats.getAbilityUpgradeCost(gourmandLevel, RpgStats.getGourmandMaxLevel());
         boolean canUpgradeGourmand = canSpend && gourmandCost > 0 && points >= gourmandCost;
         uiCommandBuilder.set("#GourmandUpgrade.HitTestVisible", canUpgradeGourmand);
         uiCommandBuilder.set("#GourmandUpgrade.Text", gourmandCost == 0 ? "Maxed" : String.valueOf(gourmandCost));
+
+        int flameTouchLevel = stats.getFlameTouchLevel();
+        double flameTouchPerLevel = config == null ? 15.0 : config.getFlameTouchBonusDamagePerLevelPct();
+        float flameTouchPct = (float) (flameTouchPerLevel * flameTouchLevel);
+        uiCommandBuilder.set("#FlameTouchLevel.Text", "Level " + flameTouchLevel + "/" + RpgStats.getFlameTouchMaxLevel()
+                + " (+" + formatPercent(flameTouchPct) + "%)");
+        uiCommandBuilder.set("#FlameTouchDescription.Text", "Adds bonus fire damage on hit: "
+                + formatPercent(flameTouchPerLevel) + "%, "
+                + formatPercent(flameTouchPerLevel * 2.0) + "%, and "
+                + formatPercent(flameTouchPerLevel * 3.0) + "% at levels 1-3.");
+        int flameTouchCost = RpgStats.getAbilityUpgradeCost(flameTouchLevel, RpgStats.getFlameTouchMaxLevel());
+        boolean canUpgradeFlameTouch = canSpend && flameTouchCost > 0 && points >= flameTouchCost;
+        uiCommandBuilder.set("#FlameTouchUpgrade.HitTestVisible", canUpgradeFlameTouch);
+        uiCommandBuilder.set("#FlameTouchUpgrade.Text", flameTouchCost == 0 ? "Maxed" : String.valueOf(flameTouchCost));
     }
 
     private void setAddButtonState(UICommandBuilder uiCommandBuilder, String buttonId, boolean enabled) {

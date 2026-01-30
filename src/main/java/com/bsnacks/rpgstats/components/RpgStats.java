@@ -18,20 +18,25 @@ public final class RpgStats implements Component<EntityStore> {
     public static final int QUADRATIC_XP = 20;
     public static final int BASE_STAT = 10;
     public static final int DEFAULT_ABILITY_POINTS_PER_LEVEL = 2;
-    public static final int LIGHT_FOOT_MAX_LEVEL = 3;
-    public static final int ARMOR_PROFICIENCY_MAX_LEVEL = 3;
-    public static final int HEALTH_REGEN_MAX_LEVEL = 3;
-    public static final int STAMINA_REGEN_MAX_LEVEL = 3;
-    public static final int GLANCING_BLOW_MAX_LEVEL = 3;
-    public static final int STRONG_LUNGS_MAX_LEVEL = 3;
-    public static final int LUCKY_SHOT_MAX_LEVEL = 3;
-    public static final int CRITICAL_STRIKE_MAX_LEVEL = 3;
-    public static final int LIFESTEAL_MAX_LEVEL = 3;
-    public static final int THORNS_MAX_LEVEL = 3;
-    public static final int TOOL_PROFICIENCY_MAX_LEVEL = 3;
-    public static final int LUCKY_MINER_MAX_LEVEL = 3;
-    public static final int FLAME_TOUCH_MAX_LEVEL = 3;
-    public static final int GOURMAND_MAX_LEVEL = 3;
+    public static final int DEFAULT_MAX_ABILITY_LEVEL = 3;
+    public static final int MIN_MAX_ABILITY_LEVEL = 1;
+    public static final int MAX_MAX_ABILITY_LEVEL = 10;
+
+    // Configurable max levels for each ability (default 3, configurable 1-10)
+    private static int lightFootMaxLevel = DEFAULT_MAX_ABILITY_LEVEL;
+    private static int armorProficiencyMaxLevel = DEFAULT_MAX_ABILITY_LEVEL;
+    private static int healthRegenMaxLevel = DEFAULT_MAX_ABILITY_LEVEL;
+    private static int staminaRegenMaxLevel = DEFAULT_MAX_ABILITY_LEVEL;
+    private static int glancingBlowMaxLevel = DEFAULT_MAX_ABILITY_LEVEL;
+    private static int strongLungsMaxLevel = DEFAULT_MAX_ABILITY_LEVEL;
+    private static int luckyShotMaxLevel = DEFAULT_MAX_ABILITY_LEVEL;
+    private static int criticalStrikeMaxLevel = DEFAULT_MAX_ABILITY_LEVEL;
+    private static int lifestealMaxLevel = DEFAULT_MAX_ABILITY_LEVEL;
+    private static int thornsMaxLevel = DEFAULT_MAX_ABILITY_LEVEL;
+    private static int toolProficiencyMaxLevel = DEFAULT_MAX_ABILITY_LEVEL;
+    private static int luckyMinerMaxLevel = DEFAULT_MAX_ABILITY_LEVEL;
+    private static int gourmandMaxLevel = DEFAULT_MAX_ABILITY_LEVEL;
+    private static int flameTouchMaxLevel = DEFAULT_MAX_ABILITY_LEVEL;
 
     public static final BuilderCodec<RpgStats> CODEC =
             BuilderCodec.builder(RpgStats.class, RpgStats::new)
@@ -65,10 +70,10 @@ public final class RpgStats implements Component<EntityStore> {
                             (d, v) -> d.toolProficiencyLevel = v, d -> d.toolProficiencyLevel).add()
                     .append(new KeyedCodec<>("LuckyMinerLevel", Codec.INTEGER),
                             (d, v) -> d.luckyMinerLevel = v, d -> d.luckyMinerLevel).add()
-                    .append(new KeyedCodec<>("FlameTouchLevel", Codec.INTEGER),
-                            (d, v) -> d.flameTouchLevel = v, d -> d.flameTouchLevel).add()
                     .append(new KeyedCodec<>("GourmandLevel", Codec.INTEGER),
                             (d, v) -> d.gourmandLevel = v, d -> d.gourmandLevel).add()
+                    .append(new KeyedCodec<>("FlameTouchLevel", Codec.INTEGER),
+                            (d, v) -> d.flameTouchLevel = v, d -> d.flameTouchLevel).add()
 
                     .append(new KeyedCodec<>("Str", Codec.INTEGER), (d, v) -> d.str = v, d -> d.str).add()
                     .append(new KeyedCodec<>("Dex", Codec.INTEGER), (d, v) -> d.dex = v, d -> d.dex).add()
@@ -102,8 +107,8 @@ public final class RpgStats implements Component<EntityStore> {
     private int thornsLevel = 0;
     private int toolProficiencyLevel = 0;
     private int luckyMinerLevel = 0;
-    private int flameTouchLevel = 0;
     private int gourmandLevel = 0;
+    private int flameTouchLevel = 0;
     private boolean syncingLevel = false;
 
     private int str = BASE_STAT, dex = BASE_STAT, con = BASE_STAT, intl = BASE_STAT, end = BASE_STAT, cha = BASE_STAT;
@@ -175,10 +180,6 @@ public final class RpgStats implements Component<EntityStore> {
             luckyMinerLevel = 0;
             version = 16;
         }
-        if (version < 17) {
-            flameTouchLevel = 0;
-            version = 17;
-        }
         if (version < 18) {
             gourmandLevel = 0;
             version = 18;
@@ -207,7 +208,6 @@ public final class RpgStats implements Component<EntityStore> {
         thornsLevel = 0;
         toolProficiencyLevel = 0;
         luckyMinerLevel = 0;
-        flameTouchLevel = 0;
         gourmandLevel = 0;
         str = BASE_STAT;
         dex = BASE_STAT;
@@ -253,7 +253,6 @@ public final class RpgStats implements Component<EntityStore> {
         thornsLevel = 0;
         toolProficiencyLevel = 0;
         luckyMinerLevel = 0;
-        flameTouchLevel = 0;
         gourmandLevel = 0;
         return refunded;
     }
@@ -320,10 +319,10 @@ public final class RpgStats implements Component<EntityStore> {
 
     public boolean upgradeLightFoot() {
         syncLevelToXp();
-        if (lightFootLevel >= LIGHT_FOOT_MAX_LEVEL) {
+        if (lightFootLevel >= lightFootMaxLevel) {
             return false;
         }
-        int cost = getAbilityUpgradeCost(lightFootLevel, LIGHT_FOOT_MAX_LEVEL);
+        int cost = getAbilityUpgradeCost(lightFootLevel, lightFootMaxLevel);
         if (getAvailableAbilityPoints() < cost) {
             return false;
         }
@@ -338,10 +337,10 @@ public final class RpgStats implements Component<EntityStore> {
 
     public boolean upgradeArmorProficiency() {
         syncLevelToXp();
-        if (armorProficiencyLevel >= ARMOR_PROFICIENCY_MAX_LEVEL) {
+        if (armorProficiencyLevel >= armorProficiencyMaxLevel) {
             return false;
         }
-        int cost = getAbilityUpgradeCost(armorProficiencyLevel, ARMOR_PROFICIENCY_MAX_LEVEL);
+        int cost = getAbilityUpgradeCost(armorProficiencyLevel, armorProficiencyMaxLevel);
         if (getAvailableAbilityPoints() < cost) {
             return false;
         }
@@ -356,10 +355,10 @@ public final class RpgStats implements Component<EntityStore> {
 
     public boolean upgradeHealthRegen() {
         syncLevelToXp();
-        if (healthRegenLevel >= HEALTH_REGEN_MAX_LEVEL) {
+        if (healthRegenLevel >= healthRegenMaxLevel) {
             return false;
         }
-        int cost = getAbilityUpgradeCost(healthRegenLevel, HEALTH_REGEN_MAX_LEVEL);
+        int cost = getAbilityUpgradeCost(healthRegenLevel, healthRegenMaxLevel);
         if (getAvailableAbilityPoints() < cost) {
             return false;
         }
@@ -374,10 +373,10 @@ public final class RpgStats implements Component<EntityStore> {
 
     public boolean upgradeStaminaRegen() {
         syncLevelToXp();
-        if (staminaRegenLevel >= STAMINA_REGEN_MAX_LEVEL) {
+        if (staminaRegenLevel >= staminaRegenMaxLevel) {
             return false;
         }
-        int cost = getAbilityUpgradeCost(staminaRegenLevel, STAMINA_REGEN_MAX_LEVEL);
+        int cost = getAbilityUpgradeCost(staminaRegenLevel, staminaRegenMaxLevel);
         if (getAvailableAbilityPoints() < cost) {
             return false;
         }
@@ -392,10 +391,10 @@ public final class RpgStats implements Component<EntityStore> {
 
     public boolean upgradeGlancingBlow() {
         syncLevelToXp();
-        if (glancingBlowLevel >= GLANCING_BLOW_MAX_LEVEL) {
+        if (glancingBlowLevel >= glancingBlowMaxLevel) {
             return false;
         }
-        int cost = getAbilityUpgradeCost(glancingBlowLevel, GLANCING_BLOW_MAX_LEVEL);
+        int cost = getAbilityUpgradeCost(glancingBlowLevel, glancingBlowMaxLevel);
         if (getAvailableAbilityPoints() < cost) {
             return false;
         }
@@ -410,10 +409,10 @@ public final class RpgStats implements Component<EntityStore> {
 
     public boolean upgradeStrongLungs() {
         syncLevelToXp();
-        if (strongLungsLevel >= STRONG_LUNGS_MAX_LEVEL) {
+        if (strongLungsLevel >= strongLungsMaxLevel) {
             return false;
         }
-        int cost = getAbilityUpgradeCost(strongLungsLevel, STRONG_LUNGS_MAX_LEVEL);
+        int cost = getAbilityUpgradeCost(strongLungsLevel, strongLungsMaxLevel);
         if (getAvailableAbilityPoints() < cost) {
             return false;
         }
@@ -428,10 +427,10 @@ public final class RpgStats implements Component<EntityStore> {
 
     public boolean upgradeLuckyShot() {
         syncLevelToXp();
-        if (luckyShotLevel >= LUCKY_SHOT_MAX_LEVEL) {
+        if (luckyShotLevel >= luckyShotMaxLevel) {
             return false;
         }
-        int cost = getAbilityUpgradeCost(luckyShotLevel, LUCKY_SHOT_MAX_LEVEL);
+        int cost = getAbilityUpgradeCost(luckyShotLevel, luckyShotMaxLevel);
         if (getAvailableAbilityPoints() < cost) {
             return false;
         }
@@ -446,10 +445,10 @@ public final class RpgStats implements Component<EntityStore> {
 
     public boolean upgradeCriticalStrike() {
         syncLevelToXp();
-        if (criticalStrikeLevel >= CRITICAL_STRIKE_MAX_LEVEL) {
+        if (criticalStrikeLevel >= criticalStrikeMaxLevel) {
             return false;
         }
-        int cost = getAbilityUpgradeCost(criticalStrikeLevel, CRITICAL_STRIKE_MAX_LEVEL);
+        int cost = getAbilityUpgradeCost(criticalStrikeLevel, criticalStrikeMaxLevel);
         if (getAvailableAbilityPoints() < cost) {
             return false;
         }
@@ -464,10 +463,10 @@ public final class RpgStats implements Component<EntityStore> {
 
     public boolean upgradeLifesteal() {
         syncLevelToXp();
-        if (lifestealLevel >= LIFESTEAL_MAX_LEVEL) {
+        if (lifestealLevel >= lifestealMaxLevel) {
             return false;
         }
-        int cost = getAbilityUpgradeCost(lifestealLevel, LIFESTEAL_MAX_LEVEL);
+        int cost = getAbilityUpgradeCost(lifestealLevel, lifestealMaxLevel);
         if (getAvailableAbilityPoints() < cost) {
             return false;
         }
@@ -482,10 +481,10 @@ public final class RpgStats implements Component<EntityStore> {
 
     public boolean upgradeThorns() {
         syncLevelToXp();
-        if (thornsLevel >= THORNS_MAX_LEVEL) {
+        if (thornsLevel >= thornsMaxLevel) {
             return false;
         }
-        int cost = getAbilityUpgradeCost(thornsLevel, THORNS_MAX_LEVEL);
+        int cost = getAbilityUpgradeCost(thornsLevel, thornsMaxLevel);
         if (getAvailableAbilityPoints() < cost) {
             return false;
         }
@@ -500,10 +499,10 @@ public final class RpgStats implements Component<EntityStore> {
 
     public boolean upgradeToolProficiency() {
         syncLevelToXp();
-        if (toolProficiencyLevel >= TOOL_PROFICIENCY_MAX_LEVEL) {
+        if (toolProficiencyLevel >= toolProficiencyMaxLevel) {
             return false;
         }
-        int cost = getAbilityUpgradeCost(toolProficiencyLevel, TOOL_PROFICIENCY_MAX_LEVEL);
+        int cost = getAbilityUpgradeCost(toolProficiencyLevel, toolProficiencyMaxLevel);
         if (getAvailableAbilityPoints() < cost) {
             return false;
         }
@@ -518,32 +517,14 @@ public final class RpgStats implements Component<EntityStore> {
 
     public boolean upgradeLuckyMiner() {
         syncLevelToXp();
-        if (luckyMinerLevel >= LUCKY_MINER_MAX_LEVEL) {
+        if (luckyMinerLevel >= luckyMinerMaxLevel) {
             return false;
         }
-        int cost = getAbilityUpgradeCost(luckyMinerLevel, LUCKY_MINER_MAX_LEVEL);
+        int cost = getAbilityUpgradeCost(luckyMinerLevel, luckyMinerMaxLevel);
         if (getAvailableAbilityPoints() < cost) {
             return false;
         }
         luckyMinerLevel++;
-        return true;
-    }
-
-    public int getFlameTouchLevel() {
-        syncLevelToXp();
-        return flameTouchLevel;
-    }
-
-    public boolean upgradeFlameTouch() {
-        syncLevelToXp();
-        if (flameTouchLevel >= FLAME_TOUCH_MAX_LEVEL) {
-            return false;
-        }
-        int cost = getAbilityUpgradeCost(flameTouchLevel, FLAME_TOUCH_MAX_LEVEL);
-        if (getAvailableAbilityPoints() < cost) {
-            return false;
-        }
-        flameTouchLevel++;
         return true;
     }
 
@@ -554,14 +535,32 @@ public final class RpgStats implements Component<EntityStore> {
 
     public boolean upgradeGourmand() {
         syncLevelToXp();
-        if (gourmandLevel >= GOURMAND_MAX_LEVEL) {
+        if (gourmandLevel >= gourmandMaxLevel) {
             return false;
         }
-        int cost = getAbilityUpgradeCost(gourmandLevel, GOURMAND_MAX_LEVEL);
+        int cost = getAbilityUpgradeCost(gourmandLevel, gourmandMaxLevel);
         if (getAvailableAbilityPoints() < cost) {
             return false;
         }
         gourmandLevel++;
+        return true;
+    }
+
+    public int getFlameTouchLevel() {
+        syncLevelToXp();
+        return flameTouchLevel;
+    }
+
+    public boolean upgradeFlameTouch() {
+        syncLevelToXp();
+        if (flameTouchLevel >= flameTouchMaxLevel) {
+            return false;
+        }
+        int cost = getAbilityUpgradeCost(flameTouchLevel, flameTouchMaxLevel);
+        if (getAvailableAbilityPoints() < cost) {
+            return false;
+        }
+        flameTouchLevel++;
         return true;
     }
 
@@ -598,8 +597,8 @@ public final class RpgStats implements Component<EntityStore> {
         copy.thornsLevel = this.thornsLevel;
         copy.toolProficiencyLevel = this.toolProficiencyLevel;
         copy.luckyMinerLevel = this.luckyMinerLevel;
-        copy.flameTouchLevel = this.flameTouchLevel;
         copy.gourmandLevel = this.gourmandLevel;
+        copy.flameTouchLevel = this.flameTouchLevel;
         copy.str = this.str;
         copy.dex = this.dex;
         copy.con = this.con;
@@ -701,11 +700,11 @@ public final class RpgStats implements Component<EntityStore> {
         if (luckyMinerLevel > 0) {
             spent += totalCostForLevels(luckyMinerLevel);
         }
-        if (flameTouchLevel > 0) {
-            spent += totalCostForLevels(flameTouchLevel);
-        }
         if (gourmandLevel > 0) {
             spent += totalCostForLevels(gourmandLevel);
+        }
+        if (flameTouchLevel > 0) {
+            spent += totalCostForLevels(flameTouchLevel);
         }
         return Math.max(0, spent);
     }
@@ -738,20 +737,20 @@ public final class RpgStats implements Component<EntityStore> {
     private void reconcileAbilityPoints() {
         long total = totalAbilityPointsEarned() + (long) abilityPointsBonus;
         int maxAllowed = clampToInt(total);
-        lightFootLevel = clamp(lightFootLevel, 0, LIGHT_FOOT_MAX_LEVEL);
-        armorProficiencyLevel = clamp(armorProficiencyLevel, 0, ARMOR_PROFICIENCY_MAX_LEVEL);
-        healthRegenLevel = clamp(healthRegenLevel, 0, HEALTH_REGEN_MAX_LEVEL);
-        staminaRegenLevel = clamp(staminaRegenLevel, 0, STAMINA_REGEN_MAX_LEVEL);
-        glancingBlowLevel = clamp(glancingBlowLevel, 0, GLANCING_BLOW_MAX_LEVEL);
-        strongLungsLevel = clamp(strongLungsLevel, 0, STRONG_LUNGS_MAX_LEVEL);
-        luckyShotLevel = clamp(luckyShotLevel, 0, LUCKY_SHOT_MAX_LEVEL);
-        criticalStrikeLevel = clamp(criticalStrikeLevel, 0, CRITICAL_STRIKE_MAX_LEVEL);
-        lifestealLevel = clamp(lifestealLevel, 0, LIFESTEAL_MAX_LEVEL);
-        thornsLevel = clamp(thornsLevel, 0, THORNS_MAX_LEVEL);
-        toolProficiencyLevel = clamp(toolProficiencyLevel, 0, TOOL_PROFICIENCY_MAX_LEVEL);
-        luckyMinerLevel = clamp(luckyMinerLevel, 0, LUCKY_MINER_MAX_LEVEL);
-        flameTouchLevel = clamp(flameTouchLevel, 0, FLAME_TOUCH_MAX_LEVEL);
-        gourmandLevel = clamp(gourmandLevel, 0, GOURMAND_MAX_LEVEL);
+        lightFootLevel = clamp(lightFootLevel, 0, lightFootMaxLevel);
+        armorProficiencyLevel = clamp(armorProficiencyLevel, 0, armorProficiencyMaxLevel);
+        healthRegenLevel = clamp(healthRegenLevel, 0, healthRegenMaxLevel);
+        staminaRegenLevel = clamp(staminaRegenLevel, 0, staminaRegenMaxLevel);
+        glancingBlowLevel = clamp(glancingBlowLevel, 0, glancingBlowMaxLevel);
+        strongLungsLevel = clamp(strongLungsLevel, 0, strongLungsMaxLevel);
+        luckyShotLevel = clamp(luckyShotLevel, 0, luckyShotMaxLevel);
+        criticalStrikeLevel = clamp(criticalStrikeLevel, 0, criticalStrikeMaxLevel);
+        lifestealLevel = clamp(lifestealLevel, 0, lifestealMaxLevel);
+        thornsLevel = clamp(thornsLevel, 0, thornsMaxLevel);
+        toolProficiencyLevel = clamp(toolProficiencyLevel, 0, toolProficiencyMaxLevel);
+        luckyMinerLevel = clamp(luckyMinerLevel, 0, luckyMinerMaxLevel);
+        gourmandLevel = clamp(gourmandLevel, 0, gourmandMaxLevel);
+        flameTouchLevel = clamp(flameTouchLevel, 0, flameTouchMaxLevel);
 
         if (getAbilityPointsSpent() > maxAllowed) {
             trimAbilityLevelsToPoints(maxAllowed);
@@ -804,18 +803,18 @@ public final class RpgStats implements Component<EntityStore> {
             thornsLevel = 0;
             toolProficiencyLevel = 0;
             luckyMinerLevel = 0;
-            flameTouchLevel = 0;
             gourmandLevel = 0;
+            flameTouchLevel = 0;
             return;
         }
-        int guard = LIGHT_FOOT_MAX_LEVEL + ARMOR_PROFICIENCY_MAX_LEVEL + HEALTH_REGEN_MAX_LEVEL + STAMINA_REGEN_MAX_LEVEL + GLANCING_BLOW_MAX_LEVEL + STRONG_LUNGS_MAX_LEVEL + LUCKY_SHOT_MAX_LEVEL + CRITICAL_STRIKE_MAX_LEVEL + LIFESTEAL_MAX_LEVEL + THORNS_MAX_LEVEL + TOOL_PROFICIENCY_MAX_LEVEL + LUCKY_MINER_MAX_LEVEL + FLAME_TOUCH_MAX_LEVEL + GOURMAND_MAX_LEVEL + 2;
+        int guard = lightFootMaxLevel + armorProficiencyMaxLevel + healthRegenMaxLevel + staminaRegenMaxLevel + glancingBlowMaxLevel + strongLungsMaxLevel + luckyShotMaxLevel + criticalStrikeMaxLevel + lifestealMaxLevel + thornsMaxLevel + toolProficiencyMaxLevel + luckyMinerMaxLevel + gourmandMaxLevel + flameTouchMaxLevel + 2;
         while (getAbilityPointsSpent() > maxAllowed && guard-- > 0) {
-            if (gourmandLevel > 0) {
-                gourmandLevel--;
-                continue;
-            }
             if (flameTouchLevel > 0) {
                 flameTouchLevel--;
+                continue;
+            }
+            if (gourmandLevel > 0) {
+                gourmandLevel--;
                 continue;
             }
             if (luckyMinerLevel > 0) {
@@ -998,6 +997,49 @@ public final class RpgStats implements Component<EntityStore> {
     public static int getAbilityRank3Cost() {
         return abilityRank3Cost;
     }
+
+    /**
+     * Sets the max level for all abilities to the same value.
+     * @param newMaxLevel the new max level (clamped to 1-10)
+     */
+    public static void setMaxAbilityLevel(int newMaxLevel) {
+        int clamped = clamp(newMaxLevel, MIN_MAX_ABILITY_LEVEL, MAX_MAX_ABILITY_LEVEL);
+        lightFootMaxLevel = clamped;
+        armorProficiencyMaxLevel = clamped;
+        healthRegenMaxLevel = clamped;
+        staminaRegenMaxLevel = clamped;
+        glancingBlowMaxLevel = clamped;
+        strongLungsMaxLevel = clamped;
+        luckyShotMaxLevel = clamped;
+        criticalStrikeMaxLevel = clamped;
+        lifestealMaxLevel = clamped;
+        thornsMaxLevel = clamped;
+        toolProficiencyMaxLevel = clamped;
+        luckyMinerMaxLevel = clamped;
+        gourmandMaxLevel = clamped;
+        flameTouchMaxLevel = clamped;
+    }
+
+    public static int getMaxAbilityLevel() {
+        // Return the common max level (all are set to the same value)
+        return lightFootMaxLevel;
+    }
+
+    // Individual ability max level getters for UI display
+    public static int getLightFootMaxLevel() { return lightFootMaxLevel; }
+    public static int getArmorProficiencyMaxLevel() { return armorProficiencyMaxLevel; }
+    public static int getHealthRegenMaxLevel() { return healthRegenMaxLevel; }
+    public static int getStaminaRegenMaxLevel() { return staminaRegenMaxLevel; }
+    public static int getGlancingBlowMaxLevel() { return glancingBlowMaxLevel; }
+    public static int getStrongLungsMaxLevel() { return strongLungsMaxLevel; }
+    public static int getLuckyShotMaxLevel() { return luckyShotMaxLevel; }
+    public static int getCriticalStrikeMaxLevel() { return criticalStrikeMaxLevel; }
+    public static int getLifestealMaxLevel() { return lifestealMaxLevel; }
+    public static int getThornsMaxLevel() { return thornsMaxLevel; }
+    public static int getToolProficiencyMaxLevel() { return toolProficiencyMaxLevel; }
+    public static int getLuckyMinerMaxLevel() { return luckyMinerMaxLevel; }
+    public static int getGourmandMaxLevel() { return gourmandMaxLevel; }
+    public static int getFlameTouchMaxLevel() { return flameTouchMaxLevel; }
 
     private static int maxAbilityPointsPerLevel(int maxLevel) {
         int levels = Math.max(1, maxLevel - 1);

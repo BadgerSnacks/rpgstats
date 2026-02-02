@@ -46,7 +46,7 @@ $C = "../Common.ui";
   ...$C.@DefaultLabelStyle,
   RenderBold: true,
   RenderUppercase: true,
-  FontSize: 14,
+  FontSize: 16,
   TextColor: #f1cb71
 );
 
@@ -86,6 +86,15 @@ $C.@PageOverlay {
         $C.@SecondaryTextButton #TabAbilities {
           Anchor: (Width: 140, Height: 30);
           Text: "Abilities";
+        }
+
+        Group {
+          Anchor: (Width: 6);
+        }
+
+        $C.@SecondaryTextButton #TabParty {
+          Anchor: (Width: 140, Height: 30);
+          Text: "Party";
         }
 
         Group {
@@ -379,7 +388,7 @@ $C.@PageOverlay {
 
             Label {
               Style: (...$C.@DefaultLabelStyle, TextColor: #c7d1d8, Wrap: true);
-              Text: "Dig faster and bring down trees more effecentyly. With each point into dexterity you get more comfortable with your work as it beomces easier to find the weak spots in the stone walls, packed earth, and tree trunks.";
+              Text: "Dig faster and bring down trees more efficiently. With each point into dexterity you get more comfortable with your work as it becomes easier to find the weak spots in the stone walls, packed earth, and tree trunks.";
               Anchor: (Bottom: 6, Left: 12, Right: 6);
             }
 
@@ -403,7 +412,7 @@ $C.@PageOverlay {
 
             Label {
               Style: (...$C.@DefaultLabelStyle, TextColor: #c7d1d8, Wrap: true);
-              Text: "You spend more time with your studys commiting the anchient texts to memory, as you spead points into intelligence you gain a litte more magical power.";
+              Text: "You spend more time with your studies committing the ancient texts to memory, as you spead points into intelligence you gain a little more magical power.";
               Anchor: (Bottom: 6, Left: 12, Right: 6);
             }
 
@@ -415,7 +424,7 @@ $C.@PageOverlay {
 
             Label {
               Style: (...$C.@DefaultLabelStyle, TextColor: #c7d1d8, Wrap: true);
-              Text: "The feel of wind on your face brings a sence of freedom to your soul, endurance give you more stamina to keep running.";
+              Text: "The feel of wind on your face brings a sense of freedom to your soul, endurance gives you more stamina to keep running.";
               Anchor: (Bottom: 6, Left: 12, Right: 6);
             }
 
@@ -492,7 +501,7 @@ $C.@PageOverlay {
                   LayoutMode: Left;
                   FlexWeight: 1;
                   Background: (TexturePath: "../Common/ability_bg.png", Border: 48);
-                  Padding: (Left: 26, Right: 24, Bottom: 10, Top: 14);
+                  Padding: (Left: 24, Right: 18, Bottom: 10, Top: 14);
 
                   Group {
                     LayoutMode: Top;
@@ -501,7 +510,7 @@ $C.@PageOverlay {
                     Label #LightFootName {
                       Style: @AbilityNameStyle;
                       Text: "Light Foot";
-                      Anchor: (Bottom: 2, Left: 8);
+                      Anchor: (Bottom: 2);
                     }
 
                     Label #LightFootLevel {
@@ -528,7 +537,7 @@ $C.@PageOverlay {
                     Group { FlexWeight: 1; }
 
                     $C.@SmallSecondaryTextButton #LightFootUpgrade {
-                      Anchor: (Width: 75, Height: 26, Right: 10, Bottom: 6);
+                      Anchor: (Width: 75, Height: 26, Right: 2, Bottom: 6);
                       Text: "Upgrade";
                     }
                   }
@@ -540,7 +549,7 @@ $C.@PageOverlay {
                   LayoutMode: Left;
                   FlexWeight: 1;
                   Background: (TexturePath: "../Common/ability_bg.png", Border: 48);
-                  Padding: (Left: 26, Right: 24, Bottom: 10, Top: 14);
+                  Padding: (Left: 24, Right: 18, Bottom: 10, Top: 14);
 
                   Group {
                     LayoutMode: Top;
@@ -549,7 +558,7 @@ $C.@PageOverlay {
                     Label #ArmorProficiencyName {
                       Style: @AbilityNameStyle;
                       Text: "Armor Proficiency";
-                      Anchor: (Bottom: 2, Left: 8);
+                      Anchor: (Bottom: 2);
                     }
 
                     Label #ArmorProficiencyLevel {
@@ -576,7 +585,7 @@ $C.@PageOverlay {
                     Group { FlexWeight: 1; }
 
                     $C.@SmallSecondaryTextButton #ArmorProficiencyUpgrade {
-                      Anchor: (Width: 75, Height: 26, Right: 10, Bottom: 6);
+                      Anchor: (Width: 75, Height: 26, Right: 2, Bottom: 6);
                       Text: "Upgrade";
                     }
                   }
@@ -591,7 +600,7 @@ $C.@PageOverlay {
                   LayoutMode: Left;
                   FlexWeight: 1;
                   Background: (TexturePath: "../Common/ability_bg.png", Border: 48);
-                  Padding: (Left: 26, Right: 24, Bottom: 10, Top: 14);
+                  Padding: (Left: 24, Right: 18, Bottom: 10, Top: 14);
 
                   Group {
                     LayoutMode: Top;
@@ -600,7 +609,7 @@ $C.@PageOverlay {
                     Label #GlancingBlowName {
                       Style: @AbilityNameStyle;
                       Text: "Glancing Blow";
-                      Anchor: (Bottom: 2, Left: 8);
+                      Anchor: (Bottom: 2);
                     }
 
                     Label #GlancingBlowLevel {
@@ -627,7 +636,7 @@ $C.@PageOverlay {
                     Group { FlexWeight: 1; }
 
                     $C.@SmallSecondaryTextButton #GlancingBlowUpgrade {
-                      Anchor: (Width: 75, Height: 26, Right: 10, Bottom: 6);
+                      Anchor: (Width: 75, Height: 26, Right: 2, Bottom: 6);
                       Text: "Upgrade";
                     }
                   }
@@ -639,7 +648,7 @@ $C.@PageOverlay {
                   LayoutMode: Left;
                   FlexWeight: 1;
                   Background: (TexturePath: "../Common/ability_bg.png", Border: 48);
-                  Padding: (Left: 26, Right: 24, Bottom: 10, Top: 14);
+                  Padding: (Left: 24, Right: 18, Bottom: 10, Top: 14);
 
                   Group {
                     LayoutMode: Top;
@@ -648,7 +657,7 @@ $C.@PageOverlay {
                     Label #HealthRegenName {
                       Style: @AbilityNameStyle;
                       Text: "Health Regeneration";
-                      Anchor: (Bottom: 2, Left: 8);
+                      Anchor: (Bottom: 2);
                     }
 
                     Label #HealthRegenLevel {
@@ -675,7 +684,7 @@ $C.@PageOverlay {
                     Group { FlexWeight: 1; }
 
                     $C.@SmallSecondaryTextButton #HealthRegenUpgrade {
-                      Anchor: (Width: 75, Height: 26, Right: 10, Bottom: 6);
+                      Anchor: (Width: 75, Height: 26, Right: 2, Bottom: 6);
                       Text: "Upgrade";
                     }
                   }
@@ -690,7 +699,7 @@ $C.@PageOverlay {
                   LayoutMode: Left;
                   FlexWeight: 1;
                   Background: (TexturePath: "../Common/ability_bg.png", Border: 48);
-                  Padding: (Left: 26, Right: 24, Bottom: 10, Top: 14);
+                  Padding: (Left: 24, Right: 18, Bottom: 10, Top: 14);
 
                   Group {
                     LayoutMode: Top;
@@ -699,7 +708,7 @@ $C.@PageOverlay {
                     Label #StaminaRegenName {
                       Style: @AbilityNameStyle;
                       Text: "Stamina Regeneration";
-                      Anchor: (Bottom: 2, Left: 8);
+                      Anchor: (Bottom: 2);
                     }
 
                     Label #StaminaRegenLevel {
@@ -726,7 +735,7 @@ $C.@PageOverlay {
                     Group { FlexWeight: 1; }
 
                     $C.@SmallSecondaryTextButton #StaminaRegenUpgrade {
-                      Anchor: (Width: 75, Height: 26, Right: 10, Bottom: 6);
+                      Anchor: (Width: 75, Height: 26, Right: 2, Bottom: 6);
                       Text: "Upgrade";
                     }
                   }
@@ -738,7 +747,7 @@ $C.@PageOverlay {
                   LayoutMode: Left;
                   FlexWeight: 1;
                   Background: (TexturePath: "../Common/ability_bg.png", Border: 48);
-                  Padding: (Left: 26, Right: 24, Bottom: 10, Top: 14);
+                  Padding: (Left: 24, Right: 18, Bottom: 10, Top: 14);
 
                   Group {
                     LayoutMode: Top;
@@ -747,7 +756,7 @@ $C.@PageOverlay {
                     Label #StrongLungsName {
                       Style: @AbilityNameStyle;
                       Text: "Strong Lungs";
-                      Anchor: (Bottom: 2, Left: 8);
+                      Anchor: (Bottom: 2);
                     }
 
                     Label #StrongLungsLevel {
@@ -774,7 +783,7 @@ $C.@PageOverlay {
                     Group { FlexWeight: 1; }
 
                     $C.@SmallSecondaryTextButton #StrongLungsUpgrade {
-                      Anchor: (Width: 75, Height: 26, Right: 10, Bottom: 6);
+                      Anchor: (Width: 75, Height: 26, Right: 2, Bottom: 6);
                       Text: "Upgrade";
                     }
                   }
@@ -789,7 +798,7 @@ $C.@PageOverlay {
                   LayoutMode: Left;
                   FlexWeight: 1;
                   Background: (TexturePath: "../Common/ability_bg.png", Border: 48);
-                  Padding: (Left: 26, Right: 24, Bottom: 10, Top: 14);
+                  Padding: (Left: 24, Right: 18, Bottom: 10, Top: 14);
 
                   Group {
                     LayoutMode: Top;
@@ -798,7 +807,7 @@ $C.@PageOverlay {
                     Label #LuckyShotName {
                       Style: @AbilityNameStyle;
                       Text: "Lucky Shot (WIP)";
-                      Anchor: (Bottom: 2, Left: 8);
+                      Anchor: (Bottom: 2);
                     }
 
                     Label #LuckyShotLevel {
@@ -825,7 +834,7 @@ $C.@PageOverlay {
                     Group { FlexWeight: 1; }
 
                     $C.@SmallSecondaryTextButton #LuckyShotUpgrade {
-                      Anchor: (Width: 75, Height: 26, Right: 10, Bottom: 6);
+                      Anchor: (Width: 75, Height: 26, Right: 2, Bottom: 6);
                       Text: "Upgrade";
                     }
                   }
@@ -837,7 +846,7 @@ $C.@PageOverlay {
                   LayoutMode: Left;
                   FlexWeight: 1;
                   Background: (TexturePath: "../Common/ability_bg.png", Border: 48);
-                  Padding: (Left: 26, Right: 24, Bottom: 10, Top: 14);
+                  Padding: (Left: 24, Right: 18, Bottom: 10, Top: 14);
 
                   Group {
                     LayoutMode: Top;
@@ -846,7 +855,7 @@ $C.@PageOverlay {
                     Label #CriticalStrikeName {
                       Style: @AbilityNameStyle;
                       Text: "Critical Strike";
-                      Anchor: (Bottom: 2, Left: 8);
+                      Anchor: (Bottom: 2);
                     }
 
                     Label #CriticalStrikeLevel {
@@ -873,7 +882,7 @@ $C.@PageOverlay {
                     Group { FlexWeight: 1; }
 
                     $C.@SmallSecondaryTextButton #CriticalStrikeUpgrade {
-                      Anchor: (Width: 75, Height: 26, Right: 10, Bottom: 6);
+                      Anchor: (Width: 75, Height: 26, Right: 2, Bottom: 6);
                       Text: "Upgrade";
                     }
                   }
@@ -888,7 +897,7 @@ $C.@PageOverlay {
                   LayoutMode: Left;
                   FlexWeight: 1;
                   Background: (TexturePath: "../Common/ability_bg.png", Border: 48);
-                  Padding: (Left: 26, Right: 24, Bottom: 10, Top: 14);
+                  Padding: (Left: 24, Right: 18, Bottom: 10, Top: 14);
 
                   Group {
                     LayoutMode: Top;
@@ -897,7 +906,7 @@ $C.@PageOverlay {
                     Label #LifestealName {
                       Style: @AbilityNameStyle;
                       Text: "Lifesteal";
-                      Anchor: (Bottom: 2, Left: 8);
+                      Anchor: (Bottom: 2);
                     }
 
                     Label #LifestealLevel {
@@ -924,7 +933,7 @@ $C.@PageOverlay {
                     Group { FlexWeight: 1; }
 
                     $C.@SmallSecondaryTextButton #LifestealUpgrade {
-                      Anchor: (Width: 75, Height: 26, Right: 10, Bottom: 6);
+                      Anchor: (Width: 75, Height: 26, Right: 2, Bottom: 6);
                       Text: "Upgrade";
                     }
                   }
@@ -936,7 +945,7 @@ $C.@PageOverlay {
                   LayoutMode: Left;
                   FlexWeight: 1;
                   Background: (TexturePath: "../Common/ability_bg.png", Border: 48);
-                  Padding: (Left: 26, Right: 24, Bottom: 10, Top: 14);
+                  Padding: (Left: 24, Right: 18, Bottom: 10, Top: 14);
 
                   Group {
                     LayoutMode: Top;
@@ -945,7 +954,7 @@ $C.@PageOverlay {
                     Label #ThornsName {
                       Style: @AbilityNameStyle;
                       Text: "Thorns";
-                      Anchor: (Bottom: 2, Left: 8);
+                      Anchor: (Bottom: 2);
                     }
 
                     Label #ThornsLevel {
@@ -972,7 +981,7 @@ $C.@PageOverlay {
                     Group { FlexWeight: 1; }
 
                     $C.@SmallSecondaryTextButton #ThornsUpgrade {
-                      Anchor: (Width: 75, Height: 26, Right: 10, Bottom: 6);
+                      Anchor: (Width: 75, Height: 26, Right: 2, Bottom: 6);
                       Text: "Upgrade";
                     }
                   }
@@ -987,7 +996,7 @@ $C.@PageOverlay {
                   LayoutMode: Left;
                   FlexWeight: 1;
                   Background: (TexturePath: "../Common/ability_bg.png", Border: 48);
-                  Padding: (Left: 26, Right: 24, Bottom: 10, Top: 14);
+                  Padding: (Left: 24, Right: 18, Bottom: 10, Top: 14);
 
                   Group {
                     LayoutMode: Top;
@@ -996,7 +1005,7 @@ $C.@PageOverlay {
                     Label #ToolProficiencyName {
                       Style: @AbilityNameStyle;
                       Text: "Tool Proficiency";
-                      Anchor: (Bottom: 2, Left: 8);
+                      Anchor: (Bottom: 2);
                     }
 
                     Label #ToolProficiencyLevel {
@@ -1023,7 +1032,7 @@ $C.@PageOverlay {
                     Group { FlexWeight: 1; }
 
                     $C.@SmallSecondaryTextButton #ToolProficiencyUpgrade {
-                      Anchor: (Width: 75, Height: 26, Right: 10, Bottom: 6);
+                      Anchor: (Width: 75, Height: 26, Right: 2, Bottom: 6);
                       Text: "Upgrade";
                     }
                   }
@@ -1035,7 +1044,7 @@ $C.@PageOverlay {
                   LayoutMode: Left;
                   FlexWeight: 1;
                   Background: (TexturePath: "../Common/ability_bg.png", Border: 48);
-                  Padding: (Left: 26, Right: 24, Bottom: 10, Top: 14);
+                  Padding: (Left: 24, Right: 18, Bottom: 10, Top: 14);
 
                   Group {
                     LayoutMode: Top;
@@ -1044,7 +1053,7 @@ $C.@PageOverlay {
                     Label #LuckyMinerName {
                       Style: @AbilityNameStyle;
                       Text: "Lucky Miner";
-                      Anchor: (Bottom: 2, Left: 8);
+                      Anchor: (Bottom: 2);
                     }
 
                     Label #LuckyMinerLevel {
@@ -1071,7 +1080,7 @@ $C.@PageOverlay {
                     Group { FlexWeight: 1; }
 
                     $C.@SmallSecondaryTextButton #LuckyMinerUpgrade {
-                      Anchor: (Width: 75, Height: 26, Right: 10, Bottom: 6);
+                      Anchor: (Width: 75, Height: 26, Right: 2, Bottom: 6);
                       Text: "Upgrade";
                     }
                   }
@@ -1086,7 +1095,7 @@ $C.@PageOverlay {
                   LayoutMode: Left;
                   FlexWeight: 1;
                   Background: (TexturePath: "../Common/ability_bg.png", Border: 48);
-                  Padding: (Left: 26, Right: 24, Bottom: 10, Top: 14);
+                  Padding: (Left: 24, Right: 18, Bottom: 10, Top: 14);
 
                   Group {
                     LayoutMode: Top;
@@ -1095,7 +1104,7 @@ $C.@PageOverlay {
                     Label #FlameTouchName {
                       Style: @AbilityNameStyle;
                       Text: "Flame Touch";
-                      Anchor: (Bottom: 2, Left: 8);
+                      Anchor: (Bottom: 2);
                     }
 
                     Label #FlameTouchLevel {
@@ -1122,7 +1131,7 @@ $C.@PageOverlay {
                     Group { FlexWeight: 1; }
 
                     $C.@SmallSecondaryTextButton #FlameTouchUpgrade {
-                      Anchor: (Width: 75, Height: 26, Right: 10, Bottom: 6);
+                      Anchor: (Width: 75, Height: 26, Right: 2, Bottom: 6);
                       Text: "Upgrade";
                     }
                   }
@@ -1134,7 +1143,7 @@ $C.@PageOverlay {
                   LayoutMode: Left;
                   FlexWeight: 1;
                   Background: (TexturePath: "../Common/ability_bg.png", Border: 48);
-                  Padding: (Left: 26, Right: 24, Bottom: 10, Top: 14);
+                  Padding: (Left: 24, Right: 18, Bottom: 10, Top: 14);
 
                   Group {
                     LayoutMode: Top;
@@ -1143,7 +1152,7 @@ $C.@PageOverlay {
                     Label #GourmandName {
                       Style: @AbilityNameStyle;
                       Text: "Gourmand";
-                      Anchor: (Bottom: 2, Left: 8);
+                      Anchor: (Bottom: 2);
                     }
 
                     Label #GourmandLevel {
@@ -1170,9 +1179,450 @@ $C.@PageOverlay {
                     Group { FlexWeight: 1; }
 
                     $C.@SmallSecondaryTextButton #GourmandUpgrade {
-                      Anchor: (Width: 75, Height: 26, Right: 10, Bottom: 6);
+                      Anchor: (Width: 75, Height: 26, Right: 2, Bottom: 6);
                       Text: "Upgrade";
                     }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+
+      Group #PartyContent {
+        LayoutMode: Top;
+        FlexWeight: 1;
+        Visible: false;
+
+        Group #PartyPanel {
+          FlexWeight: 1;
+          Background: (TexturePath: "../Common/ContainerPanelPatch.png", Border: 4);
+          LayoutMode: Top;
+          Padding: (Full: 16);
+
+          Group {
+            LayoutMode: Left;
+            Anchor: (Bottom: 12);
+
+            Label {
+              Style: @SectionTitleStyle;
+              Text: "Party";
+            }
+
+            Group { FlexWeight: 1; }
+
+            $C.@SecondaryTextButton #PartyCreateButton {
+              Anchor: (Width: 180, Height: 26);
+              Text: "Create Party";
+            }
+
+            $C.@SecondaryTextButton #PartyLeaveButton {
+              Anchor: (Width: 180, Height: 26);
+              Text: "Leave Party";
+              Visible: false;
+              HitTestVisible: false;
+            }
+          }
+
+          Group #PartyList {
+            FlexWeight: 1;
+            LayoutMode: TopScrolling;
+            ScrollbarStyle: $C.@DefaultScrollbarStyle;
+            Padding: (Right: 8);
+
+            Group #PartyListStack {
+              LayoutMode: Top;
+              Anchor: (Left: 0, Right: 0);
+
+              Group #PartyPlayer1Card {
+                LayoutMode: Left;
+                Anchor: (Left: 0, Right: 0, Height: 96, Bottom: 8);
+                Background: (TexturePath: "../Common/party_bg.png", Border: 48);
+                Padding: (Left: 24, Right: 18, Bottom: 10, Top: 12);
+
+                Group {
+                  LayoutMode: Top;
+                  FlexWeight: 1;
+
+                  Label #PartyPlayer1Name {
+                    Style: @AbilityNameStyle;
+                    Text: "Player";
+                    Anchor: (Bottom: 2);
+                  }
+
+                  Label #PartyPlayer1Level {
+                    Style: (...$C.@DefaultLabelStyle, TextColor: #9fb3c8);
+                    Text: "LV ?";
+                    Anchor: (Bottom: 2);
+                  }
+
+                  Label #PartyPlayer1Status {
+                    Style: @AbilityDescriptionStyle;
+                    Text: "No party";
+                  }
+                }
+
+                Group {
+                  Anchor: (Width: 180);
+                  LayoutMode: Top;
+
+                  $C.@SmallSecondaryTextButton #PartyPlayer1Invite {
+                    Anchor: (Width: 160, Height: 24, Bottom: 6);
+                    Text: "Invite";
+                  }
+
+                  $C.@SmallSecondaryTextButton #PartyPlayer1Accept {
+                    Anchor: (Width: 160, Height: 24, Bottom: 6);
+                    Text: "Accept";
+                  }
+
+                  $C.@SmallSecondaryTextButton #PartyPlayer1Decline {
+                    Anchor: (Width: 160, Height: 24);
+                    Text: "Decline";
+                  }
+                }
+              }
+
+              Group #PartyPlayer2Card {
+                LayoutMode: Left;
+                Anchor: (Left: 0, Right: 0, Height: 96, Bottom: 8);
+                Background: (TexturePath: "../Common/party_bg.png", Border: 48);
+                Padding: (Left: 24, Right: 18, Bottom: 10, Top: 12);
+
+                Group {
+                  LayoutMode: Top;
+                  FlexWeight: 1;
+
+                  Label #PartyPlayer2Name {
+                    Style: @AbilityNameStyle;
+                    Text: "Player";
+                    Anchor: (Bottom: 2);
+                  }
+
+                  Label #PartyPlayer2Level {
+                    Style: (...$C.@DefaultLabelStyle, TextColor: #9fb3c8);
+                    Text: "LV ?";
+                    Anchor: (Bottom: 2);
+                  }
+
+                  Label #PartyPlayer2Status {
+                    Style: @AbilityDescriptionStyle;
+                    Text: "No party";
+                  }
+                }
+
+                Group {
+                  Anchor: (Width: 180);
+                  LayoutMode: Top;
+
+                  $C.@SmallSecondaryTextButton #PartyPlayer2Invite {
+                    Anchor: (Width: 160, Height: 24, Bottom: 6);
+                    Text: "Invite";
+                  }
+
+                  $C.@SmallSecondaryTextButton #PartyPlayer2Accept {
+                    Anchor: (Width: 160, Height: 24, Bottom: 6);
+                    Text: "Accept";
+                  }
+
+                  $C.@SmallSecondaryTextButton #PartyPlayer2Decline {
+                    Anchor: (Width: 160, Height: 24);
+                    Text: "Decline";
+                  }
+                }
+              }
+
+              Group #PartyPlayer3Card {
+                LayoutMode: Left;
+                Anchor: (Left: 0, Right: 0, Height: 96, Bottom: 8);
+                Background: (TexturePath: "../Common/party_bg.png", Border: 48);
+                Padding: (Left: 24, Right: 18, Bottom: 10, Top: 12);
+
+                Group {
+                  LayoutMode: Top;
+                  FlexWeight: 1;
+
+                  Label #PartyPlayer3Name {
+                    Style: @AbilityNameStyle;
+                    Text: "Player";
+                    Anchor: (Bottom: 2);
+                  }
+
+                  Label #PartyPlayer3Level {
+                    Style: (...$C.@DefaultLabelStyle, TextColor: #9fb3c8);
+                    Text: "LV ?";
+                    Anchor: (Bottom: 2);
+                  }
+
+                  Label #PartyPlayer3Status {
+                    Style: @AbilityDescriptionStyle;
+                    Text: "No party";
+                  }
+                }
+
+                Group {
+                  Anchor: (Width: 180);
+                  LayoutMode: Top;
+
+                  $C.@SmallSecondaryTextButton #PartyPlayer3Invite {
+                    Anchor: (Width: 160, Height: 24, Bottom: 6);
+                    Text: "Invite";
+                  }
+
+                  $C.@SmallSecondaryTextButton #PartyPlayer3Accept {
+                    Anchor: (Width: 160, Height: 24, Bottom: 6);
+                    Text: "Accept";
+                  }
+
+                  $C.@SmallSecondaryTextButton #PartyPlayer3Decline {
+                    Anchor: (Width: 160, Height: 24);
+                    Text: "Decline";
+                  }
+                }
+              }
+
+              Group #PartyPlayer4Card {
+                LayoutMode: Left;
+                Anchor: (Left: 0, Right: 0, Height: 96, Bottom: 8);
+                Background: (TexturePath: "../Common/party_bg.png", Border: 48);
+                Padding: (Left: 24, Right: 18, Bottom: 10, Top: 12);
+
+                Group {
+                  LayoutMode: Top;
+                  FlexWeight: 1;
+
+                  Label #PartyPlayer4Name {
+                    Style: @AbilityNameStyle;
+                    Text: "Player";
+                    Anchor: (Bottom: 2);
+                  }
+
+                  Label #PartyPlayer4Level {
+                    Style: (...$C.@DefaultLabelStyle, TextColor: #9fb3c8);
+                    Text: "LV ?";
+                    Anchor: (Bottom: 2);
+                  }
+
+                  Label #PartyPlayer4Status {
+                    Style: @AbilityDescriptionStyle;
+                    Text: "No party";
+                  }
+                }
+
+                Group {
+                  Anchor: (Width: 180);
+                  LayoutMode: Top;
+
+                  $C.@SmallSecondaryTextButton #PartyPlayer4Invite {
+                    Anchor: (Width: 160, Height: 24, Bottom: 6);
+                    Text: "Invite";
+                  }
+
+                  $C.@SmallSecondaryTextButton #PartyPlayer4Accept {
+                    Anchor: (Width: 160, Height: 24, Bottom: 6);
+                    Text: "Accept";
+                  }
+
+                  $C.@SmallSecondaryTextButton #PartyPlayer4Decline {
+                    Anchor: (Width: 160, Height: 24);
+                    Text: "Decline";
+                  }
+                }
+              }
+
+              Group #PartyPlayer5Card {
+                LayoutMode: Left;
+                Anchor: (Left: 0, Right: 0, Height: 96, Bottom: 8);
+                Background: (TexturePath: "../Common/party_bg.png", Border: 48);
+                Padding: (Left: 24, Right: 18, Bottom: 10, Top: 12);
+
+                Group {
+                  LayoutMode: Top;
+                  FlexWeight: 1;
+
+                  Label #PartyPlayer5Name {
+                    Style: @AbilityNameStyle;
+                    Text: "Player";
+                    Anchor: (Bottom: 2);
+                  }
+
+                  Label #PartyPlayer5Level {
+                    Style: (...$C.@DefaultLabelStyle, TextColor: #9fb3c8);
+                    Text: "LV ?";
+                    Anchor: (Bottom: 2);
+                  }
+
+                  Label #PartyPlayer5Status {
+                    Style: @AbilityDescriptionStyle;
+                    Text: "No party";
+                  }
+                }
+
+                Group {
+                  Anchor: (Width: 180);
+                  LayoutMode: Top;
+
+                  $C.@SmallSecondaryTextButton #PartyPlayer5Invite {
+                    Anchor: (Width: 160, Height: 24, Bottom: 6);
+                    Text: "Invite";
+                  }
+
+                  $C.@SmallSecondaryTextButton #PartyPlayer5Accept {
+                    Anchor: (Width: 160, Height: 24, Bottom: 6);
+                    Text: "Accept";
+                  }
+
+                  $C.@SmallSecondaryTextButton #PartyPlayer5Decline {
+                    Anchor: (Width: 160, Height: 24);
+                    Text: "Decline";
+                  }
+                }
+              }
+
+              Group #PartyPlayer6Card {
+                LayoutMode: Left;
+                Anchor: (Left: 0, Right: 0, Height: 96, Bottom: 8);
+                Background: (TexturePath: "../Common/party_bg.png", Border: 48);
+                Padding: (Left: 24, Right: 18, Bottom: 10, Top: 12);
+
+                Group {
+                  LayoutMode: Top;
+                  FlexWeight: 1;
+
+                  Label #PartyPlayer6Name {
+                    Style: @AbilityNameStyle;
+                    Text: "Player";
+                    Anchor: (Bottom: 2);
+                  }
+
+                  Label #PartyPlayer6Level {
+                    Style: (...$C.@DefaultLabelStyle, TextColor: #9fb3c8);
+                    Text: "LV ?";
+                    Anchor: (Bottom: 2);
+                  }
+
+                  Label #PartyPlayer6Status {
+                    Style: @AbilityDescriptionStyle;
+                    Text: "No party";
+                  }
+                }
+
+                Group {
+                  Anchor: (Width: 180);
+                  LayoutMode: Top;
+
+                  $C.@SmallSecondaryTextButton #PartyPlayer6Invite {
+                    Anchor: (Width: 160, Height: 24, Bottom: 6);
+                    Text: "Invite";
+                  }
+
+                  $C.@SmallSecondaryTextButton #PartyPlayer6Accept {
+                    Anchor: (Width: 160, Height: 24, Bottom: 6);
+                    Text: "Accept";
+                  }
+
+                  $C.@SmallSecondaryTextButton #PartyPlayer6Decline {
+                    Anchor: (Width: 160, Height: 24);
+                    Text: "Decline";
+                  }
+                }
+              }
+
+              Group #PartyPlayer7Card {
+                LayoutMode: Left;
+                Anchor: (Left: 0, Right: 0, Height: 96, Bottom: 8);
+                Background: (TexturePath: "../Common/party_bg.png", Border: 48);
+                Padding: (Left: 24, Right: 18, Bottom: 10, Top: 12);
+
+                Group {
+                  LayoutMode: Top;
+                  FlexWeight: 1;
+
+                  Label #PartyPlayer7Name {
+                    Style: @AbilityNameStyle;
+                    Text: "Player";
+                    Anchor: (Bottom: 2);
+                  }
+
+                  Label #PartyPlayer7Level {
+                    Style: (...$C.@DefaultLabelStyle, TextColor: #9fb3c8);
+                    Text: "LV ?";
+                    Anchor: (Bottom: 2);
+                  }
+
+                  Label #PartyPlayer7Status {
+                    Style: @AbilityDescriptionStyle;
+                    Text: "No party";
+                  }
+                }
+
+                Group {
+                  Anchor: (Width: 180);
+                  LayoutMode: Top;
+
+                  $C.@SmallSecondaryTextButton #PartyPlayer7Invite {
+                    Anchor: (Width: 160, Height: 24, Bottom: 6);
+                    Text: "Invite";
+                  }
+
+                  $C.@SmallSecondaryTextButton #PartyPlayer7Accept {
+                    Anchor: (Width: 160, Height: 24, Bottom: 6);
+                    Text: "Accept";
+                  }
+
+                  $C.@SmallSecondaryTextButton #PartyPlayer7Decline {
+                    Anchor: (Width: 160, Height: 24);
+                    Text: "Decline";
+                  }
+                }
+              }
+
+              Group #PartyPlayer8Card {
+                LayoutMode: Left;
+                Anchor: (Left: 0, Right: 0, Height: 96, Bottom: 8);
+                Background: (TexturePath: "../Common/party_bg.png", Border: 48);
+                Padding: (Left: 24, Right: 18, Bottom: 10, Top: 12);
+
+                Group {
+                  LayoutMode: Top;
+                  FlexWeight: 1;
+
+                  Label #PartyPlayer8Name {
+                    Style: @AbilityNameStyle;
+                    Text: "Player";
+                    Anchor: (Bottom: 2);
+                  }
+
+                  Label #PartyPlayer8Level {
+                    Style: (...$C.@DefaultLabelStyle, TextColor: #9fb3c8);
+                    Text: "LV ?";
+                    Anchor: (Bottom: 2);
+                  }
+
+                  Label #PartyPlayer8Status {
+                    Style: @AbilityDescriptionStyle;
+                    Text: "No party";
+                  }
+                }
+
+                Group {
+                  Anchor: (Width: 180);
+                  LayoutMode: Top;
+
+                  $C.@SmallSecondaryTextButton #PartyPlayer8Invite {
+                    Anchor: (Width: 160, Height: 24, Bottom: 6);
+                    Text: "Invite";
+                  }
+
+                  $C.@SmallSecondaryTextButton #PartyPlayer8Accept {
+                    Anchor: (Width: 160, Height: 24, Bottom: 6);
+                    Text: "Accept";
+                  }
+
+                  $C.@SmallSecondaryTextButton #PartyPlayer8Decline {
+                    Anchor: (Width: 160, Height: 24);
+                    Text: "Decline";
                   }
                 }
               }
@@ -1218,3 +1668,4 @@ $C.@PageOverlay {
 
   }
 }
+

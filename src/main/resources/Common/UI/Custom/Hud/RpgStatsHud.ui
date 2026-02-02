@@ -1,7 +1,7 @@
-$C = "../Common.ui";
+// RpgStats XP HUD - Inline styles (no external references)
+// Fixed: Removed $C = "../Common.ui" reference that caused crash
 
 @HudLabelStyle = LabelStyle(
-  ...$C.@DefaultLabelStyle,
   FontSize: 12,
   TextColor: #bfcdd5,
   RenderBold: true,
@@ -9,11 +9,11 @@ $C = "../Common.ui";
 );
 
 Group {
-  Anchor: (Bottom: 135, Left: 0, Right: 0, Height: 36);
+  Anchor: (Bottom: 135, Left: 0, Right: 0, Height: 42);
   LayoutMode: Center;
 
   Group #XpHudContainer {
-    Anchor: (Width: 260, Height: 32);
+    Anchor: (Width: 400, Height: 38);
     Background: (TexturePath: "../Common/ContainerPanelPatch.png", Border: 4);
     Padding: (Full: 6);
     LayoutMode: Top;
@@ -37,17 +37,35 @@ Group {
     }
 
     Group {
-      Anchor: (Height: 8, Left: 0, Right: 0);
-      Background: "../Common/ProgressBar.png";
+      Anchor: (Height: 12, Left: 0, Right: 0);
+      Background: (TexturePath: "../Common/XpBarBackground.png");
       Padding: (Full: 2);
 
       ProgressBar #XpHudBar {
-        BarTexturePath: "../Common/ProgressBarFill.png";
-        EffectTexturePath: "../Common/ProgressBarEffect.png";
-        EffectWidth: 40;
-        EffectHeight: 16;
-        EffectOffset: 30;
+        Anchor: (Full: 0);
+        BarTexturePath: "../Common/XpBarFill.png";
+        EffectTexturePath: "../Common/XpBarEffect.png";
+        EffectWidth: 60;
+        EffectHeight: 20;
+        EffectOffset: 40;
       }
     }
+  }
+}
+
+Group #PartyHudContainer {
+  Anchor: (Top: 20, Left: 20, Width: 260);
+  LayoutMode: Top;
+  Padding: (Full: 8);
+  Visible: false;
+
+  Label #PartyHudTitle {
+    Style: @HudLabelStyle;
+    Text: "Party";
+    Anchor: (Bottom: 6);
+  }
+
+  Group #PartyHudList {
+    LayoutMode: Top;
   }
 }

@@ -2,7 +2,7 @@
     "Name": "RPG Stats",
     "Description": "DND Style rpg stats for hytale",
     "Author": "BadgerSnacks",
-    "Version": "0.6.0",
+    "Version": "0.7.0",
     "Main": "com.bsnacks.rpgstats.RpgStatsPlugin",
     "IncludesAssetPack": true,
     "Group": "com.bsnacks"

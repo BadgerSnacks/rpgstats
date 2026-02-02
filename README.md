@@ -22,7 +22,10 @@ This project is a java plugin mod for the game Hytale. It gives each player RPG-
 - Lets admins set or reset stats with `/stats set` and `/stats reset`.
 - Provides a stats GUI with tabs (Stats, Abilities, Reset) and an XP progress bar.
 - Shows an optional HUD XP bar (toggle with `hud_enabled` in `config.toml`).
-- Awards XP on hostile NPC kills and shows chat updates. XP is determined by health of hostile entity.
+- Party system with `/sparty` commands and a Party tab in the stats GUI.
+- Party HUD overlay (top-left) showing party members, level, health %, and out-of-range indicator.
+- Party XP sharing for kills and mining within a configurable radius (scaled-killer distribution).
+- Awards XP on hostile NPC kills and shows chat updates (toggle via `xp_chat_messages_enabled`). XP is determined by health of hostile entity.
 - Applies **Strength damage multiplier**: `damage = baseDamage * (str / damage_multiplier_base)`.
   - STR 10 = 1.0x, STR 11 = 1.1x, STR 20 = 2.0x, STR 25 = 2.5x.
 - Applies **Constitution max health**: `+health_per_point` per point above 10; below 10 reduces max health (floor 10).
@@ -51,6 +54,19 @@ Basic command:
 /stats
 ```
 Opens the stats GUI (tabs for Stats, Abilities, and Reset).
+
+Party commands:
+```text
+/sparty create
+/sparty invite <player>
+/sparty accept <player>
+/sparty decline <player>
+/sparty leave
+/sparty kick <player>
+/sparty disband
+/sparty info
+```
+The Party tab in `/stats` shows online players and lets you invite/accept/decline from the UI.
 
 Reset your stats (GUI tab):
 - The Reset tab includes a warning and a button to reset your stats.
@@ -107,7 +123,7 @@ The plugin writes `config.toml` to the plugin data directory on first run. Edit 
 
 Default keys:
 ```toml
-config_version = 5
+config_version = 16
 xp_multiplier = 0.35
 max_level = 25
 ability_points_per_level = 2
@@ -133,6 +149,18 @@ health_per_point = 10.0 # (CON)
 mana_per_point = 10.0 # (INT)
 stamina_per_point = 1.0 # (END)
 hud_enabled = true
+xp_chat_messages_enabled = false
+party_enabled = true
+party_max_size = 5
+party_invite_timeout_sec = 60
+party_xp_share_mode = "scaled_killer"
+party_xp_share_radius_blocks = 256
+party_killer_share_by_size = [60, 50, 40, 30]
+party_extra_member_pct = 17
+party_hud_enabled = true
+party_hud_offset_x = 20
+party_hud_offset_y = 20
+party_hud_refresh_ticks = 20
 str_cap = 25
 dex_cap = 25
 con_cap = 25
@@ -155,6 +183,14 @@ Thorns reflects a percentage of damage taken back to attackers, scaling with `th
 Health/Stamina regeneration abilities add per-level points per second using
 `health_regen_per_level_per_sec` and `stamina_regen_per_level_per_sec`.
 Set `hud_enabled = false` to disable the HUD XP bar (useful for HUD mod conflicts like TextSigns).
+Set `xp_chat_messages_enabled = false` to hide XP gain chat messages (level-up splash still appears).
+
+Party settings:
+- `party_enabled` toggles the party system.
+- `party_xp_share_mode` currently supports `scaled_killer`.
+- `party_xp_share_radius_blocks` controls who is eligible for shared XP (0 = infinite).
+- `party_killer_share_by_size` and `party_extra_member_pct` define the scaled-killer split.
+- `party_hud_*` controls the party HUD overlay and its position.
 
 XP blacklist (xp_blacklist.toml):
 ```toml
@@ -193,7 +229,8 @@ XP is stored as **total XP**, and your level is calculated from that total.
 - XP formula: `round(maxHealth * xp_multiplier)`
 - Boss bonus: if `maxHealth >= 200`, XP is multiplied by `1.5`. (This may change after testing)
 - XP is clamped to `min = 1, max = 1000`.
-- Player chat shows XP gained and progress toward next level.
+- Player chat shows XP gained and progress toward next level (toggle with `xp_chat_messages_enabled`).
+- If in a party with shared XP enabled, kills are distributed to eligible party members within range.
 
 ## Diagnostics log
 

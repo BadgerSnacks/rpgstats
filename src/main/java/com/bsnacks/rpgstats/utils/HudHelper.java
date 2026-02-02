@@ -22,6 +22,7 @@ public final class HudHelper {
 
     // Track our own HUD instances per player
     private static final Map<UUID, CustomUIHud> playerHuds = new ConcurrentHashMap<>();
+    private static final java.util.Set<UUID> hiddenHudPlayers = ConcurrentHashMap.newKeySet();
 
     // Cached reflection objects for MultipleHUD
     private static Object multipleHudInstance = null;
@@ -99,6 +100,25 @@ public final class HudHelper {
         }
     }
 
+    public static boolean isHudHidden(PlayerRef playerRef) {
+        if (playerRef == null) {
+            return false;
+        }
+        return hiddenHudPlayers.contains(playerRef.getUuid());
+    }
+
+    public static void setHudHidden(PlayerRef playerRef, boolean hidden) {
+        if (playerRef == null) {
+            return;
+        }
+        UUID playerUuid = playerRef.getUuid();
+        if (hidden) {
+            hiddenHudPlayers.add(playerUuid);
+        } else {
+            hiddenHudPlayers.remove(playerUuid);
+        }
+    }
+
     /**
      * Gets the RPGStats HUD for a player if it's currently active.
      * With MultipleHUD: Returns our tracked HUD since multiple HUDs can coexist.
@@ -123,5 +143,6 @@ public final class HudHelper {
      */
     public static void removePlayer(UUID playerUuid) {
         playerHuds.remove(playerUuid);
+        hiddenHudPlayers.remove(playerUuid);
     }
 }

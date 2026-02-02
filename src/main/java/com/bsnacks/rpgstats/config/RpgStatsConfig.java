@@ -9,11 +9,13 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
@@ -25,7 +27,7 @@ public final class RpgStatsConfig {
     private static final String XP_BLACKLIST_FILE_NAME = "xp_blacklist.toml";
     private static final String MINING_XP_FILE_NAME = "mining_xp.toml";
     private static final String CRAFTING_XP_FILE_NAME = "crafting_xp.toml";
-    private static final int CURRENT_CONFIG_VERSION = 13;
+    private static final int CURRENT_CONFIG_VERSION = 16;
     // Crafting XP formula defaults
     private static final int DEFAULT_CRAFTING_BASE_XP = 5;
     private static final double DEFAULT_CRAFTING_INGREDIENT_XP = 2.0;
@@ -74,6 +76,23 @@ public final class RpgStatsConfig {
     private static final double DEFAULT_MANA_PER_POINT = 10.0;
     private static final double DEFAULT_STAMINA_PER_POINT = 1.0;
     private static final boolean DEFAULT_HUD_ENABLED = true;
+    private static final boolean DEFAULT_XP_CHAT_MESSAGES_ENABLED = false;
+    private static final boolean DEFAULT_PARTY_ENABLED = true;
+    private static final int DEFAULT_PARTY_MAX_SIZE = 5;
+    private static final int MIN_PARTY_MAX_SIZE = 1;
+    private static final int DEFAULT_PARTY_INVITE_TIMEOUT_SEC = 60;
+    private static final int MIN_PARTY_INVITE_TIMEOUT_SEC = 1;
+    private static final String DEFAULT_PARTY_XP_SHARE_MODE = "scaled_killer";
+    private static final int DEFAULT_PARTY_XP_SHARE_RADIUS_BLOCKS = 256;
+    private static final int[] DEFAULT_PARTY_KILLER_SHARE_BY_SIZE = new int[] {60, 50, 40, 30};
+    private static final int DEFAULT_PARTY_EXTRA_MEMBER_PCT = 17;
+    private static final int MIN_PARTY_SHARE_PCT = 0;
+    private static final int MAX_PARTY_SHARE_PCT = 100;
+    private static final boolean DEFAULT_PARTY_HUD_ENABLED = true;
+    private static final int DEFAULT_PARTY_HUD_OFFSET_X = 20;
+    private static final int DEFAULT_PARTY_HUD_OFFSET_Y = 20;
+    private static final int DEFAULT_PARTY_HUD_REFRESH_TICKS = 20;
+    private static final int MIN_PARTY_HUD_REFRESH_TICKS = 1;
 
     private int configVersion;
     private double xpMultiplier;
@@ -91,6 +110,7 @@ public final class RpgStatsConfig {
     private double manaPerPoint;
     private double staminaPerPoint;
     private boolean hudEnabled;
+    private boolean xpChatMessagesEnabled;
     private int strCap;
     private int dexCap;
     private int conCap;
@@ -124,6 +144,17 @@ public final class RpgStatsConfig {
     private int abilityRank2Cost;
     private int abilityRank3Cost;
     private int maxAbilityLevel;
+    private boolean partyEnabled;
+    private int partyMaxSize;
+    private int partyInviteTimeoutSec;
+    private String partyXpShareMode;
+    private int partyXpShareRadiusBlocks;
+    private int[] partyKillerShareBySize;
+    private int partyExtraMemberPct;
+    private boolean partyHudEnabled;
+    private int partyHudOffsetX;
+    private int partyHudOffsetY;
+    private int partyHudRefreshTicks;
 
     private RpgStatsConfig(int configVersion, double xpMultiplier, int maxLevel, int abilityPointsPerLevel,
                             double lightFootSpeedPerLevelPct, double armorProficiencyResistancePerLevelPct,
@@ -132,7 +163,7 @@ public final class RpgStatsConfig {
                             double damageMultiplierBase,
                             double miningSpeedBase, double miningSpeedPerPoint,
                             double healthPerPoint, double manaPerPoint, double staminaPerPoint,
-                            boolean hudEnabled,
+                            boolean hudEnabled, boolean xpChatMessagesEnabled,
                             int strCap, int dexCap, int conCap, int intCap, int endCap, int chaCap,
                             Set<String> xpBlacklistNpcTypes, Set<String> xpBlacklistRoles,
                             Map<String, Integer> miningXpByBlockId,
@@ -149,7 +180,12 @@ public final class RpgStatsConfig {
                             double flameTouchBonusDamagePerLevelPct,
                             String flameTouchParticleSystem,
                             int abilityRank1Cost, int abilityRank2Cost, int abilityRank3Cost,
-                            int maxAbilityLevel) {
+                            int maxAbilityLevel,
+                            boolean partyEnabled, int partyMaxSize, int partyInviteTimeoutSec,
+                            String partyXpShareMode, int partyXpShareRadiusBlocks,
+                            int[] partyKillerShareBySize, int partyExtraMemberPct,
+                            boolean partyHudEnabled, int partyHudOffsetX, int partyHudOffsetY,
+                            int partyHudRefreshTicks) {
         this.configVersion = configVersion;
         this.xpMultiplier = xpMultiplier;
         this.maxLevel = maxLevel;
@@ -166,6 +202,7 @@ public final class RpgStatsConfig {
         this.manaPerPoint = manaPerPoint;
         this.staminaPerPoint = staminaPerPoint;
         this.hudEnabled = hudEnabled;
+        this.xpChatMessagesEnabled = xpChatMessagesEnabled;
         this.strCap = strCap;
         this.dexCap = dexCap;
         this.conCap = conCap;
@@ -199,6 +236,17 @@ public final class RpgStatsConfig {
         this.abilityRank2Cost = abilityRank2Cost;
         this.abilityRank3Cost = abilityRank3Cost;
         this.maxAbilityLevel = maxAbilityLevel;
+        this.partyEnabled = partyEnabled;
+        this.partyMaxSize = partyMaxSize;
+        this.partyInviteTimeoutSec = partyInviteTimeoutSec;
+        this.partyXpShareMode = partyXpShareMode;
+        this.partyXpShareRadiusBlocks = partyXpShareRadiusBlocks;
+        this.partyKillerShareBySize = partyKillerShareBySize;
+        this.partyExtraMemberPct = partyExtraMemberPct;
+        this.partyHudEnabled = partyHudEnabled;
+        this.partyHudOffsetX = partyHudOffsetX;
+        this.partyHudOffsetY = partyHudOffsetY;
+        this.partyHudRefreshTicks = partyHudRefreshTicks;
     }
 
     public double getXpMultiplier() {
@@ -323,6 +371,54 @@ public final class RpgStatsConfig {
 
     public boolean isHudEnabled() {
         return hudEnabled;
+    }
+
+    public boolean isXpChatMessagesEnabled() {
+        return xpChatMessagesEnabled;
+    }
+
+    public boolean isPartyEnabled() {
+        return partyEnabled;
+    }
+
+    public int getPartyMaxSize() {
+        return partyMaxSize;
+    }
+
+    public int getPartyInviteTimeoutSec() {
+        return partyInviteTimeoutSec;
+    }
+
+    public String getPartyXpShareMode() {
+        return partyXpShareMode;
+    }
+
+    public int getPartyXpShareRadiusBlocks() {
+        return partyXpShareRadiusBlocks;
+    }
+
+    public int[] getPartyKillerShareBySize() {
+        return partyKillerShareBySize == null ? new int[0] : partyKillerShareBySize.clone();
+    }
+
+    public int getPartyExtraMemberPct() {
+        return partyExtraMemberPct;
+    }
+
+    public boolean isPartyHudEnabled() {
+        return partyHudEnabled;
+    }
+
+    public int getPartyHudOffsetX() {
+        return partyHudOffsetX;
+    }
+
+    public int getPartyHudOffsetY() {
+        return partyHudOffsetY;
+    }
+
+    public int getPartyHudRefreshTicks() {
+        return partyHudRefreshTicks;
     }
 
     public int getStatCap(String attribute) {
@@ -467,6 +563,7 @@ public final class RpgStatsConfig {
         this.manaPerPoint = other.manaPerPoint;
         this.staminaPerPoint = other.staminaPerPoint;
         this.hudEnabled = other.hudEnabled;
+        this.xpChatMessagesEnabled = other.xpChatMessagesEnabled;
         this.strCap = other.strCap;
         this.dexCap = other.dexCap;
         this.conCap = other.conCap;
@@ -498,6 +595,17 @@ public final class RpgStatsConfig {
         this.abilityRank2Cost = other.abilityRank2Cost;
         this.abilityRank3Cost = other.abilityRank3Cost;
         this.maxAbilityLevel = other.maxAbilityLevel;
+        this.partyEnabled = other.partyEnabled;
+        this.partyMaxSize = other.partyMaxSize;
+        this.partyInviteTimeoutSec = other.partyInviteTimeoutSec;
+        this.partyXpShareMode = other.partyXpShareMode;
+        this.partyXpShareRadiusBlocks = other.partyXpShareRadiusBlocks;
+        this.partyKillerShareBySize = other.partyKillerShareBySize == null ? null : other.partyKillerShareBySize.clone();
+        this.partyExtraMemberPct = other.partyExtraMemberPct;
+        this.partyHudEnabled = other.partyHudEnabled;
+        this.partyHudOffsetX = other.partyHudOffsetX;
+        this.partyHudOffsetY = other.partyHudOffsetY;
+        this.partyHudRefreshTicks = other.partyHudRefreshTicks;
     }
 
     public static Path resolveConfigPath(Path dataDirectory) {
@@ -547,6 +655,7 @@ public final class RpgStatsConfig {
                     DEFAULT_MANA_PER_POINT,
                     DEFAULT_STAMINA_PER_POINT,
                     DEFAULT_HUD_ENABLED,
+                    DEFAULT_XP_CHAT_MESSAGES_ENABLED,
                     DEFAULT_STAT_CAP,
                     DEFAULT_STAT_CAP,
                     DEFAULT_STAT_CAP,
@@ -579,7 +688,18 @@ public final class RpgStatsConfig {
                     DEFAULT_ABILITY_RANK1_COST,
                     DEFAULT_ABILITY_RANK2_COST,
                     DEFAULT_ABILITY_RANK3_COST,
-                    DEFAULT_MAX_ABILITY_LEVEL
+                    DEFAULT_MAX_ABILITY_LEVEL,
+                    DEFAULT_PARTY_ENABLED,
+                    DEFAULT_PARTY_MAX_SIZE,
+                    DEFAULT_PARTY_INVITE_TIMEOUT_SEC,
+                    DEFAULT_PARTY_XP_SHARE_MODE,
+                    DEFAULT_PARTY_XP_SHARE_RADIUS_BLOCKS,
+                    DEFAULT_PARTY_KILLER_SHARE_BY_SIZE.clone(),
+                    DEFAULT_PARTY_EXTRA_MEMBER_PCT,
+                    DEFAULT_PARTY_HUD_ENABLED,
+                    DEFAULT_PARTY_HUD_OFFSET_X,
+                    DEFAULT_PARTY_HUD_OFFSET_Y,
+                    DEFAULT_PARTY_HUD_REFRESH_TICKS
             );
         }
 
@@ -777,6 +897,76 @@ public final class RpgStatsConfig {
         }
 
         boolean hudEnabled = parseBoolean(values.get("hud_enabled"), DEFAULT_HUD_ENABLED, logger, "hud_enabled");
+        boolean xpChatMessagesEnabled = parseBoolean(values.get("xp_chat_messages_enabled"),
+                DEFAULT_XP_CHAT_MESSAGES_ENABLED, logger, "xp_chat_messages_enabled");
+
+        boolean partyEnabled = parseBoolean(values.get("party_enabled"), DEFAULT_PARTY_ENABLED, logger, "party_enabled");
+
+        int partyMaxSize = parseInt(values.get("party_max_size"), DEFAULT_PARTY_MAX_SIZE, logger, "party_max_size");
+        if (partyMaxSize < MIN_PARTY_MAX_SIZE) {
+            logger.at(Level.WARNING).log("[RPGStats] party_max_size must be >= " + MIN_PARTY_MAX_SIZE
+                    + ". Using default " + DEFAULT_PARTY_MAX_SIZE);
+            partyMaxSize = DEFAULT_PARTY_MAX_SIZE;
+        }
+
+        int partyInviteTimeoutSec = parseInt(values.get("party_invite_timeout_sec"),
+                DEFAULT_PARTY_INVITE_TIMEOUT_SEC, logger, "party_invite_timeout_sec");
+        if (partyInviteTimeoutSec < MIN_PARTY_INVITE_TIMEOUT_SEC) {
+            logger.at(Level.WARNING).log("[RPGStats] party_invite_timeout_sec must be >= " + MIN_PARTY_INVITE_TIMEOUT_SEC
+                    + ". Using default " + DEFAULT_PARTY_INVITE_TIMEOUT_SEC);
+            partyInviteTimeoutSec = DEFAULT_PARTY_INVITE_TIMEOUT_SEC;
+        }
+
+        String partyXpShareMode = stripQuotes(values.get("party_xp_share_mode"));
+        if (partyXpShareMode == null || partyXpShareMode.isBlank()) {
+            partyXpShareMode = DEFAULT_PARTY_XP_SHARE_MODE;
+        } else {
+            partyXpShareMode = partyXpShareMode.trim().toLowerCase(Locale.ROOT);
+            if (!"scaled_killer".equals(partyXpShareMode)) {
+                logger.at(Level.WARNING).log("[RPGStats] party_xp_share_mode '" + partyXpShareMode
+                        + "' is invalid. Using default " + DEFAULT_PARTY_XP_SHARE_MODE);
+                partyXpShareMode = DEFAULT_PARTY_XP_SHARE_MODE;
+            }
+        }
+
+        int partyXpShareRadiusBlocks = parseInt(values.get("party_xp_share_radius_blocks"),
+                DEFAULT_PARTY_XP_SHARE_RADIUS_BLOCKS, logger, "party_xp_share_radius_blocks");
+        if (partyXpShareRadiusBlocks < 0) {
+            logger.at(Level.WARNING).log("[RPGStats] party_xp_share_radius_blocks must be >= 0. Using default "
+                    + DEFAULT_PARTY_XP_SHARE_RADIUS_BLOCKS);
+            partyXpShareRadiusBlocks = DEFAULT_PARTY_XP_SHARE_RADIUS_BLOCKS;
+        }
+
+        int[] partyKillerShareBySize = parseIntArray(values.get("party_killer_share_by_size"),
+                logger, "party_killer_share_by_size");
+        partyKillerShareBySize = clampPartyShares(partyKillerShareBySize, logger, "party_killer_share_by_size");
+        if (partyKillerShareBySize.length == 0) {
+            partyKillerShareBySize = DEFAULT_PARTY_KILLER_SHARE_BY_SIZE.clone();
+        }
+
+        int partyExtraMemberPct = parseInt(values.get("party_extra_member_pct"),
+                DEFAULT_PARTY_EXTRA_MEMBER_PCT, logger, "party_extra_member_pct");
+        if (partyExtraMemberPct < MIN_PARTY_SHARE_PCT || partyExtraMemberPct > MAX_PARTY_SHARE_PCT) {
+            logger.at(Level.WARNING).log("[RPGStats] party_extra_member_pct must be between "
+                    + MIN_PARTY_SHARE_PCT + " and " + MAX_PARTY_SHARE_PCT + ". Using default "
+                    + DEFAULT_PARTY_EXTRA_MEMBER_PCT);
+            partyExtraMemberPct = DEFAULT_PARTY_EXTRA_MEMBER_PCT;
+        }
+
+        boolean partyHudEnabled = parseBoolean(values.get("party_hud_enabled"),
+                DEFAULT_PARTY_HUD_ENABLED, logger, "party_hud_enabled");
+
+        int partyHudOffsetX = parseInt(values.get("party_hud_offset_x"),
+                DEFAULT_PARTY_HUD_OFFSET_X, logger, "party_hud_offset_x");
+        int partyHudOffsetY = parseInt(values.get("party_hud_offset_y"),
+                DEFAULT_PARTY_HUD_OFFSET_Y, logger, "party_hud_offset_y");
+        int partyHudRefreshTicks = parseInt(values.get("party_hud_refresh_ticks"),
+                DEFAULT_PARTY_HUD_REFRESH_TICKS, logger, "party_hud_refresh_ticks");
+        if (partyHudRefreshTicks < MIN_PARTY_HUD_REFRESH_TICKS) {
+            logger.at(Level.WARNING).log("[RPGStats] party_hud_refresh_ticks must be >= "
+                    + MIN_PARTY_HUD_REFRESH_TICKS + ". Using default " + DEFAULT_PARTY_HUD_REFRESH_TICKS);
+            partyHudRefreshTicks = DEFAULT_PARTY_HUD_REFRESH_TICKS;
+        }
 
         int strCap = parseCap(values.get("str_cap"), "str_cap", logger);
         int dexCap = parseCap(values.get("dex_cap"), "dex_cap", logger);
@@ -798,6 +988,7 @@ public final class RpgStatsConfig {
                 healthRegenPerLevelPerSec, staminaRegenPerLevelPerSec, glancingBlowChancePerLevelPct,
                 damageBase, miningBase, miningPerPoint, healthPerPoint, manaPerPoint, staminaPerPoint,
                 hudEnabled,
+                xpChatMessagesEnabled,
                 strCap, dexCap, conCap, intCap, endCap, chaCap,
                 xpBlacklistNpcTypes, xpBlacklistRoles, miningXp.blockXp,
                 craftingXp.itemXp,
@@ -816,7 +1007,12 @@ public final class RpgStatsConfig {
                 flameTouchBonusDamagePerLevelPct,
                 flameTouchParticleSystem,
                 abilityRank1Cost, abilityRank2Cost, abilityRank3Cost,
-                maxAbilityLevel);
+                maxAbilityLevel,
+                partyEnabled, partyMaxSize, partyInviteTimeoutSec,
+                partyXpShareMode, partyXpShareRadiusBlocks,
+                partyKillerShareBySize, partyExtraMemberPct,
+                partyHudEnabled, partyHudOffsetX, partyHudOffsetY,
+                partyHudRefreshTicks);
         return config;
     }
 
@@ -1073,6 +1269,57 @@ public final class RpgStatsConfig {
             return Collections.emptySet();
         }
         return Collections.unmodifiableSet(values);
+    }
+
+    private static int[] parseIntArray(String raw, HytaleLogger logger, String key) {
+        if (raw == null) {
+            return new int[0];
+        }
+        String trimmed = raw.trim();
+        if (trimmed.isEmpty() || "[]".equals(trimmed)) {
+            return new int[0];
+        }
+        if (trimmed.startsWith("[") && trimmed.endsWith("]")) {
+            trimmed = trimmed.substring(1, trimmed.length() - 1);
+        }
+        String[] parts = trimmed.split(",");
+        List<Integer> values = new ArrayList<>();
+        for (String part : parts) {
+            String entry = stripQuotes(part.trim());
+            if (entry.isEmpty()) {
+                continue;
+            }
+            try {
+                values.add(Integer.parseInt(entry));
+            } catch (NumberFormatException ex) {
+                logger.at(Level.WARNING).log("[RPGStats] Invalid " + key + " entry '" + entry + "'.");
+            }
+        }
+        if (values.isEmpty()) {
+            return new int[0];
+        }
+        int[] result = new int[values.size()];
+        for (int i = 0; i < values.size(); i++) {
+            result[i] = values.get(i);
+        }
+        return result;
+    }
+
+    private static int[] clampPartyShares(int[] values, HytaleLogger logger, String key) {
+        if (values == null || values.length == 0) {
+            return new int[0];
+        }
+        int[] clamped = new int[values.length];
+        for (int i = 0; i < values.length; i++) {
+            int value = values[i];
+            if (value < MIN_PARTY_SHARE_PCT || value > MAX_PARTY_SHARE_PCT) {
+                logger.at(Level.WARNING).log("[RPGStats] " + key + " entry '" + value
+                        + "' must be between " + MIN_PARTY_SHARE_PCT + " and " + MAX_PARTY_SHARE_PCT + ". Clamping.");
+                value = Math.max(MIN_PARTY_SHARE_PCT, Math.min(MAX_PARTY_SHARE_PCT, value));
+            }
+            clamped[i] = value;
+        }
+        return clamped;
     }
 
     private static Map<String, Double> parseDoubleEntries(Set<String> entries, Map<String, Double> defaults,
@@ -1391,6 +1638,37 @@ public final class RpgStatsConfig {
                 + "\n"
                 + "# HUD XP bar (set false to disable the RPG stats HUD).\n"
                 + "hud_enabled = " + DEFAULT_HUD_ENABLED + "\n"
+                + "# XP chat messages (default " + DEFAULT_XP_CHAT_MESSAGES_ENABLED + ").\n"
+                + "# When false, XP gain messages are hidden; level-up splash still appears.\n"
+                + "xp_chat_messages_enabled = " + DEFAULT_XP_CHAT_MESSAGES_ENABLED + "\n"
+                + "\n"
+                + "# Party system settings.\n"
+                + "party_enabled = " + DEFAULT_PARTY_ENABLED + "\n"
+                + "# Max party size (default " + DEFAULT_PARTY_MAX_SIZE + ").\n"
+                + "party_max_size = " + DEFAULT_PARTY_MAX_SIZE + "\n"
+                + "# Invite timeout in seconds (default " + DEFAULT_PARTY_INVITE_TIMEOUT_SEC + ").\n"
+                + "party_invite_timeout_sec = " + DEFAULT_PARTY_INVITE_TIMEOUT_SEC + "\n"
+                + "# Party XP share mode (default \"" + DEFAULT_PARTY_XP_SHARE_MODE + "\").\n"
+                + "# Supported: scaled_killer\n"
+                + "party_xp_share_mode = \"" + DEFAULT_PARTY_XP_SHARE_MODE + "\"\n"
+                + "# XP share radius in blocks (default " + DEFAULT_PARTY_XP_SHARE_RADIUS_BLOCKS + ").\n"
+                + "# Set to 0 for no distance limit.\n"
+                + "party_xp_share_radius_blocks = " + DEFAULT_PARTY_XP_SHARE_RADIUS_BLOCKS + "\n"
+                + "# Killer XP share by party size (index 0 = size 2, index 1 = size 3, etc.).\n"
+                + "# Default: [60, 50, 40, 30]\n"
+                + "party_killer_share_by_size = [60, 50, 40, 30]\n"
+                + "# Extra member XP percent for party sizes larger than the list above (default "
+                + DEFAULT_PARTY_EXTRA_MEMBER_PCT + ").\n"
+                + "# For sizes above the list, the killer uses the last list entry and each extra member\n"
+                + "# gains party_extra_member_pct. This can increase total XP above 100%.\n"
+                + "party_extra_member_pct = " + DEFAULT_PARTY_EXTRA_MEMBER_PCT + "\n"
+                + "# Party HUD overlay enabled (default " + DEFAULT_PARTY_HUD_ENABLED + ").\n"
+                + "party_hud_enabled = " + DEFAULT_PARTY_HUD_ENABLED + "\n"
+                + "# Party HUD position offsets in pixels (top-left anchor).\n"
+                + "party_hud_offset_x = " + DEFAULT_PARTY_HUD_OFFSET_X + "\n"
+                + "party_hud_offset_y = " + DEFAULT_PARTY_HUD_OFFSET_Y + "\n"
+                + "# Party HUD refresh interval in ticks (20 ticks = 1 second).\n"
+                + "party_hud_refresh_ticks = " + DEFAULT_PARTY_HUD_REFRESH_TICKS + "\n"
                 + "\n"
                 + "# Stat caps (default " + DEFAULT_STAT_CAP + "). Values below 1 revert to default.\n"
                 + "str_cap = " + DEFAULT_STAT_CAP + "\n"

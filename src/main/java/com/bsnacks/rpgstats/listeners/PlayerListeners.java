@@ -9,6 +9,7 @@ import com.bsnacks.rpgstats.systems.EnduranceStaminaEffect;
 import com.bsnacks.rpgstats.systems.LightFootSpeedEffect;
 import com.bsnacks.rpgstats.ui.RpgStatsHud;
 import com.bsnacks.rpgstats.utils.HudHelper;
+import com.bsnacks.rpgstats.party.PartyService;
 
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.Ref;
@@ -24,12 +25,14 @@ public final class PlayerListeners {
     private final RpgStatsPlugin plugin;
     private final ComponentType<EntityStore, RpgStats> rpgStatsType;
     private final RpgStatsConfig config;
+    private final PartyService partyService;
 
     public PlayerListeners(RpgStatsPlugin plugin, ComponentType<EntityStore, RpgStats> rpgStatsType,
-                           RpgStatsConfig config) {
+                           RpgStatsConfig config, PartyService partyService) {
         this.plugin = plugin;
         this.rpgStatsType = rpgStatsType;
         this.config = config;
+        this.partyService = partyService;
     }
 
     public void onPlayerReady(PlayerReadyEvent event) {
@@ -53,6 +56,9 @@ public final class PlayerListeners {
                 + player.getDisplayName() + " | Level=" + stats.getLevel() + " XP=" + stats.getXp());
         initializeHud(player, stats);
         plugin.scheduleHudRefresh(player, "player_ready");
+        if (partyService != null) {
+            partyService.onPlayerReady(player.toHolder().getComponent(PlayerRef.getComponentType()));
+        }
     }
 
     private void initializeHud(Player player, RpgStats stats) {
@@ -62,6 +68,11 @@ public final class PlayerListeners {
         var holder = player.toHolder();
         PlayerRef playerRef = holder.getComponent(PlayerRef.getComponentType());
         if (playerRef == null) {
+            return;
+        }
+        if (HudHelper.isHudHidden(playerRef)) {
+            HudHelper.hideCustomHud(player, playerRef);
+            plugin.logDebug("RPG stats HUD hidden by player toggle: " + player.getDisplayName());
             return;
         }
         if (config != null && !config.isHudEnabled()) {
@@ -74,7 +85,7 @@ public final class PlayerListeners {
             if (existingHud != null && !HudHelper.isMultipleHudAvailable()) {
                 plugin.logDebug("Replacing custom HUD for player: " + player.getDisplayName());
             }
-            HudHelper.setCustomHud(player, playerRef, new RpgStatsHud(playerRef, rpgStatsType));
+            HudHelper.setCustomHud(player, playerRef, new RpgStatsHud(playerRef, rpgStatsType, config, partyService));
             plugin.logDebug("RPG stats HUD enabled for player: " + player.getDisplayName());
         }
         if (stats != null) {

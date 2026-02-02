@@ -11,6 +11,7 @@ public final class RpgStatsPermissions {
     public static final String STATS_SET_OTHERS = ROOT + ".set.others";
     public static final String STATS_RESET = ROOT + ".reset";
     public static final String STATS_RESET_OTHERS = ROOT + ".reset.others";
+    public static final String STATS_HUD = ROOT + ".hud";
 
     private RpgStatsPermissions() {
     }

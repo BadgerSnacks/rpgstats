@@ -1,10 +1,16 @@
 package com.bsnacks.rpgstats;
 
 import com.bsnacks.rpgstats.commands.StatsCommand;
+import com.bsnacks.rpgstats.components.NpcLevelData;
+import com.bsnacks.rpgstats.components.PartyMemberComponent;
 import com.bsnacks.rpgstats.components.RpgStats;
+import com.bsnacks.rpgstats.config.NpcLevelingConfig;
 import com.bsnacks.rpgstats.config.RpgStatsConfig;
+import com.bsnacks.rpgstats.services.NpcLevelCalculator;
 import com.bsnacks.rpgstats.logging.RpgStatsFileLogger;
 import com.bsnacks.rpgstats.listeners.PlayerListeners;
+import com.bsnacks.rpgstats.listeners.PartyDisconnectListener;
+import com.bsnacks.rpgstats.party.PartyService;
 import com.bsnacks.rpgstats.systems.DexterityMiningSpeedSystem;
 import com.bsnacks.rpgstats.systems.ExperienceOnKillSystem;
 import com.bsnacks.rpgstats.systems.StrengthDamageSystem;
@@ -28,10 +34,12 @@ import com.bsnacks.rpgstats.systems.ToolProficiencySystem;
 import com.bsnacks.rpgstats.systems.LuckyMinerSystem;
 import com.bsnacks.rpgstats.systems.MiningExperienceSystem;
 import com.bsnacks.rpgstats.systems.HudRefreshSystem;
+import com.bsnacks.rpgstats.systems.PartyHudRefreshSystem;
 
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
+import com.hypixel.hytale.server.core.event.events.player.PlayerDisconnectEvent;
 import com.hypixel.hytale.server.core.event.events.player.PlayerReadyEvent;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.modules.entitystats.EntityStatMap;
@@ -50,10 +58,16 @@ public final class RpgStatsPlugin extends JavaPlugin {
 
     private ComponentType<EntityStore, RpgStats> rpgStatsType;
     private ComponentType<EntityStore, com.bsnacks.rpgstats.components.FlameTouchAttribution> flameTouchAttributionType;
+    private ComponentType<EntityStore, NpcLevelData> npcLevelDataType;
+    private ComponentType<EntityStore, PartyMemberComponent> partyMemberType;
     private RpgStatsFileLogger fileLogger;
     private RpgStatsConfig config;
+    private NpcLevelingConfig npcLevelingConfig;
+    private NpcLevelCalculator npcLevelCalculator;
     private Path configPath;
     private HudRefreshSystem hudRefreshSystem;
+    private PartyHudRefreshSystem partyHudRefreshSystem;
+    private PartyService partyService;
 
     public RpgStatsPlugin(@Nonnull JavaPluginInit init) {
         super(init);
@@ -79,14 +93,39 @@ public final class RpgStatsPlugin extends JavaPlugin {
                 com.bsnacks.rpgstats.components.FlameTouchAttribution.CODEC);
         logInfo("Registered Flame Touch attribution component");
 
+        // NPC Level Data component for caching NPC levels
+        npcLevelDataType = getEntityStoreRegistry().registerComponent(
+                NpcLevelData.class,
+                "rpgstats:npc_level_data",
+                NpcLevelData.CODEC);
+        logInfo("Registered NPC level data component");
+
+        partyMemberType = getEntityStoreRegistry().registerComponent(
+                PartyMemberComponent.class,
+                PartyMemberComponent.COMPONENT_ID,
+                PartyMemberComponent.CODEC);
+        logInfo("Registered party member component");
+        partyService = new PartyService(this, partyMemberType);
+        applyPartyConfigToService();
+
+        // Initialize NPC leveling system
+        npcLevelingConfig = NpcLevelingConfig.load(getDataDirectory(), getLogger());
+        npcLevelCalculator = new NpcLevelCalculator(npcLevelingConfig, this);
+        logInfo("NPC leveling initialized: enabled=" + npcLevelingConfig.isEnabled()
+                + " zones=" + npcLevelingConfig.getZoneCount()
+                + " overrides=" + npcLevelingConfig.getEntityOverrideCount());
+
         //Register listeners + commands
-        PlayerListeners listeners = new PlayerListeners(this, rpgStatsType, config);
+        PlayerListeners listeners = new PlayerListeners(this, rpgStatsType, config, partyService);
+        PartyDisconnectListener partyDisconnectListener = new PartyDisconnectListener(partyService);
         getEventRegistry().registerGlobal(PlayerReadyEvent.class, listeners::onPlayerReady);
-        getCommandRegistry().registerCommand(new StatsCommand(this, rpgStatsType, config));
+        getEventRegistry().registerGlobal(PlayerDisconnectEvent.class, partyDisconnectListener::onPlayerDisconnect);
+        getCommandRegistry().registerCommand(new StatsCommand(this, rpgStatsType, config, partyService));
+        getCommandRegistry().registerCommand(new com.bsnacks.rpgstats.commands.StatsPartyCommand(this, partyService));
         // Core systems
         getEntityStoreRegistry().registerSystem(new StrengthDamageSystem(rpgStatsType, config));
         getEntityStoreRegistry().registerSystem(new DexterityMiningSpeedSystem(rpgStatsType, config));
-        getEntityStoreRegistry().registerSystem(new ExperienceOnKillSystem(rpgStatsType, flameTouchAttributionType, fileLogger, config));
+        getEntityStoreRegistry().registerSystem(new ExperienceOnKillSystem(rpgStatsType, flameTouchAttributionType, fileLogger, config, this));
         getEntityStoreRegistry().registerSystem(new ArmorProficiencySystem(rpgStatsType, config));
         getEntityStoreRegistry().registerSystem(new GlancingBlowSystem(rpgStatsType, config));
         getEntityStoreRegistry().registerSystem(new AbilityRegenSystem(rpgStatsType, config));
@@ -103,6 +142,8 @@ public final class RpgStatsPlugin extends JavaPlugin {
         // The current API only fires events for instant crafts, not bench crafting with time
         hudRefreshSystem = new HudRefreshSystem(rpgStatsType, this);
         getEntityStoreRegistry().registerSystem(hudRefreshSystem);
+        partyHudRefreshSystem = new PartyHudRefreshSystem(rpgStatsType, config);
+        getEntityStoreRegistry().registerSystem(partyHudRefreshSystem);
 
         // Lucky Shot utility - ability tracking works, effect trigger needs proper Hytale API hook
         // The tryLuckyShot() method is ready to be called when the correct event is identified
@@ -133,12 +174,22 @@ public final class RpgStatsPlugin extends JavaPlugin {
                 + " gourmand_food_bonus_per_level_pct=" + config.getGourmandFoodBonusPerLevelPct()
                 + " ability_rank_costs=" + config.getAbilityRank1Cost() + "/" + config.getAbilityRank2Cost() + "/" + config.getAbilityRank3Cost()
                 + " hud_enabled=" + config.isHudEnabled()
+                + " xp_chat_messages_enabled=" + config.isXpChatMessagesEnabled()
+                + " party_enabled=" + config.isPartyEnabled()
+                + " party_max_size=" + config.getPartyMaxSize()
+                + " party_invite_timeout_sec=" + config.getPartyInviteTimeoutSec()
+                + " party_xp_share_mode=" + config.getPartyXpShareMode()
+                + " party_xp_share_radius_blocks=" + config.getPartyXpShareRadiusBlocks()
+                + " party_hud_enabled=" + config.isPartyHudEnabled()
+                + " party_hud_offset=" + config.getPartyHudOffsetX() + "," + config.getPartyHudOffsetY()
+                + " party_hud_refresh_ticks=" + config.getPartyHudRefreshTicks()
                 + " xp_blacklist_npc_types=" + config.getXpBlacklistNpcTypes().size()
                 + " xp_blacklist_roles=" + config.getXpBlacklistRoles().size()
                 + " mining_xp_entries=" + config.getMiningXpEntryCount()
                 + " crafting_xp_entries=" + config.getCraftingXpEntryCount());
         logDebug("XP blacklist loaded: npc_types=" + config.getXpBlacklistNpcTypes().size()
                 + " roles=" + config.getXpBlacklistRoles().size());
+        applyPartyConfigToService();
         if (rpgStatsType != null) {
             applyConfigToOnlinePlayers();
         }
@@ -213,6 +264,42 @@ public final class RpgStatsPlugin extends JavaPlugin {
         if (hudRefreshSystem != null && player != null) {
             hudRefreshSystem.schedule(player, reason);
         }
+    }
+
+    private void applyPartyConfigToService() {
+        if (partyService == null || config == null) {
+            return;
+        }
+        partyService.setMaxPartySize(config.getPartyMaxSize());
+        partyService.setInviteTimeoutMs(config.getPartyInviteTimeoutSec() * 1000L);
+    }
+
+    /**
+     * Gets the NPC level calculator service.
+     */
+    public NpcLevelCalculator getNpcLevelCalculator() {
+        return npcLevelCalculator;
+    }
+
+    /**
+     * Gets the NPC leveling configuration.
+     */
+    public NpcLevelingConfig getNpcLevelingConfig() {
+        return npcLevelingConfig;
+    }
+
+    /**
+     * Gets the NPC level data component type.
+     */
+    public ComponentType<EntityStore, NpcLevelData> getNpcLevelDataType() {
+        return npcLevelDataType;
+    }
+
+    /**
+     * Gets the party service.
+     */
+    public PartyService getPartyService() {
+        return partyService;
     }
 
 }

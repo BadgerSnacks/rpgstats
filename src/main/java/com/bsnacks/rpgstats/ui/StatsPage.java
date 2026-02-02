@@ -18,6 +18,9 @@ import com.bsnacks.rpgstats.systems.GourmandSystem;
 import com.bsnacks.rpgstats.systems.ThornsSystem;
 import com.bsnacks.rpgstats.systems.ToolProficiencySystem;
 import com.bsnacks.rpgstats.systems.LuckyMinerSystem;
+import com.bsnacks.rpgstats.party.Party;
+import com.bsnacks.rpgstats.party.PartyInvite;
+import com.bsnacks.rpgstats.party.PartyService;
 
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
@@ -36,15 +39,25 @@ import com.hypixel.hytale.server.core.ui.builder.EventData;
 import com.hypixel.hytale.server.core.ui.builder.UICommandBuilder;
 import com.hypixel.hytale.server.core.ui.builder.UIEventBuilder;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
+import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 public final class StatsPage extends InteractiveCustomUIPage<StatsPage.StatsPageEventData> {
 
     private static final String PAGE_PATH = "Pages/RpgStatsPage.ui";
     private static final String TAB_STATS = "Stats";
     private static final String TAB_ABILITIES = "Abilities";
+    private static final String TAB_PARTY = "Party";
     private static final String TAB_RESET = "Reset";
     private static final String ACTION_TAB_SWITCH = "TabSwitch";
     private static final String ACTION_SPEND_STAT = "SpendStat";
@@ -52,6 +65,11 @@ public final class StatsPage extends InteractiveCustomUIPage<StatsPage.StatsPage
     private static final String ACTION_RESET_STATS = "ResetStats";
     private static final String ACTION_REFUND_ATTRIBUTES = "RefundAttributes";
     private static final String ACTION_REFUND_ABILITIES = "RefundAbilities";
+    private static final String ACTION_PARTY_CREATE = "PartyCreate";
+    private static final String ACTION_PARTY_LEAVE = "PartyLeave";
+    private static final String ACTION_PARTY_INVITE = "PartyInvite";
+    private static final String ACTION_PARTY_ACCEPT = "PartyAccept";
+    private static final String ACTION_PARTY_DECLINE = "PartyDecline";
     private static final String ABILITY_LIGHT_FOOT = "light_foot";
     private static final String ABILITY_ARMOR_PROFICIENCY = "armor_proficiency";
     private static final String ABILITY_GLANCING_BLOW = "glancing_blow";
@@ -68,13 +86,16 @@ public final class StatsPage extends InteractiveCustomUIPage<StatsPage.StatsPage
     private static final String ABILITY_FLAME_TOUCH = "flame_touch";
     private static final int DEFAULT_STAT_CAP = 25;
     private static final double BASE_REGEN_PER_SEC = 1.0;
+    private static final int PARTY_SLOT_COUNT = 8;
 
     private static final Value<String> TAB_STYLE_ACTIVE = Value.ref("Common.ui", "DefaultTextButtonStyle");
     private static final Value<String> TAB_STYLE_INACTIVE = Value.ref("Common.ui", "SecondaryTextButtonStyle");
     private final ComponentType<EntityStore, RpgStats> rpgStatsType;
     private final RpgStatsConfig config;
     private final RpgStatsPlugin plugin;
+    private final PartyService partyService;
     private String activeTab = TAB_STATS;
+    private final Map<Integer, UUID> partySlotTargets = new HashMap<>();
 
     public StatsPage(PlayerRef playerRef, ComponentType<EntityStore, RpgStats> rpgStatsType,
                      RpgStatsConfig config, RpgStatsPlugin plugin) {
@@ -82,6 +103,7 @@ public final class StatsPage extends InteractiveCustomUIPage<StatsPage.StatsPage
         this.rpgStatsType = rpgStatsType;
         this.config = config;
         this.plugin = plugin;
+        this.partyService = plugin == null ? null : plugin.getPartyService();
     }
 
     @Override
@@ -123,6 +145,26 @@ public final class StatsPage extends InteractiveCustomUIPage<StatsPage.StatsPage
         }
         if (ACTION_REFUND_ABILITIES.equalsIgnoreCase(type)) {
             handleRefundAbilities(ref, store, player);
+            return;
+        }
+        if (ACTION_PARTY_CREATE.equalsIgnoreCase(type)) {
+            handlePartyCreate(ref, store, player);
+            return;
+        }
+        if (ACTION_PARTY_LEAVE.equalsIgnoreCase(type)) {
+            handlePartyLeave(ref, store, player);
+            return;
+        }
+        if (ACTION_PARTY_INVITE.equalsIgnoreCase(type)) {
+            handlePartyInvite(ref, store, player, parseSlot(eventData.slot));
+            return;
+        }
+        if (ACTION_PARTY_ACCEPT.equalsIgnoreCase(type)) {
+            handlePartyAccept(ref, store, player, parseSlot(eventData.slot));
+            return;
+        }
+        if (ACTION_PARTY_DECLINE.equalsIgnoreCase(type)) {
+            handlePartyDecline(ref, store, player, parseSlot(eventData.slot));
         }
     }
 
@@ -135,6 +177,10 @@ public final class StatsPage extends InteractiveCustomUIPage<StatsPage.StatsPage
                 new EventData()
                         .append(StatsPageEventData.KEY_TYPE, ACTION_TAB_SWITCH)
                         .append(StatsPageEventData.KEY_TAB, TAB_ABILITIES));
+        uiEventBuilder.addEventBinding(CustomUIEventBindingType.Activating, "#TabParty",
+                new EventData()
+                        .append(StatsPageEventData.KEY_TYPE, ACTION_TAB_SWITCH)
+                        .append(StatsPageEventData.KEY_TAB, TAB_PARTY));
         uiEventBuilder.addEventBinding(CustomUIEventBindingType.Activating, "#TabReset",
                 new EventData()
                         .append(StatsPageEventData.KEY_TYPE, ACTION_TAB_SWITCH)
@@ -169,6 +215,19 @@ public final class StatsPage extends InteractiveCustomUIPage<StatsPage.StatsPage
         uiEventBuilder.addEventBinding(CustomUIEventBindingType.Activating, "#RefundAbilitiesButton",
                 new EventData()
                         .append(StatsPageEventData.KEY_TYPE, ACTION_REFUND_ABILITIES));
+
+        uiEventBuilder.addEventBinding(CustomUIEventBindingType.Activating, "#PartyCreateButton",
+                new EventData()
+                        .append(StatsPageEventData.KEY_TYPE, ACTION_PARTY_CREATE));
+        uiEventBuilder.addEventBinding(CustomUIEventBindingType.Activating, "#PartyLeaveButton",
+                new EventData()
+                        .append(StatsPageEventData.KEY_TYPE, ACTION_PARTY_LEAVE));
+
+        for (int slot = 1; slot <= PARTY_SLOT_COUNT; slot++) {
+            bindPartyButton(uiEventBuilder, "#PartyPlayer" + slot + "Invite", ACTION_PARTY_INVITE, slot);
+            bindPartyButton(uiEventBuilder, "#PartyPlayer" + slot + "Accept", ACTION_PARTY_ACCEPT, slot);
+            bindPartyButton(uiEventBuilder, "#PartyPlayer" + slot + "Decline", ACTION_PARTY_DECLINE, slot);
+        }
     }
 
     private void bindStatButton(UIEventBuilder uiEventBuilder, String buttonId, String statKey) {
@@ -185,6 +244,13 @@ public final class StatsPage extends InteractiveCustomUIPage<StatsPage.StatsPage
                         .append(StatsPageEventData.KEY_ABILITY, abilityId));
     }
 
+    private void bindPartyButton(UIEventBuilder uiEventBuilder, String buttonId, String action, int slot) {
+        uiEventBuilder.addEventBinding(CustomUIEventBindingType.Activating, buttonId,
+                new EventData()
+                        .append(StatsPageEventData.KEY_TYPE, action)
+                        .append(StatsPageEventData.KEY_SLOT, String.valueOf(slot)));
+    }
+
     private void handleTabSwitch(Ref<EntityStore> ref, Store<EntityStore> store, Player player, String tab) {
         if (tab == null || tab.isBlank()) {
             return;
@@ -193,6 +259,217 @@ public final class StatsPage extends InteractiveCustomUIPage<StatsPage.StatsPage
             return;
         }
         activeTab = tab;
+        refreshUI(ref, store, player);
+    }
+
+    private void handlePartyCreate(Ref<EntityStore> ref, Store<EntityStore> store, Player player) {
+        if (player == null || partyService == null) {
+            return;
+        }
+        UUID selfUuid = getPlayerUuid(ref, store, player);
+        if (selfUuid == null) {
+            return;
+        }
+        if (config != null && !config.isPartyEnabled()) {
+            player.sendMessage(Message.raw("Party system is disabled on this server."));
+            return;
+        }
+        PartyService.PartyResult result = partyService.createParty(selfUuid);
+        if (!result.isSuccess()) {
+            if (result.getError() == PartyService.PartyError.ALREADY_IN_PARTY) {
+                player.sendMessage(Message.raw("You are already in a party."));
+            } else {
+                player.sendMessage(Message.raw("Unable to create party right now."));
+            }
+            refreshUI(ref, store, player);
+            return;
+        }
+        player.sendMessage(Message.raw("Party created. You are the leader."));
+        if (plugin != null) {
+            plugin.logInfo("Party created via UI: leader=" + player.getDisplayName());
+        }
+        refreshUI(ref, store, player);
+    }
+
+    private void handlePartyLeave(Ref<EntityStore> ref, Store<EntityStore> store, Player player) {
+        if (player == null || partyService == null) {
+            return;
+        }
+        UUID selfUuid = getPlayerUuid(ref, store, player);
+        if (selfUuid == null) {
+            return;
+        }
+        Party party = partyService.getPartyFor(selfUuid);
+        if (party == null) {
+            player.sendMessage(Message.raw("You are not in a party."));
+            refreshUI(ref, store, player);
+            return;
+        }
+        boolean wasLeader = party.isLeader(selfUuid);
+        PartyService.PartyResult result = wasLeader
+                ? partyService.disband(selfUuid)
+                : partyService.leave(selfUuid);
+        if (!result.isSuccess()) {
+            player.sendMessage(Message.raw("Unable to update party right now."));
+            refreshUI(ref, store, player);
+            return;
+        }
+        if (wasLeader) {
+            player.sendMessage(Message.raw("Party disbanded."));
+        } else if (result.isDisbanded()) {
+            player.sendMessage(Message.raw("Party disbanded."));
+        } else {
+            player.sendMessage(Message.raw("You left the party."));
+        }
+        UUID newLeaderUuid = result.getNewLeaderUuid();
+        if (newLeaderUuid != null) {
+            PlayerRef newLeaderRef = Universe.get().getPlayer(newLeaderUuid);
+            if (newLeaderRef != null && newLeaderRef.isValid()) {
+                newLeaderRef.sendMessage(Message.raw("You are now the party leader."));
+            }
+        }
+        if (plugin != null) {
+            plugin.logInfo("Party leave via UI: player=" + player.getDisplayName());
+        }
+        refreshUI(ref, store, player);
+    }
+
+    private void handlePartyInvite(Ref<EntityStore> ref, Store<EntityStore> store, Player player, int slot) {
+        if (player == null || partyService == null) {
+            return;
+        }
+        if (slot <= 0) {
+            return;
+        }
+        UUID selfUuid = getPlayerUuid(ref, store, player);
+        if (selfUuid == null) {
+            return;
+        }
+        UUID targetUuid = partySlotTargets.get(slot);
+        if (targetUuid == null) {
+            return;
+        }
+        if (targetUuid.equals(selfUuid)) {
+            player.sendMessage(Message.raw("You cannot invite yourself."));
+            return;
+        }
+        if (config != null && !config.isPartyEnabled()) {
+            player.sendMessage(Message.raw("Party system is disabled on this server."));
+            return;
+        }
+        PartyService.PartyResult result = partyService.invite(selfUuid, targetUuid);
+        if (!result.isSuccess()) {
+            switch (result.getError()) {
+                case NOT_LEADER:
+                    player.sendMessage(Message.raw("Only the party leader can invite players."));
+                    break;
+                case PARTY_FULL:
+                    player.sendMessage(Message.raw("Your party is full."));
+                    break;
+                case TARGET_IN_PARTY:
+                    player.sendMessage(Message.raw("That player is already in a party."));
+                    break;
+                case INVITE_EXISTS:
+                    player.sendMessage(Message.raw("You already invited that player."));
+                    break;
+                default:
+                    player.sendMessage(Message.raw("Unable to send party invite right now."));
+                    break;
+            }
+            refreshUI(ref, store, player);
+            return;
+        }
+        PlayerRef targetRef = Universe.get().getPlayer(targetUuid);
+        if (targetRef != null && targetRef.isValid()) {
+            targetRef.sendMessage(Message.raw("You have been invited to a party by " + player.getDisplayName()
+                    + ". Use /sparty accept " + player.getDisplayName() + " to join."));
+        }
+        player.sendMessage(Message.raw("Party invite sent."));
+        if (plugin != null) {
+            plugin.logInfo("Party invite via UI: inviter=" + player.getDisplayName() + " target=" + targetUuid);
+        }
+        refreshUI(ref, store, player);
+    }
+
+    private void handlePartyAccept(Ref<EntityStore> ref, Store<EntityStore> store, Player player, int slot) {
+        if (player == null || partyService == null) {
+            return;
+        }
+        if (slot <= 0) {
+            return;
+        }
+        UUID selfUuid = getPlayerUuid(ref, store, player);
+        if (selfUuid == null) {
+            return;
+        }
+        UUID inviterUuid = partySlotTargets.get(slot);
+        if (inviterUuid == null) {
+            return;
+        }
+        PartyService.PartyResult result = partyService.accept(selfUuid, inviterUuid);
+        if (!result.isSuccess()) {
+            switch (result.getError()) {
+                case INVITE_NOT_FOUND:
+                    player.sendMessage(Message.raw("That invite is no longer available."));
+                    break;
+                case INVITE_EXPIRED:
+                    player.sendMessage(Message.raw("That invite has expired."));
+                    break;
+                case PARTY_FULL:
+                    player.sendMessage(Message.raw("That party is full."));
+                    break;
+                case ALREADY_IN_PARTY:
+                    player.sendMessage(Message.raw("You are already in a party."));
+                    break;
+                default:
+                    player.sendMessage(Message.raw("Unable to accept party invite right now."));
+                    break;
+            }
+            refreshUI(ref, store, player);
+            return;
+        }
+        PlayerRef inviterRef = Universe.get().getPlayer(inviterUuid);
+        if (inviterRef != null && inviterRef.isValid()) {
+            inviterRef.sendMessage(Message.raw(player.getDisplayName() + " joined your party."));
+        }
+        player.sendMessage(Message.raw("You joined the party."));
+        if (plugin != null) {
+            plugin.logInfo("Party invite accepted via UI: player=" + player.getDisplayName()
+                    + " inviter=" + inviterUuid);
+        }
+        refreshUI(ref, store, player);
+    }
+
+    private void handlePartyDecline(Ref<EntityStore> ref, Store<EntityStore> store, Player player, int slot) {
+        if (player == null || partyService == null) {
+            return;
+        }
+        if (slot <= 0) {
+            return;
+        }
+        UUID selfUuid = getPlayerUuid(ref, store, player);
+        if (selfUuid == null) {
+            return;
+        }
+        UUID inviterUuid = partySlotTargets.get(slot);
+        if (inviterUuid == null) {
+            return;
+        }
+        PartyService.PartyResult result = partyService.decline(selfUuid, inviterUuid);
+        if (!result.isSuccess()) {
+            player.sendMessage(Message.raw("That invite is no longer available."));
+            refreshUI(ref, store, player);
+            return;
+        }
+        PlayerRef inviterRef = Universe.get().getPlayer(inviterUuid);
+        if (inviterRef != null && inviterRef.isValid()) {
+            inviterRef.sendMessage(Message.raw(player.getDisplayName() + " declined your party invite."));
+        }
+        player.sendMessage(Message.raw("Party invite declined."));
+        if (plugin != null) {
+            plugin.logInfo("Party invite declined via UI: player=" + player.getDisplayName()
+                    + " inviter=" + inviterUuid);
+        }
         refreshUI(ref, store, player);
     }
 
@@ -856,17 +1133,21 @@ public final class StatsPage extends InteractiveCustomUIPage<StatsPage.StatsPage
         updateTabVisibility(uiCommandBuilder);
         updateAddButtons(uiCommandBuilder, stats, player);
         updateAbilityButtons(uiCommandBuilder, stats, player);
+        updatePartyContent(ref, store, player, uiCommandBuilder);
     }
 
     private void updateTabVisibility(UICommandBuilder uiCommandBuilder) {
         boolean statsVisible = TAB_STATS.equalsIgnoreCase(activeTab);
         boolean abilitiesVisible = TAB_ABILITIES.equalsIgnoreCase(activeTab);
+        boolean partyVisible = TAB_PARTY.equalsIgnoreCase(activeTab);
         boolean resetVisible = TAB_RESET.equalsIgnoreCase(activeTab);
         uiCommandBuilder.set("#StatsContent.Visible", statsVisible);
         uiCommandBuilder.set("#AbilitiesContent.Visible", abilitiesVisible);
+        uiCommandBuilder.set("#PartyContent.Visible", partyVisible);
         uiCommandBuilder.set("#ResetContent.Visible", resetVisible);
         uiCommandBuilder.set("#TabStats.Style", statsVisible ? TAB_STYLE_ACTIVE : TAB_STYLE_INACTIVE);
         uiCommandBuilder.set("#TabAbilities.Style", abilitiesVisible ? TAB_STYLE_ACTIVE : TAB_STYLE_INACTIVE);
+        uiCommandBuilder.set("#TabParty.Style", partyVisible ? TAB_STYLE_ACTIVE : TAB_STYLE_INACTIVE);
         uiCommandBuilder.set("#TabReset.Style", resetVisible ? TAB_STYLE_ACTIVE : TAB_STYLE_INACTIVE);
     }
 
@@ -1084,6 +1365,193 @@ public final class StatsPage extends InteractiveCustomUIPage<StatsPage.StatsPage
         uiCommandBuilder.set("#FlameTouchUpgrade.Text", flameTouchCost == 0 ? "Maxed" : String.valueOf(flameTouchCost));
     }
 
+    private void updatePartyContent(Ref<EntityStore> ref, Store<EntityStore> store, Player player,
+                                    UICommandBuilder uiCommandBuilder) {
+        partySlotTargets.clear();
+        if (player == null) {
+            uiCommandBuilder.set("#PartyCreateButton.Visible", false);
+            uiCommandBuilder.set("#PartyCreateButton.HitTestVisible", false);
+            uiCommandBuilder.set("#PartyLeaveButton.Visible", false);
+            uiCommandBuilder.set("#PartyLeaveButton.HitTestVisible", false);
+            hidePartySlots(uiCommandBuilder);
+            return;
+        }
+
+        if (config != null && !config.isPartyEnabled()) {
+            uiCommandBuilder.set("#PartyCreateButton.Visible", false);
+            uiCommandBuilder.set("#PartyCreateButton.HitTestVisible", false);
+            uiCommandBuilder.set("#PartyLeaveButton.Visible", false);
+            uiCommandBuilder.set("#PartyLeaveButton.HitTestVisible", false);
+            hidePartySlots(uiCommandBuilder);
+            return;
+        }
+
+        PartyService service = partyService;
+        if (service == null) {
+            uiCommandBuilder.set("#PartyCreateButton.Visible", false);
+            uiCommandBuilder.set("#PartyCreateButton.HitTestVisible", false);
+            uiCommandBuilder.set("#PartyLeaveButton.Visible", false);
+            uiCommandBuilder.set("#PartyLeaveButton.HitTestVisible", false);
+            hidePartySlots(uiCommandBuilder);
+            return;
+        }
+        UUID selfUuid = getPlayerUuid(ref, store, player);
+        if (selfUuid == null) {
+            uiCommandBuilder.set("#PartyCreateButton.Visible", false);
+            uiCommandBuilder.set("#PartyCreateButton.HitTestVisible", false);
+            uiCommandBuilder.set("#PartyLeaveButton.Visible", false);
+            uiCommandBuilder.set("#PartyLeaveButton.HitTestVisible", false);
+            hidePartySlots(uiCommandBuilder);
+            return;
+        }
+        Party myParty = service == null ? null : service.getPartyFor(selfUuid);
+        boolean isLeader = myParty != null && myParty.isLeader(selfUuid);
+        int maxPartySize = config == null ? PARTY_SLOT_COUNT : config.getPartyMaxSize();
+
+        boolean canCreate = myParty == null;
+        uiCommandBuilder.set("#PartyCreateButton.Visible", canCreate);
+        uiCommandBuilder.set("#PartyCreateButton.HitTestVisible", canCreate);
+        boolean canLeave = myParty != null;
+        uiCommandBuilder.set("#PartyLeaveButton.Visible", canLeave);
+        uiCommandBuilder.set("#PartyLeaveButton.HitTestVisible", canLeave);
+        if (canLeave) {
+            uiCommandBuilder.set("#PartyLeaveButton.Text", isLeader ? "Disband" : "Leave");
+        }
+
+        Set<UUID> incomingInvites = new HashSet<>();
+        if (service != null) {
+            for (PartyInvite invite : service.getInvitesFor(selfUuid)) {
+                incomingInvites.add(invite.getInviterUuid());
+            }
+        }
+
+        List<PlayerRef> players = getOnlinePlayers();
+        Store<EntityStore> currentStore = store;
+
+        for (int slot = 1; slot <= PARTY_SLOT_COUNT; slot++) {
+            PlayerRef targetRef = slot - 1 < players.size() ? players.get(slot - 1) : null;
+            if (targetRef == null || !targetRef.isValid()) {
+                setPartySlotVisible(uiCommandBuilder, slot, false);
+                continue;
+            }
+            UUID targetUuid = targetRef.getUuid();
+            partySlotTargets.put(slot, targetUuid);
+            setPartySlotVisible(uiCommandBuilder, slot, true);
+
+            String name = targetRef.getUsername();
+            uiCommandBuilder.set("#PartyPlayer" + slot + "Name.Text", name == null ? "Unknown" : name);
+
+            Integer level = readPlayerLevel(targetRef, currentStore);
+            uiCommandBuilder.set("#PartyPlayer" + slot + "Level.Text", level == null ? "LV ?" : "LV " + level);
+
+            Party targetParty = service == null ? null : service.getPartyFor(targetUuid);
+            boolean sameParty = myParty != null && targetParty != null
+                    && myParty.getPartyId().equals(targetParty.getPartyId());
+            boolean isSelf = targetUuid.equals(selfUuid);
+            boolean hasIncomingInvite = incomingInvites.contains(targetUuid);
+            boolean hasOutgoingInvite = service != null && service.hasInvite(selfUuid, targetUuid);
+
+            String status;
+            if (isSelf) {
+                status = "You";
+            } else if (hasIncomingInvite && myParty == null) {
+                status = "Invited you";
+            } else if (hasOutgoingInvite) {
+                status = "Invite sent";
+            } else if (sameParty) {
+                status = targetParty.isLeader(targetUuid) ? "Leader" : "In your party";
+            } else if (targetParty != null) {
+                status = "In a party";
+            } else {
+                status = "No party";
+            }
+            uiCommandBuilder.set("#PartyPlayer" + slot + "Status.Text", status);
+
+            boolean canInvite = !isSelf
+                    && !hasIncomingInvite
+                    && !hasOutgoingInvite
+                    && (targetParty == null)
+                    && (myParty == null || (isLeader && myParty.getSize() < Math.max(1, maxPartySize)));
+
+            boolean canAccept = hasIncomingInvite && myParty == null;
+            boolean canDecline = hasIncomingInvite && myParty == null;
+
+            uiCommandBuilder.set("#PartyPlayer" + slot + "Invite.Visible", canInvite);
+            uiCommandBuilder.set("#PartyPlayer" + slot + "Invite.HitTestVisible", canInvite);
+            uiCommandBuilder.set("#PartyPlayer" + slot + "Accept.Visible", canAccept);
+            uiCommandBuilder.set("#PartyPlayer" + slot + "Accept.HitTestVisible", canAccept);
+            uiCommandBuilder.set("#PartyPlayer" + slot + "Decline.Visible", canDecline);
+            uiCommandBuilder.set("#PartyPlayer" + slot + "Decline.HitTestVisible", canDecline);
+        }
+    }
+
+    private void hidePartySlots(UICommandBuilder uiCommandBuilder) {
+        for (int slot = 1; slot <= PARTY_SLOT_COUNT; slot++) {
+            setPartySlotVisible(uiCommandBuilder, slot, false);
+        }
+    }
+
+    private void setPartySlotVisible(UICommandBuilder uiCommandBuilder, int slot, boolean visible) {
+        uiCommandBuilder.set("#PartyPlayer" + slot + "Card.Visible", visible);
+    }
+
+    private List<PlayerRef> getOnlinePlayers() {
+        Universe universe = Universe.get();
+        if (universe == null) {
+            return Collections.emptyList();
+        }
+        List<PlayerRef> players = universe.getPlayers();
+        if (players == null || players.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return new ArrayList<>(players);
+    }
+
+    private UUID getPlayerUuid(Ref<EntityStore> ref, Store<EntityStore> store, Player player) {
+        if (player == null || store == null || ref == null) {
+            return null;
+        }
+        PlayerRef playerRef = store.getComponent(ref, PlayerRef.getComponentType());
+        if (playerRef != null) {
+            return playerRef.getUuid();
+        }
+        return null;
+    }
+
+    private int parseSlot(String raw) {
+        if (raw == null || raw.isBlank()) {
+            return 0;
+        }
+        try {
+            return Integer.parseInt(raw);
+        } catch (NumberFormatException ex) {
+            return 0;
+        }
+    }
+
+    private Integer readPlayerLevel(PlayerRef targetRef, Store<EntityStore> currentStore) {
+        if (targetRef == null || !targetRef.isValid()) {
+            return null;
+        }
+        Ref<EntityStore> targetEntity = targetRef.getReference();
+        if (targetEntity == null || !targetEntity.isValid()) {
+            return null;
+        }
+        Store<EntityStore> targetStore = targetEntity.getStore();
+        if (targetStore == null) {
+            return null;
+        }
+        if (currentStore != null && targetStore != currentStore) {
+            return null;
+        }
+        RpgStats stats = targetStore.getComponent(targetEntity, rpgStatsType);
+        if (stats == null) {
+            return null;
+        }
+        stats.migrateIfNeeded();
+        return stats.getLevel();
+    }
+
     private void setAddButtonState(UICommandBuilder uiCommandBuilder, String buttonId, boolean enabled) {
         uiCommandBuilder.set(buttonId + ".HitTestVisible", enabled);
     }
@@ -1180,6 +1648,7 @@ public final class StatsPage extends InteractiveCustomUIPage<StatsPage.StatsPage
         static final String KEY_STAT = "Stat";
         static final String KEY_TAB = "Tab";
         static final String KEY_ABILITY = "Ability";
+        static final String KEY_SLOT = "Slot";
 
         public static final BuilderCodec<StatsPageEventData> CODEC =
                 BuilderCodec.builder(StatsPageEventData.class, StatsPageEventData::new)
@@ -1187,11 +1656,13 @@ public final class StatsPage extends InteractiveCustomUIPage<StatsPage.StatsPage
                         .append(new KeyedCodec<>(KEY_STAT, Codec.STRING), (d, v) -> d.stat = v, d -> d.stat).add()
                         .append(new KeyedCodec<>(KEY_TAB, Codec.STRING), (d, v) -> d.tab = v, d -> d.tab).add()
                         .append(new KeyedCodec<>(KEY_ABILITY, Codec.STRING), (d, v) -> d.ability = v, d -> d.ability).add()
+                        .append(new KeyedCodec<>(KEY_SLOT, Codec.STRING), (d, v) -> d.slot = v, d -> d.slot).add()
                         .build();
 
         public String type;
         public String stat;
         public String tab;
         public String ability;
+        public String slot;
     }
 }

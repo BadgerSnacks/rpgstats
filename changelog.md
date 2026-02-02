@@ -1,5 +1,29 @@
 # Changelog
 
+## 0.7.0
+
+### Changed
+- `config_version` bumped to 16.
+- XP gain chat messages are disabled by default (toggle via config).
+
+### Added
+- Config option `xp_chat_messages_enabled` (default false) to toggle XP gain chat messages.
+- Party system: `/sparty` commands for create/invite/accept/decline/leave/kick/disband/info.
+- Party UI tab with create/leave actions and player cards.
+- Party HUD overlay (top-left) showing party members, level, health percent, and out-of-range indicator.
+- Party XP sharing for kill and mining XP with radius checks and scaled-killer distribution.
+
+## 0.6.1
+
+### Changed
+- `config_version` bumped to 15.
+
+### Added
+- /stats hud command to toggle the RPG stats HUD per player.
+- Party HUD overlay showing party members, levels, and health percentage with out-of-range indicator.
+- Party HUD config options: `party_hud_offset_x`, `party_hud_offset_y`, `party_hud_refresh_ticks`.
+- Party XP sharing for kills and mining using the scaled-killer distribution and share radius rules.
+
 ## 0.6.0
 
 ### Added
@@ -7,11 +31,25 @@
 - Configurable max ability level via `max_ability_level` in `config.toml` (default 3, range 1-10).
   - Allows server admins to let players upgrade abilities beyond rank 3.
   - Rank costs beyond rank 3 equal the rank number (rank 4 costs 4 points, rank 5 costs 5 points, etc.).
+- **Level-up splash notification** using EventTitleUtil for prominent on-screen celebration with chat message fallback.
+- **NPC Leveling System** for calculating mob levels based on HP and zone configuration:
+  - `npc_leveling.toml` config file with zone definitions and entity overrides.
+  - Zone-based level ranges (e.g., Emerald Grove L1-15, Howling Sands L15-50).
+  - Entity override support with wildcards (e.g., `hytale:trork_*:8:false`).
+  - Deterministic level variation using entity UUID for consistency.
+  - Level caching for performance with configurable expiration.
+  - NPC levels logged in kill XP debug output.
+- `NpcLevelData` component for caching calculated NPC levels.
+- `NpcLevelCalculator` service for centralized level computation.
 
 ### Changed
 - `config_version` bumped to 13.
+- `RpgStatsHud.ui` rewritten with inline styles to fix CustomUI crash (removed external Common.ui reference).
+- `LevelUpSplash.java` now uses EventTitleUtil for splash screen with graceful fallback to chat messages.
+- `ExperienceOnKillSystem` now calculates and logs NPC level for each kill.
 
 ### Fixed
+- **CustomUI document loading crash** on player join - caused by reference to non-existent Common.ui file.
 - Config loading crash when upgrading from older versions missing new config keys (null pointer in `stripQuotes`).
 
 ### Deferred

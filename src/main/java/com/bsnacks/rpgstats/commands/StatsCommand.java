@@ -4,11 +4,13 @@ import com.bsnacks.rpgstats.RpgStatsPlugin;
 import com.bsnacks.rpgstats.components.RpgStats;
 import com.bsnacks.rpgstats.config.RpgStatsConfig;
 import com.bsnacks.rpgstats.commands.StatsAddCommand;
+import com.bsnacks.rpgstats.commands.StatsHudCommand;
 import com.bsnacks.rpgstats.commands.StatsReloadCommand;
 import com.bsnacks.rpgstats.commands.StatsResetCommand;
 import com.bsnacks.rpgstats.commands.StatsSetCommand;
 import com.bsnacks.rpgstats.permissions.RpgStatsPermissions;
 import com.bsnacks.rpgstats.ui.StatsPage;
+import com.bsnacks.rpgstats.party.PartyService;
 
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.Ref;
@@ -28,9 +30,8 @@ public final class StatsCommand extends CommandBase {
     private final RpgStatsPlugin plugin;
     private final ComponentType<EntityStore, RpgStats> rpgStatsType;
     private final RpgStatsConfig config;
-
     public StatsCommand(RpgStatsPlugin plugin, ComponentType<EntityStore, RpgStats> rpgStatsType,
-                        RpgStatsConfig config) {
+                        RpgStatsConfig config, PartyService partyService) {
         super("stats", "Show your RPG stats.");
         setPermissionGroup(GameMode.Adventure);
         requirePermission(RpgStatsPermissions.STATS_VIEW);
@@ -40,6 +41,7 @@ public final class StatsCommand extends CommandBase {
         addSubCommand(new StatsAddCommand(plugin, rpgStatsType, config));
         addSubCommand(new StatsSetCommand(plugin, rpgStatsType, config));
         addSubCommand(new StatsResetCommand(plugin, rpgStatsType, config));
+        addSubCommand(new StatsHudCommand(plugin, rpgStatsType, config));
         addSubCommand(new StatsReloadCommand(plugin));
     }
 
